@@ -1,0 +1,14 @@
+# local node overrides
+conf/node.properties
+conf/logging.properties
+
+# runtime state
+db/
+node.log
+node.log.lck
+
+# brainstorming session artifacts
+.superpowers/
+
+# IDE
+.idea/
