@@ -30,7 +30,7 @@ Everything below was checked against the shipped `signum-node.jar` (v3.9.11) on 
 | `--headless` is an existing CLI flag; with it no Swing GUI or MetricsPanel starts. | No node patch needed for a headless default. |
 | `/*` is a catch-all servlet with no SPA fallback — deep links 404 on hard reload. | Client-side routing must use hash history. |
 | The node release zip contains `signum-node.jar`, `conf/node-default.properties`, `conf/logging-default.properties`, `html/api-doc` and the GPL `LICENSE.txt`. | One download covers every fetched artifact. |
-| The mock network uses address prefix `TS` and network name `Signum-LOCAL-MOCK`. | The UI must not hardcode the `S` prefix. |
+| The mock network uses address prefix `TS` and network name `Signum-LOCAL-MOCK`. | The UI must not hardcode the `S` prefix; `getNetworkInfo` reports both, and SignumJS's `Address` honours the prefix. |
 | Forging via `submitNonce` credits the forger 10,000 SIGNA per block. | Seeding later is trivial; no faucet infrastructure needed. |
 | Several `submitNonce` calls in quick succession yield only one block. | The later seeding script needs a measured delay between blocks. |
 | `getState` crashed on fresh mock chains (NPE on the missing burn-account row). Fixed in `signum-node` commit `dcb7e5d2` on `feat/new-web-ui`; **not in any release**. | The start page uses `getBlockchainStatus` for now. |
@@ -46,8 +46,9 @@ Everything below was checked against the shipped `signum-node.jar` (v3.9.11) on 
 6. **Node artifacts are fetched, never committed** — jar, `html/api-doc`, and the two `*-default.properties` files. Only `conf/node.properties`, our mock configuration, belongs to us.
 7. **The node version is pinned** in `.signum-node-version`. Raising it is a deliberate commit. The bootstrap accepts `--latest` as an explicit opt-in for trying the newest release.
 8. **The bootstrap never installs a runtime system-wide.** It uses an existing Bun or Node if one is present, and otherwise fetches a pinned Bun into `.tools/`, following the node repository's own `downloadBun` precedent.
-9. **`getBlockchainStatus` as the data source**, switching to `getState` once the sandbox pins a node release containing the fix.
-10. **Headless by default**, GUI opt-in via a start-script flag.
+9. **SignumJS is the API layer**, not a hand-written client. It carries the whole chain vocabulary the sandbox will need — signing, address handling, amounts, contracts — instead of us re-deriving it call by call. `ChainService.query<T>()` remains available as an escape hatch for request types without a typed method, `getState` among them.
+10. **`getBlockchainStatus` as the data source**, switching to `getState` once the sandbox pins a node release containing the fix.
+11. **Headless by default**, GUI opt-in via a start-script flag.
 
 ## Architecture
 
@@ -63,7 +64,7 @@ signum-sandbox/
     components/ui/            vendored: Card, AnimatedNumber, Pill, …
     components/startpage/     new
     i18n/locales/             ten locales
-    lib/nodeApi.ts            typed node API client
+    lib/ledger.ts             SignumJS client, configured once
     routes/                   hash router
   conf/node.properties        mock node configuration
   scripts/
@@ -113,7 +114,9 @@ Licensing resolves along the same seam: the repository is MIT for our own code, 
 
 ## Components
 
-**`lib/nodeApi.ts`** — typed wrappers over `/api` returning parsed responses. Owns the request-type strings and response types. Knows nothing about React.
+**`lib/ledger.ts`** — creates the SignumJS client against the node host and exports it. The single place that knows the node address, so switching between the Vite proxy in development and the same origin in production touches one file. This step only reads, so it uses `createReadOnlyClient`; signing later swaps in the full client without changing call sites.
+
+SignumJS also supplies what would otherwise be hand-written helpers: `Amount` converts between planck and SIGNA and carries the currency symbol, `ChainTime` converts chain timestamps against the Signum epoch, and `Address` formats account identifiers with the network's own prefix. None of these are reimplemented here.
 
 **`hooks/useNodeStatus.ts`** — exposes node state to components. Subscribes to `/events`; while the socket is connected it does not poll, and it falls back to polling when the socket drops. This mirrors the reference's `useNodeQuery` pattern.
 
@@ -123,7 +126,7 @@ Licensing resolves along the same seam: the repository is MIT for our own code, 
 
 ## Data flow
 
-`getConstants` is fetched once for network name and address prefix. `getBlockchainStatus` supplies the live values. A `block` event on the WebSocket invalidates the status query.
+`network.getNetworkInfo()` is fetched once for network name, address prefix and decimal places. `network.getBlockchainStatus()` supplies the live values. A `block` event on the WebSocket invalidates the status query.
 
 Tiles in this step:
 
@@ -133,7 +136,7 @@ Tiles in this step:
 | Last Block | `lastBlockTimestamp`, rendered as elapsed time |
 | Cumulative Difficulty | `cumulativeDifficulty` |
 
-The header shows `version` from the same response and `networkName` from `getConstants`. `isScanning` drives a scanning indicator.
+The header shows `version` from the same response and `networkName` from `getNetworkInfo`. `isScanning` drives a scanning indicator.
 
 Three tiles is deliberately sparse. Cumulative difficulty in particular is a developer-facing number rather than a newcomer-friendly one; it earns its place only until richer metrics unblock. The left panel is expected to be revisited once `getState` is available, and the layout is explicitly not final.
 
@@ -156,13 +159,13 @@ Audio is on by default with a toggle in the header, persisted in localStorage, m
 
 - **Node unreachable:** the page renders a dedicated state naming the expected address, not empty tiles.
 - **WebSocket down:** the connection dot reflects it and polling takes over. Not an error state — a mock node is restarted often.
-- **A single API call fails:** the affected tile shows a placeholder and the rest of the page keeps working. A failing `getConstants` must not blank the header.
+- **A single API call fails:** the affected tile shows a placeholder and the rest of the page keeps working. A failing `getNetworkInfo` must not blank the header.
 - **Chain reset:** height going backwards is legitimate in a sandbox. Derived values must not assume monotonic growth.
 - **Bootstrap failures:** an unreachable release, a checksum mismatch or a missing asset must abort with the failing URL named. Half-populated artifacts are worse than none.
 
 ## Testing
 
-- **Vitest** for pure functions: elapsed-time and large-number formatting, mapping an API response to tile values, the placeholder decision, and the node-unreachable/stale-socket state derivation. Named `*.utils.test.ts` after the reference convention. State decisions therefore live in testable functions rather than inline in JSX.
+- **Vitest** for pure functions: mapping an API response to tile values, the placeholder decision, and the node-unreachable/stale-socket state derivation. Named `*.utils.test.ts` after the reference convention. State decisions therefore live in testable functions rather than inline in JSX. Amount and timestamp formatting are not tested here — they belong to SignumJS.
 - **Smoke script** in `scripts/smoke`: start the node headless from the bootstrapped jar, assert that `/`, `/api-doc/` and `/api?requestType=getBlockchainStatus` respond, then shut down. This catches a broken `API.UI_Dir` or a missing build output — the class of failure unit tests cannot see.
 
 Component rendering is **not** tested in this step. The reference project runs Vitest with `environment: 'node'` and has neither jsdom nor a testing library; adding that stack is a deliberate follow-up decision rather than something inherited. Keeping render-state logic in pure functions covers most of the risk without it.
