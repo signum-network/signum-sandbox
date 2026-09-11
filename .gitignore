@@ -1,14 +1,25 @@
-# local node overrides
-conf/node.properties
-conf/logging.properties
+# Artifacts pulled from the signum-node release by scripts/bootstrap
+signum-node.jar
+html/
+conf/node-default.properties
+conf/logging-default.properties
 
-# runtime state
+# Vendored toolchain
+.tools/
+
+# Node runtime state
 db/
 node.log
 node.log.lck
 
-# brainstorming session artifacts
-.superpowers/
+# Build
+build/
+dist/
+node_modules/
 
 # IDE
 .idea/
+.vscode/
+
+# Brainstorming session artifacts
+.superpowers/
