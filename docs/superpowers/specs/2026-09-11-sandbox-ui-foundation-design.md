@@ -30,6 +30,8 @@ Everything below was checked against the shipped `signum-node.jar` (v3.9.11) on 
 | `--headless` is an existing CLI flag; with it no Swing GUI or MetricsPanel starts. | No node patch needed for a headless default. |
 | `/*` is a catch-all servlet with no SPA fallback — deep links 404 on hard reload. | Client-side routing must use hash history. |
 | The node release zip contains `signum-node.jar`, `conf/node-default.properties`, `conf/logging-default.properties`, `html/api-doc` and the GPL `LICENSE.txt`. | One download covers every fetched artifact. |
+| `/events` is served on the dedicated WebSocket port (6877 on the mock network) **and** on the API port, because both connectors share one servlet context. Both deliver byte-identical events. | The UI can follow the page origin instead of hardcoding a second port. |
+| The socket needs no subscription message; it emits exactly four events — `CONNECTED`, `BLOCK_PUSHED`, `PENDING_TRANSACTIONS_ADDED`, `HEARTBEAT` — and debounces block events by one second. | Only two of them may trigger a refetch; refetching on `HEARTBEAT` would restore polling at the heartbeat interval. |
 | The mock network uses address prefix `TS` and network name `Signum-LOCAL-MOCK`. | The UI must not hardcode the `S` prefix; `getNetworkInfo` reports both, and SignumJS's `Address` honours the prefix. |
 | Forging via `submitNonce` credits the forger 10,000 SIGNA per block. | Seeding later is trivial; no faucet infrastructure needed. |
 | Several `submitNonce` calls in quick succession yield only one block. | The later seeding script needs a measured delay between blocks. |
@@ -126,7 +128,7 @@ SignumJS also supplies what would otherwise be hand-written helpers: `Amount` co
 
 ## Data flow
 
-`network.getNetworkInfo()` is fetched once for network name, address prefix and decimal places. `network.getBlockchainStatus()` supplies the live values. A `block` event on the WebSocket invalidates the status query.
+`network.getNetworkInfo()` is fetched once for network name, address prefix and decimal places. `network.getBlockchainStatus()` supplies the live values. A `BLOCK_PUSHED` or `PENDING_TRANSACTIONS_ADDED` event invalidates the status query; `CONNECTED` and `HEARTBEAT` are ignored, and that filter is a tested pure function rather than a condition buried in an effect.
 
 Tiles in this step:
 

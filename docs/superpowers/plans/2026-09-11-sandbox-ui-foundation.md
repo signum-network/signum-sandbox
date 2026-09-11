@@ -40,7 +40,7 @@ Gitignored artifacts after bootstrap: `signum-node.jar`, `conf/node-default.prop
 ### Task 1: Project scaffold
 
 **Files:**
-- Create: `package.json`, `tsconfig.json`, `tsconfig.node.json`, `vite.config.ts`, `index.html`, `.signum-node-version`, `src/main.tsx`, `src/index.css`
+- Create: `package.json`, `tsconfig.json`, `vite.config.ts`, `index.html`, `.signum-node-version`, `src/vite-env.d.ts`, `src/main.tsx`, `src/index.css`
 
 - [ ] **Step 1: Create `.signum-node-version`**
 
@@ -175,7 +175,25 @@ export default defineConfig({
 </html>
 ```
 
-- [ ] **Step 6: Create a placeholder `src/main.tsx` and `src/index.css`**
+- [ ] **Step 6: Create `src/vite-env.d.ts`**
+
+Without this, `import.meta.env.VITE_NODE_URL` and `VITE_WS_URL` fail to
+type-check under `strict`.
+
+```ts
+/// <reference types="vite/client" />
+
+interface ImportMetaEnv {
+  readonly VITE_NODE_URL?: string
+  readonly VITE_WS_URL?: string
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv
+}
+```
+
+- [ ] **Step 7: Create a placeholder `src/main.tsx` and `src/index.css`**
 
 `src/index.css`:
 
@@ -197,15 +215,15 @@ createRoot(document.getElementById('root')!).render(
 )
 ```
 
-- [ ] **Step 7: Install and verify the build**
+- [ ] **Step 8: Install and verify the build**
 
 Run: `bun install && bun run build`
 Expected: build succeeds and `html/sandbox/index.html` exists. Verify with `ls html/sandbox/`.
 
-- [ ] **Step 8: Commit**
+- [ ] **Step 9: Commit**
 
 ```bash
-git add package.json bun.lock tsconfig.json vite.config.ts index.html .signum-node-version src/main.tsx src/index.css
+git add package.json bun.lock tsconfig.json vite.config.ts index.html .signum-node-version src/vite-env.d.ts src/main.tsx src/index.css
 git commit -m "feat: scaffold the Vite project building into html/sandbox"
 ```
 
@@ -989,17 +1007,97 @@ git commit -m "feat: pure derivation of the start page view state"
 Connects SignumJS and the node's WebSocket to the pure functions from Task 7.
 
 **Files:**
-- Create: `src/hooks/useNodeSocket.ts`, `src/hooks/useNodeState.ts`, `src/hooks/useBlockChime.ts`
+- Create: `src/lib/socketEvents.ts`, `src/lib/socketEvents.test.ts`, `src/hooks/useNodeSocket.ts`, `src/hooks/useNodeState.ts`, `src/hooks/useBlockChime.ts`
 
-- [ ] **Step 1: Create `src/hooks/useNodeSocket.ts`**
+- [ ] **Step 1: Write the failing test for the event filter**
+
+The node emits exactly four events, verified from `WebsocketEventNames.java`:
+`CONNECTED`, `BLOCK_PUSHED`, `PENDING_TRANSACTIONS_ADDED`, `HEARTBEAT`. Only two
+of them change chain state. Refetching on `HEARTBEAT` would reintroduce the very
+polling the socket is meant to replace, at the heartbeat interval.
+
+`src/lib/socketEvents.test.ts`:
+
+```ts
+import { describe, expect, it } from 'vitest'
+import { isRefetchTrigger, parseEvent } from './socketEvents'
+
+describe('parseEvent', () => {
+  it('reads the event name out of the envelope', () => {
+    expect(parseEvent('{"e":"BLOCK_PUSHED","p":{"localHeight":7}}')).toBe('BLOCK_PUSHED')
+  })
+
+  it('returns null for anything unparseable', () => {
+    expect(parseEvent('not json')).toBeNull()
+    expect(parseEvent('{"noEventField":1}')).toBeNull()
+  })
+})
+
+describe('isRefetchTrigger', () => {
+  it.each([
+    ['BLOCK_PUSHED', true],
+    ['PENDING_TRANSACTIONS_ADDED', true],
+    ['HEARTBEAT', false],
+    ['CONNECTED', false],
+    [null, false],
+    ['SOMETHING_NEW', false],
+  ])('%s -> %s', (event, expected) => {
+    expect(isRefetchTrigger(event)).toBe(expected)
+  })
+})
+```
+
+- [ ] **Step 2: Run it to confirm it fails**
+
+Run: `bun run test src/lib/socketEvents.test.ts`
+Expected: FAIL — `Failed to resolve import "./socketEvents"`.
+
+- [ ] **Step 3: Create `src/lib/socketEvents.ts`**
+
+```ts
+/**
+ * The node's SIP-50 event envelope is { e: <name>, p: <payload> }.
+ * The full set of names comes from brs/web/api/ws/common/WebsocketEventNames.java.
+ */
+const REFETCH_ON = new Set(['BLOCK_PUSHED', 'PENDING_TRANSACTIONS_ADDED'])
+
+export function parseEvent(raw: string): string | null {
+  try {
+    const parsed = JSON.parse(raw) as { e?: unknown }
+    return typeof parsed.e === 'string' ? parsed.e : null
+  } catch {
+    return null
+  }
+}
+
+/** CONNECTED and HEARTBEAT carry no new chain state, so they must not trigger a refetch. */
+export function isRefetchTrigger(event: string | null): boolean {
+  return event !== null && REFETCH_ON.has(event)
+}
+```
+
+- [ ] **Step 4: Run the test**
+
+Run: `bun run test src/lib/socketEvents.test.ts`
+Expected: all tests pass.
+
+- [ ] **Step 5: Create `src/hooks/useNodeSocket.ts`**
 
 ```ts
 import { useEffect, useRef, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
+import { isRefetchTrigger, parseEvent } from '@/lib/socketEvents'
 
 /**
- * SIP-50 event socket. The node serves it next to the API, so it follows the
- * page origin; in development Vite proxies it.
+ * SIP-50 event socket.
+ *
+ * The node exposes /events on its dedicated WebSocket port (6877 here) and, as
+ * a side effect of both connectors sharing one servlet context, on the API port
+ * as well - verified against v3.9.11: both deliver byte-identical events. We
+ * follow the page origin, which keeps the socket same-origin in production and
+ * lets the Vite proxy handle development, with VITE_WS_URL as an escape hatch.
+ *
+ * No subscription message is needed; events arrive on connect.
  */
 export function useNodeSocket() {
   const [connected, setConnected] = useState(false)
@@ -1012,11 +1110,14 @@ export function useNodeSocket() {
 
     const open = () => {
       if (disposed) return
-      const url = `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}/events`
+      const scheme = window.location.protocol === 'https:' ? 'wss' : 'ws'
+      const url = import.meta.env.VITE_WS_URL ?? `${scheme}://${window.location.host}/events`
       socket = new WebSocket(url)
       socket.onopen = () => setConnected(true)
-      socket.onmessage = () => {
-        void queryClient.invalidateQueries({ queryKey: ['blockchainStatus'] })
+      socket.onmessage = (event) => {
+        if (isRefetchTrigger(parseEvent(String(event.data)))) {
+          void queryClient.invalidateQueries({ queryKey: ['blockchainStatus'] })
+        }
       }
       socket.onclose = () => {
         setConnected(false)
@@ -1037,7 +1138,7 @@ export function useNodeSocket() {
 }
 ```
 
-- [ ] **Step 2: Create `src/hooks/useNodeState.ts`**
+- [ ] **Step 6: Create `src/hooks/useNodeState.ts`**
 
 ```ts
 import { useQuery } from '@tanstack/react-query'
@@ -1097,7 +1198,7 @@ export function useNodeState(): { state: NodeState; nodeHost: string } {
 }
 ```
 
-- [ ] **Step 3: Create `src/hooks/useBlockChime.ts`**
+- [ ] **Step 7: Create `src/hooks/useBlockChime.ts`**
 
 The spec asks for a chime on every new block. It belongs in its own hook rather
 than in the socket, which must stay a transport concern — and it must not fire
@@ -1119,7 +1220,7 @@ export function useBlockChime(height: number | null) {
 }
 ```
 
-- [ ] **Step 4: Verify it type-checks and that the field really arrives**
+- [ ] **Step 8: Verify it type-checks and that the field really arrives**
 
 Run: `bun run build`
 Expected: build succeeds.
@@ -1129,11 +1230,19 @@ Run: `curl -s "http://localhost:6876/api?requestType=getBlockchainStatus" | grep
 Expected: prints `lastBlockTimestamp`. If it does not, the cast is wrong and the
 value must come from `ledger.network.getMiningInfo().timestamp` instead.
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 9: Verify the heartbeat does not cause refetches**
+
+Run: `bun run test src/lib/socketEvents.test.ts`
+Expected: pass — this is the guard. Additionally, with the page open and the
+socket connected, watch the browser's network panel for longer than the
+heartbeat interval (30s by default): no `getBlockchainStatus` request may fire
+until a block is actually forged.
+
+- [ ] **Step 10: Commit**
 
 ```bash
-git add src/hooks
-git commit -m "feat: node state hook over SignumJS and the event socket"
+git add src/lib/socketEvents.ts src/lib/socketEvents.test.ts src/hooks
+git commit -m "feat: node state hook over SignumJS and the filtered event socket"
 ```
 
 ---
