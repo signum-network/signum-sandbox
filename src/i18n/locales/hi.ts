@@ -1,0 +1,12 @@
+export default {
+  tagline: 'आपकी अपनी ब्लॉकचेन। कोई लागत नहीं, कोई जोखिम नहीं, कोई अड़चन नहीं।',
+  status: { live: 'लाइव', polling: 'पोलिंग', offline: 'ऑफ़लाइन', scanning: 'स्कैन जारी' },
+  panel: { nodeState: 'नोड स्थिति' },
+  tile: { height: 'ब्लॉक ऊँचाई', lastBlock: 'अंतिम ब्लॉक', difficulty: 'संचयी कठिनाई' },
+  entry: {
+    apiDocs: { title: 'API दस्तावेज़', description: 'पूरे JSON API को इंटरैक्टिव रूप से आज़माएँ' },
+    dashboard: { title: 'मॉक नोड डैशबोर्ड', description: 'ब्लॉक बनाएँ, खाते और लेनदेन देखें' },
+    comingSoon: 'जल्द आ रहा है',
+  },
+  unreachable: { title: '{{host}} पर कोई नोड नहीं', description: 'इसे ./scripts/start.sh से शुरू करें' },
+} as const
