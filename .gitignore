@@ -3,6 +3,7 @@ signum-node.jar
 html/
 conf/node-default.properties
 conf/logging-default.properties
+LICENSE-signum-node.txt
 
 # Vendored toolchain
 .tools/
@@ -16,6 +17,7 @@ node.log.lck
 build/
 dist/
 node_modules/
+tsconfig.tsbuildinfo
 
 # IDE
 .idea/
