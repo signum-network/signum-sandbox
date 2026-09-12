@@ -13,7 +13,13 @@ export default {
     back: 'Página inicial',
     tab: { transactions: 'Transações', blocks: 'Blocos', accounts: 'Contas' },
     search: { placeholder: 'Id, endereço ou nome' },
-    forge: { action: 'Forjar', requested: 'Bloco solicitado', auto: 'auto', forger: 'Forjador' },
+    forge: {
+      action: 'Forjar',
+      requested: 'Bloco solicitado',
+      failed: 'Falha ao forjar — {{message}}',
+      auto: 'auto',
+      forger: 'Forjador',
+    },
     empty: {
       title: 'Ainda não aconteceu nada',
       description: 'Crie uma conta e depois forje um bloco para lhe dar fundos.',
@@ -81,6 +87,7 @@ export default {
       reset: 'Reiniciar a cadeia',
       resetConfirm: 'Isto apaga todos os blocos, contas e transações. Continuar?',
       resetDone: 'A cadeia voltou ao início',
+      resetAlreadyAtStart: 'Nada para reiniciar — a cadeia já está no início',
       resetManual: 'Nenhuma das chamadas de reinício funcionou. Execute ./scripts/reset.sh',
       height: 'Altura',
     },

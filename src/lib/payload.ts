@@ -31,6 +31,28 @@ function src44Fields(description: string): PayloadField[] | null {
   }
 }
 
+/**
+ * `recipients` is shared by two attachments the node tells apart, not this
+ * decoder: sendMoneyMulti puts `[id, planck]` pairs (per
+ * Attachment$PaymentMultiOutCreation.putMyJson), sendMoneyMultiSame puts a flat
+ * list of id strings (per Attachment$PaymentMultiSameOutCreation.putMyJson,
+ * whose backing field is an `ArrayList<Long>` serialised one string per
+ * recipient — confirmed by decompiling the pinned node jar). Destructuring the
+ * flat form as a pair would read an id's first two characters as an id and
+ * invent an amount from the rest, so the shape is checked before anything is
+ * unpacked. The flat form carries no per-recipient amount — the transaction's
+ * own amount is split between the ids, and that split isn't in the attachment
+ * — so only ids are listed for it, never a number.
+ */
+function recipientsSummary(recipients: unknown[]): string {
+  if (recipients.length > 0 && Array.isArray(recipients[0])) {
+    return (recipients as [string, string][])
+      .map(([id, planck]) => `${id}: ${Amount.fromPlanck(planck).getSigna()} SIGNA`)
+      .join(', ')
+  }
+  return (recipients as string[]).join(', ')
+}
+
 export function decodePayload(tx: Transaction): PayloadField[] {
   const a = asRecord(tx)
   const fields: PayloadField[] = []
@@ -51,10 +73,7 @@ export function decodePayload(tx: Transaction): PayloadField[] {
   }
 
   if (Array.isArray(a.recipients)) {
-    const list = (a.recipients as [string, string][])
-      .map(([id, planck]) => `${id}: ${Amount.fromPlanck(planck).getSigna()} SIGNA`)
-      .join(', ')
-    fields.push({ label: 'recipients', value: list })
+    fields.push({ label: 'recipients', value: recipientsSummary(a.recipients) })
   }
 
   if (typeof a.frequency === 'number') {

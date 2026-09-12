@@ -14,14 +14,17 @@ export function Header({
   onOpenDrawer: (drawer: 'send' | 'chain' | 'help') => void
 }) {
   const { t } = useTranslation()
-  const { forgeOnce, busy, auto, setAuto, canForge } = useForge(accounts.forger)
+  const { forgeOnce, busy, auto, setAuto, canForge, error } = useForge(accounts.forger)
   const [requested, setRequested] = useState(false)
 
   // submitNonce reports success even when several calls collapse into a single
   // block, so the button promises a request, not a block. The height beside it
-  // is what actually answers whether one appeared.
+  // is what actually answers whether one appeared. A request and a failure are
+  // mutually exclusive, so "requested" only lights up once forgeOnce actually
+  // succeeded — on failure useForge's own error takes that spot instead.
   const forgeClicked = async () => {
-    await forgeOnce()
+    const ok = await forgeOnce()
+    if (!ok) return
     setRequested(true)
     setTimeout(() => setRequested(false), 3000)
   }
@@ -55,6 +58,11 @@ export function Header({
         {requested && (
           <span className="text-[10px] text-[var(--muted)]">{t('console.forge.requested')}</span>
         )}
+        {!requested && error && (
+          <span className="text-[10px] text-[var(--mag)]">
+            {t('console.forge.failed', { message: error })}
+          </span>
+        )}
 
         <select
           className="border bg-transparent px-2 py-1 text-[10px] text-[var(--fg)]"
@@ -69,7 +77,12 @@ export function Header({
         </select>
 
         <label className="flex items-center gap-1 text-[10px] text-[var(--muted)]">
-          <input type="checkbox" checked={auto} onChange={(e) => setAuto(e.target.checked)} />
+          <input
+            type="checkbox"
+            checked={auto}
+            disabled={!canForge}
+            onChange={(e) => setAuto(e.target.checked)}
+          />
           {t('console.forge.auto')}
         </label>
 

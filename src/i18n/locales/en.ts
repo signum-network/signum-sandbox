@@ -24,7 +24,13 @@ export default {
     back: 'Start page',
     tab: { transactions: 'Transactions', blocks: 'Blocks', accounts: 'Accounts' },
     search: { placeholder: 'Id, address or name' },
-    forge: { action: 'Forge', requested: 'Block requested', auto: 'auto', forger: 'Forger' },
+    forge: {
+      action: 'Forge',
+      requested: 'Block requested',
+      failed: 'Forge failed — {{message}}',
+      auto: 'auto',
+      forger: 'Forger',
+    },
     empty: {
       title: 'Nothing has happened yet',
       description: 'Create an account, then forge a block to give it funds.',
@@ -92,6 +98,7 @@ export default {
       reset: 'Reset the chain',
       resetConfirm: 'This deletes every block, account and transaction. Continue?',
       resetDone: 'The chain is back at the start',
+      resetAlreadyAtStart: 'Nothing to reset — the chain is already at the start',
       resetManual: 'Neither reset call worked. Run ./scripts/reset.sh',
       height: 'Height',
     },

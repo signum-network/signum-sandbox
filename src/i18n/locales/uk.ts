@@ -13,7 +13,13 @@ export default {
     back: 'Початкова сторінка',
     tab: { transactions: 'Транзакції', blocks: 'Блоки', accounts: 'Рахунки' },
     search: { placeholder: 'Id, адреса або назва' },
-    forge: { action: 'Кувати', requested: 'Блок запитано', auto: 'авто', forger: 'Форджер' },
+    forge: {
+      action: 'Кувати',
+      requested: 'Блок запитано',
+      failed: 'Помилка кування — {{message}}',
+      auto: 'авто',
+      forger: 'Форджер',
+    },
     empty: {
       title: 'Поки що нічого не сталося',
       description: 'Створіть рахунок, а потім викуйте блок, щоб дати йому кошти.',
@@ -81,6 +87,7 @@ export default {
       reset: 'Скинути блокчейн',
       resetConfirm: 'Це видалить кожен блок, рахунок і транзакцію. Продовжити?',
       resetDone: 'Блокчейн знову на початку',
+      resetAlreadyAtStart: 'Нічого скидати — ланцюг вже на початку',
       resetManual: 'Жоден із викликів скидання не спрацював. Виконайте ./scripts/reset.sh',
       height: 'Висота',
     },

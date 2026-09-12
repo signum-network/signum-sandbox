@@ -17,6 +17,7 @@
   "dependencies": {
     "@signumjs/core": "^3.3.4",
     "@signumjs/crypto": "3.3.4",
+    "@signumjs/http": "3.3.4",
     "@signumjs/standards": "3.3.4",
     "@signumjs/util": "^3.3.4",
     "@tanstack/react-query": "^5.80.0",

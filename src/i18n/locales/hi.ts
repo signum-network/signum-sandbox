@@ -13,7 +13,13 @@ export default {
     back: 'प्रारंभ पृष्ठ',
     tab: { transactions: 'लेनदेन', blocks: 'ब्लॉक', accounts: 'खाते' },
     search: { placeholder: 'Id, पता या नाम' },
-    forge: { action: 'फ़ोर्ज करें', requested: 'ब्लॉक का अनुरोध किया गया', auto: 'ऑटो', forger: 'फ़ोर्जर' },
+    forge: {
+      action: 'फ़ोर्ज करें',
+      requested: 'ब्लॉक का अनुरोध किया गया',
+      failed: 'फ़ोर्ज विफल — {{message}}',
+      auto: 'ऑटो',
+      forger: 'फ़ोर्जर',
+    },
     empty: {
       title: 'अभी तक कुछ नहीं हुआ है',
       description: 'एक खाता बनाएँ, फिर उसे धन देने के लिए एक ब्लॉक फ़ोर्ज करें।',
@@ -81,6 +87,7 @@ export default {
       reset: 'चेन रीसेट करें',
       resetConfirm: 'इससे हर ब्लॉक, खाता और लेनदेन मिट जाएगा। जारी रखें?',
       resetDone: 'चेन फिर से शुरुआत में है',
+      resetAlreadyAtStart: 'रीसेट करने के लिए कुछ नहीं — चेन पहले से ही शुरुआत में है',
       resetManual: 'दोनों में से कोई भी रीसेट कॉल काम नहीं आया। ./scripts/reset.sh चलाएँ',
       height: 'ऊँचाई',
     },

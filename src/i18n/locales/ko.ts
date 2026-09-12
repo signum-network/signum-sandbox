@@ -13,7 +13,13 @@ export default {
     back: '시작 페이지',
     tab: { transactions: '트랜잭션', blocks: '블록', accounts: '계정' },
     search: { placeholder: 'Id, 주소 또는 이름' },
-    forge: { action: '생성', requested: '블록 생성 요청됨', auto: '자동', forger: '포저' },
+    forge: {
+      action: '생성',
+      requested: '블록 생성 요청됨',
+      failed: '생성 실패 — {{message}}',
+      auto: '자동',
+      forger: '포저',
+    },
     empty: {
       title: '아직 아무 일도 없습니다',
       description: '계정을 만든 다음 블록을 생성해 자금을 지급하세요.',
@@ -81,6 +87,7 @@ export default {
       reset: '체인 초기화',
       resetConfirm: '모든 블록, 계정, 트랜잭션이 삭제됩니다. 계속하시겠습니까?',
       resetDone: '체인이 처음 상태로 돌아갔습니다',
+      resetAlreadyAtStart: '초기화할 필요 없음 — 체인이 이미 시작 상태입니다',
       resetManual: '두 초기화 호출 모두 실패했습니다. ./scripts/reset.sh 를 실행하세요',
       height: '높이',
     },

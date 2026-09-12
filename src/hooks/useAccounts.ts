@@ -79,7 +79,16 @@ export function useAccounts(): AccountStore {
     // later meet outside the sandbox, and it should look like what it is.
     create: (name) => store(name, generateMnemonic()),
     importPassphrase: (name, passphrase) => store(name, passphrase),
-    remove: (id) => persist(removeAccount(accounts, id)),
+    remove: (id) => {
+      persist(removeAccount(accounts, id))
+      // A forger id left pointing at a removed account would linger in
+      // localStorage forever, leaving auto-forge switched on with nothing to
+      // forge with and no way to tell why.
+      if (id === forgerId) {
+        setForgerId(null)
+        window.localStorage.removeItem(FORGER_KEY)
+      }
+    },
     setForger: (id) => {
       setForgerId(id)
       window.localStorage.setItem(FORGER_KEY, id)

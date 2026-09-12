@@ -14,7 +14,13 @@ export function ChainDrawer({ height }: { height: number | null }) {
     setBusy(true)
     const outcome = await resetChain(height ?? 0)
     setBusy(false)
-    setNotice(outcome.succeeded ? t('console.chain.resetDone') : t('console.chain.resetManual'))
+    setNotice(
+      outcome.kind === 'succeeded'
+        ? t('console.chain.resetDone')
+        : outcome.kind === 'alreadyAtStart'
+          ? t('console.chain.resetAlreadyAtStart')
+          : t('console.chain.resetManual'),
+    )
     void client.invalidateQueries()
   }
 

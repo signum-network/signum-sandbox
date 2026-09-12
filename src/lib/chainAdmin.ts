@@ -1,5 +1,5 @@
 import { ledger } from './ledger'
-import { resetPlan, type ResetStage } from './resetPlan'
+import { resetPlan, START_HEIGHT, type ResetStage } from './resetPlan'
 
 /** Matches API.adminKeyList in conf/node.properties. */
 const ADMIN_KEY = 'sandbox'
@@ -26,10 +26,16 @@ export const fullReset = () => admin('fullReset')
 
 export const clearUnconfirmed = () => admin('clearUnconfirmedTransactions')
 
-export type ResetOutcome = { succeeded: ResetStage } | { succeeded: null }
-
-/** Genesis plus block 1 — what a chain looks like once it is back at the start. */
-const START_HEIGHT = 2
+/**
+ * `alreadyAtStart` is not a failure: resetPlan already found nothing to do, so
+ * there was nothing for either call to get wrong. Only an empty plan that was
+ * actually attempted and still didn't land the chain at START_HEIGHT is
+ * `failed` — that's the case with no explanation left but scripts/reset.sh.
+ */
+export type ResetOutcome =
+  | { kind: 'succeeded'; stage: ResetStage }
+  | { kind: 'alreadyAtStart' }
+  | { kind: 'failed' }
 
 const currentHeight = async () =>
   (await ledger.network.getBlockchainStatus()).numberOfBlocks
@@ -40,17 +46,20 @@ const currentHeight = async () =>
  * database untouched, because Flyway's clean is disabled in the node build. A
  * stage that lies is exactly why success is measured, not reported.
  *
- * A null result means the caller has to tell the user to run scripts/reset.sh.
+ * A `failed` result means the caller has to tell the user to run scripts/reset.sh.
  */
 export async function resetChain(height: number): Promise<ResetOutcome> {
-  for (const stage of resetPlan(height)) {
+  const stages = resetPlan(height)
+  if (stages.length === 0) return { kind: 'alreadyAtStart' }
+
+  for (const stage of stages) {
     try {
       if (stage === 'popOff') await popOffTo(1)
       else await fullReset()
-      if ((await currentHeight()) <= START_HEIGHT) return { succeeded: stage }
+      if ((await currentHeight()) <= START_HEIGHT) return { kind: 'succeeded', stage }
     } catch {
       // Fall through to the next stage.
     }
   }
-  return { succeeded: null }
+  return { kind: 'failed' }
 }

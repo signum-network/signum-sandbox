@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Amount } from '@signumjs/util'
 import type { AccountStore } from '@/hooks/useAccounts'
 import { ledger } from '@/lib/ledger'
+import { isUnknownAccount } from '@/lib/accountStatus'
 import type { Query } from '@/lib/search'
 import { Identicon } from '../Identicon'
 
@@ -118,9 +119,15 @@ function Balance({ id }: { id: string }) {
   })
 
   // An account that has never received anything does not exist on chain yet,
-  // and the node answers with an error rather than a zero balance.
+  // and the node answers with errorCode 5 rather than a zero balance — but
+  // with retry:false, any other failure (the node restarting, a timeout) also
+  // lands here, and that is not evidence the account is absent. Only the
+  // node's own "unknown account" answer earns the claim; anything else says
+  // nothing rather than a false one.
   if (balance.isError) {
-    return <span className="text-[var(--muted)]">{t('console.accounts.notOnChain')}</span>
+    return isUnknownAccount(balance.error) ? (
+      <span className="text-[var(--muted)]">{t('console.accounts.notOnChain')}</span>
+    ) : null
   }
   if (!balance.data) return null
   return <span>{Amount.fromPlanck(balance.data.balanceNQT).getSigna()} SIGNA</span>

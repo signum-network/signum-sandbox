@@ -18,4 +18,12 @@ describe('resetPlan', () => {
     expect(resetPlan(1)).toEqual([])
     expect(resetPlan(0)).toEqual([])
   })
+
+  it('has nothing to do exactly at the start height (genesis plus block 1)', () => {
+    expect(resetPlan(2)).toEqual([])
+  })
+
+  it('has something to do just past the start height', () => {
+    expect(resetPlan(3)).toEqual(['popOff', 'fullReset'])
+  })
 })

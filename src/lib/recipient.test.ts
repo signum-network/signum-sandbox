@@ -49,4 +49,30 @@ describe('knownPublicKey', () => {
       knownPublicKey(bob.address, accounts),
     )
   })
+
+  it('finds a recipient by a lowercased address', () => {
+    expect(knownPublicKey(bob.address.toLowerCase(), accounts)).toBe(
+      generateSignKeys(bob.passphrase).publicKey,
+    )
+  })
+
+  it('finds a recipient by an address with the network prefix stripped', () => {
+    const withoutPrefix = bob.address.replace(/^TS-/, '')
+    expect(knownPublicKey(withoutPrefix, accounts)).toBe(
+      generateSignKeys(bob.passphrase).publicKey,
+    )
+  })
+
+  it('finds a recipient by the extended Reed-Solomon form that carries the public key', () => {
+    // Modern Signum wallets and SRC44 hand out this form. It is what
+    // `Address.fromReedSolomonAddress`/`.create` calls "extended": the
+    // canonical address plus a base36-encoded public key suffix.
+    const { publicKey } = generateSignKeys(bob.passphrase)
+    const extended = Address.fromPublicKey(publicKey, 'TS').getReedSolomonAddressExtended(true)
+    expect(knownPublicKey(extended, accounts)).toBe(publicKey)
+  })
+
+  it('falls back to raw comparison for a value Address.create cannot parse', () => {
+    expect(knownPublicKey('not-an-address-at-all', accounts)).toBeUndefined()
+  })
 })

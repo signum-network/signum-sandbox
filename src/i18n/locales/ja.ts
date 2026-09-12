@@ -13,7 +13,13 @@ export default {
     back: 'スタートページ',
     tab: { transactions: '取引', blocks: 'ブロック', accounts: 'アカウント' },
     search: { placeholder: 'Id、アドレスまたは名前' },
-    forge: { action: '生成', requested: 'ブロックをリクエスト済み', auto: '自動', forger: 'フォージャー' },
+    forge: {
+      action: '生成',
+      requested: 'ブロックをリクエスト済み',
+      failed: '生成に失敗しました — {{message}}',
+      auto: '自動',
+      forger: 'フォージャー',
+    },
     empty: {
       title: 'まだ何も起きていません',
       description: 'アカウントを作成し、ブロックを生成して資金を与えてください。',
@@ -81,6 +87,7 @@ export default {
       reset: 'チェーンをリセット',
       resetConfirm: 'すべてのブロック、アカウント、取引が削除されます。続行しますか？',
       resetDone: 'チェーンは最初の状態に戻りました',
+      resetAlreadyAtStart: 'リセットの必要はありません — チェーンはすでに最初の状態です',
       resetManual: 'どちらのリセット呼び出しも失敗しました。./scripts/reset.sh を実行してください',
       height: '高さ',
     },

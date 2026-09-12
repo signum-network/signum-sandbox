@@ -36,13 +36,20 @@ describe('decodePayload', () => {
     ])
   })
 
-  it('lists multi-out recipients', () => {
+  it('lists multi-out recipients with their individual amounts', () => {
     const fields = decodePayload(
       tx({ recipients: [['123', '100000000'], ['456', '200000000']] }),
     )
     expect(fields).toEqual([
       { label: 'recipients', value: '123: 1 SIGNA, 456: 2 SIGNA' },
     ])
+  })
+
+  it('lists multi-same-out recipients by id only, inventing no amount', () => {
+    // sendMoneyMultiSame's attachment is a flat array of id strings, not
+    // [id, amount] pairs — the per-recipient share isn't in the attachment.
+    const fields = decodePayload(tx({ recipients: ['12345', '67890'] }))
+    expect(fields).toEqual([{ label: 'recipients', value: '12345, 67890' }])
   })
 
   it('describes a subscription by its interval', () => {

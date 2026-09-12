@@ -13,7 +13,13 @@ export default {
     back: '起始页',
     tab: { transactions: '交易', blocks: '区块', accounts: '账户' },
     search: { placeholder: 'Id、地址或名称' },
-    forge: { action: '铸造', requested: '已请求铸造区块', auto: '自动', forger: '铸块者' },
+    forge: {
+      action: '铸造',
+      requested: '已请求铸造区块',
+      failed: '铸造失败 — {{message}}',
+      auto: '自动',
+      forger: '铸块者',
+    },
     empty: {
       title: '还什么都没发生',
       description: '先创建一个账户，再铸造一个区块给它注入资金。',
@@ -81,6 +87,7 @@ export default {
       reset: '重置链',
       resetConfirm: '这将删除每一个区块、账户和交易。是否继续？',
       resetDone: '链已回到起点',
+      resetAlreadyAtStart: '无需重置 — 链已经处于起始状态',
       resetManual: '两个重置调用都没有成功。请运行 ./scripts/reset.sh',
       height: '高度',
     },

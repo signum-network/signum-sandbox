@@ -13,7 +13,13 @@ export default {
     back: 'Начальная страница',
     tab: { transactions: 'Транзакции', blocks: 'Блоки', accounts: 'Счета' },
     search: { placeholder: 'Id, адрес или имя' },
-    forge: { action: 'Ковать', requested: 'Блок запрошен', auto: 'авто', forger: 'Кузнец' },
+    forge: {
+      action: 'Ковать',
+      requested: 'Блок запрошен',
+      failed: 'Ошибка ковки — {{message}}',
+      auto: 'авто',
+      forger: 'Кузнец',
+    },
     empty: {
       title: 'Пока ничего не произошло',
       description: 'Создайте счёт, затем выкуйте блок, чтобы дать ему средства.',
@@ -81,6 +87,7 @@ export default {
       reset: 'Сбросить цепочку',
       resetConfirm: 'Это удалит все блоки, счета и транзакции. Продолжить?',
       resetDone: 'Цепочка снова в начале',
+      resetAlreadyAtStart: 'Нечего сбрасывать — цепочка уже в начале',
       resetManual: 'Ни один из вызовов сброса не сработал. Выполните ./scripts/reset.sh',
       height: 'Высота',
     },

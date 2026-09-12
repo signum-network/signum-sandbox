@@ -13,7 +13,13 @@ export default {
     back: 'Startseite',
     tab: { transactions: 'Transaktionen', blocks: 'Blöcke', accounts: 'Accounts' },
     search: { placeholder: 'ID, Adresse oder Name' },
-    forge: { action: 'Forgen', requested: 'Block angefordert', auto: 'auto', forger: 'Forger' },
+    forge: {
+      action: 'Forgen',
+      requested: 'Block angefordert',
+      failed: 'Forgen fehlgeschlagen — {{message}}',
+      auto: 'auto',
+      forger: 'Forger',
+    },
     empty: {
       title: 'Noch ist nichts passiert',
       description: 'Lege einen Account an und forge einen Block, um ihn zu füllen.',
@@ -81,6 +87,7 @@ export default {
       reset: 'Chain zurücksetzen',
       resetConfirm: 'Das löscht jeden Block, Account und jede Transaktion. Fortfahren?',
       resetDone: 'Die Chain steht wieder am Anfang',
+      resetAlreadyAtStart: 'Nichts zurückzusetzen — die Chain ist bereits am Anfang',
       resetManual: 'Keiner der beiden Reset-Aufrufe hat funktioniert. Führe ./scripts/reset.sh aus',
       height: 'Höhe',
     },
