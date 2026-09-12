@@ -34,7 +34,8 @@ Everything below was checked against the shipped `signum-node.jar` (v3.9.11) on 
 | The socket needs no subscription message; it emits exactly four events — `CONNECTED`, `BLOCK_PUSHED`, `PENDING_TRANSACTIONS_ADDED`, `HEARTBEAT` — and debounces block events by one second. | Only two of them may trigger a refetch; refetching on `HEARTBEAT` would restore polling at the heartbeat interval. |
 | The mock network uses address prefix `TS` and network name `Signum-LOCAL-MOCK`. | The UI must not hardcode the `S` prefix; `getNetworkInfo` reports both, and SignumJS's `Address` honours the prefix. |
 | Forging via `submitNonce` credits the forger 10,000 SIGNA per block. | Seeding later is trivial; no faucet infrastructure needed. |
-| Several `submitNonce` calls in quick succession yield only one block. | The later seeding script needs a measured delay between blocks. |
+| `submitNonce` must be called **without** `accountId`. Passing it takes the node down its passthrough-mining path, which fails with `failed to create generator` once the secret's account exists on chain. | The forge button and the seeding script omit the parameter. |
+| Spaced roughly five seconds apart, each `submitNonce` yields exactly one block. Rapid-fire calls all report success but collapse into a single block, since they register competing generators for the same height. | Seeding forges in a loop with a delay, and the UI must not promise one block per click. |
 | `getState` crashed on fresh mock chains (NPE on the missing burn-account row). Fixed in `signum-node` commit `dcb7e5d2` on `feat/new-web-ui`; **not in any release**. | The start page uses `getBlockchainStatus` for now. |
 | `signum-node` vendors a pinned Bun into its build directory via its own `downloadBun`/`setupBun` Gradle tasks. | Precedent for vendoring the toolchain instead of installing it system-wide. |
 
