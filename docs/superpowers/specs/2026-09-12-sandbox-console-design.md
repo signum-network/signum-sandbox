@@ -26,7 +26,9 @@ Checked against the pinned `signum-node.jar` (v3.9.11) API description and the i
 | `getNetworkInfo` is not an API request type; SignumJS derives it from `getConstants`. | Nothing changes for us — the existing call already works — but the network-name safety rail rides on `getConstants` data. |
 | Read-only endpoints for the three views all exist: `getUnconfirmedTransactions`, `getAccountTransactions`, `getBlocks`, `getBlock`, `getTransaction`, `getAccount`, `getAliases`, `getAsset`, `getAccountAssets`, `getAccountSubscriptions`. | The inspector needs no node change. |
 
-Unverified and to be checked during implementation: how `fullReset` and `popOff` actually behave on the offline mock network. `fullReset` is documented as "resets the node and forces a resync" — with no peers there is nothing to resync from, which is exactly what we want, but it has not been run yet. If it turns out to leave the node in an unusable state, reset falls back to a documented script that stops the node, removes `db/` and restarts it.
+Unverified and to be checked during implementation: how `fullReset` and `popOff` actually behave on the offline mock network. `fullReset` is documented as "resets the node and forces a resync" — with no peers there is nothing to resync from, which is exactly what we want, but it has not been run yet.
+
+Reset therefore has three stages, and the first one that works wins. `popOff` down to height 1 is the preferred path: a sandbox chain is almost always shorter than the 1440-block limit, so rewinding to the start *is* a full reset, and it needs neither a restart nor a second mechanism. `fullReset` is the fallback for a chain that has grown past that limit. And `scripts/reset.sh` — stop the node, remove `db/`, start it again — is the last resort the console names when neither API call worked.
 
 ## Decisions
 
@@ -41,7 +43,9 @@ Unverified and to be checked during implementation: how `fullReset` and `popOff`
 9. **Identicons via pinned `hashicon@0.3.0`**, so an address looks the same here as in the wallets. SRC44 avatars are optional and fall back to the identicon.
 10. **The tour drives real actions and waits for real chain state**, rather than narrating over the UI.
 11. **The passphrase safety rail:** passphrases live in plain `localStorage` because they are worthless on a mock chain — and the account store refuses to operate when the connected node is not the mock network.
-12. **Delivery in two layers:** the developer core first, the newcomer layer on top.
+12. **Scenario accounts use obviously fake passphrases** (`sandbox-alice`, `sandbox-miner`); accounts created in the console get real generated mnemonics.
+13. **Reset walks three stages** — `popOff` to height 1, then `fullReset`, then a documented script.
+14. **Delivery in two layers:** the developer core first, the newcomer layer on top.
 
 ## Layout
 
@@ -89,7 +93,7 @@ The expanded detail decodes the payload rather than restating the JSON: a plain 
 
 **Auto-forge** produces a block on a fixed interval, **off by default**. It is what a developer switches on so their application's transactions confirm without switching windows; leaving it off by default preserves the newcomer's cause-and-effect between pressing a button and seeing a block.
 
-**Reset** calls `fullReset` behind a confirmation, then returns the console to its empty state, which offers the scenarios again.
+**Reset** sits behind a confirmation and walks the three stages above — `popOff` to height 1, then `fullReset`, then the script it tells you to run. Afterwards the console is back in its empty state, offering the scenarios again.
 
 **Advanced tools** are hidden behind a switch in the Chain drawer. It currently holds `popOff` with −1, −10 and −100 blocks. The same switch is the place for any later tool that would confuse more than it helps.
 
@@ -113,7 +117,11 @@ Messages get first-class treatment because attaching real payload to a transacti
 
 ## Accounts
 
-An account is a name, a passphrase, and everything derived from it. Creation generates a passphrase from `@signumjs/crypto`'s mnemonic dictionary; import accepts an existing one. Accounts are stored in `localStorage` under a versioned key.
+An account is a name, a passphrase, and everything derived from it. Accounts are stored in `localStorage` under a versioned key.
+
+**Two kinds of passphrase, on purpose.** Scenario accounts carry deliberately fake ones — `sandbox-alice`, `sandbox-bob`, `sandbox-miner`. They are deterministic, short enough to type into an `.env` without copying, published in the documentation, and their worthlessness is self-evident: a passphrase anyone can guess is emptied within seconds of touching a real chain, which is precisely why it is safe here and nowhere else. Hardhat and Ganache use the same trick with their published mnemonics. The console labels them as such wherever they appear.
+
+Accounts **created in the console** get a real generated mnemonic from `@signumjs/crypto`'s dictionary instead. This is where the tour teaches something, and a toy passphrase would teach the wrong thing: you should see once what a real seed looks like, that it *is* the account rather than a password guarding it, that nobody can restore it for you, and that it sits here in plain text in your browser only because here it is worth nothing. Import accepts any existing passphrase.
 
 An account only exists on chain once it has received something, so a freshly created account shows as *not yet on chain* until it does — this is a fact about Signum worth surfacing rather than hiding, and beginner mode explains it.
 
@@ -147,7 +155,7 @@ Two scenarios ship:
 
 **Full House** — a chain that looks lived-in: SRC44 profiles on every account, a token with metadata distributed across several holders, two or three aliases, encrypted messages between two accounts, a payroll multi-out, and a running subscription. Roughly twenty transactions. This is the chain on which every view has something to show, and it doubles as the feature demonstration.
 
-Both use a fixed miner account and deterministic passphrases, published in the documentation, so addresses survive a reset and can be written into an application's configuration and test fixtures.
+Both use a fixed miner account and the deliberately fake passphrases described above, published in the documentation, so addresses survive a reset and can be written into an application's configuration and test fixtures.
 
 Avatars: SRC44's avatar field references IPFS, which an offline sandbox cannot rely on. Scenarios leave it empty and the UI renders a `hashicon` identicon from the address. Exactly one account carries a real pinned CID to demonstrate the field, and falls back to the identicon if it cannot be fetched.
 
@@ -158,6 +166,8 @@ The console asks once, on first entry: new here, or an old hand? The answer sets
 **Beginner mode on** adds help icons next to every domain term (the vendored `InfoTooltip` already exists for this), adds a sentence of context to each view, and offers the tour on entry. It changes what is explained, not what is reachable — every tab and every drawer stays available, because a beginner who wanders off should find a working console, not a locked one.
 
 **The tour asks you to act and waits for the chain to answer.** It highlights the forge button and says "press it"; the step completes when the height actually increases. It opens the Send drawer with fields pre-filled and says "send Alice 100 SIGNA to Bob"; the step completes when the transaction appears in the stream. Then: "it is unconfirmed — forge again and watch what happens to it." Nothing is simulated; every step is a real transaction on a real chain that costs nothing.
+
+**Creating an account is its own chapter**, and the one that carries the most weight, because it is where a newcomer meets the concepts that matter outside the sandbox too. The tour walks through creating a real account and explains, at the moment each becomes visible: what a passphrase is and that it *is* the account rather than a password protecting it; that the address is derived from it, so the same passphrase always yields the same account; that nobody can restore it — no reset link, no support; that the sandbox keeps it in plain text in the browser because here it is worthless, and that this is exactly what a real wallet must not do; and finally that the account does not exist on chain until it has received something. The chapter ends by funding the new account from the miner and watching it appear.
 
 This couples the tour to the rest of the UI, and that coupling is designed in from the start rather than bolted on: components that the tour needs to highlight or pre-fill expose that capability, and steps complete against observed state rather than against clicks. The tour content itself belongs to the second delivery layer, but the hooks are built with the components.
 
@@ -183,7 +193,7 @@ src/
     ledger.ts                   extended: signing client alongside the read-only one
     accounts.ts                 the account store, incl. the network rail
     transactions.ts             one typed function per composer action
-    chainAdmin.ts               forge, auto-forge, reset, popOff
+    chainAdmin.ts               forge, auto-forge, the staged reset, popOff
     scenario/
       types.ts                  the step vocabulary
       runner.ts                 executes a step list, reports progress
@@ -196,6 +206,7 @@ src/
     useTour.ts                  step state, completion against chain state
   tour/steps.ts                 the tour as data
 scripts/seed.sh                 runs a scenario from the terminal
+scripts/reset.sh                last-resort reset: stop, remove db/, start
 ```
 
 Files stay under 500 lines, per the repository's own rule. The split above is drawn so that each unit answers one question: `payload.ts` knows how to read an attachment, `runner.ts` knows how to execute a step, `search.ts` knows what an input means, and none of them knows anything about React.
@@ -213,7 +224,7 @@ Sending goes through the full SignumJS client: build, sign locally with the send
 - **A transaction is rejected** — insufficient balance, malformed field — the form keeps its input and states the node's error message. Nothing is lost to a failed send.
 - **The forged block does not arrive.** `submitNonce` reports success even when several calls collapse into one block, so the forge button reports "block requested" and lets the height speak, rather than promising a block per click.
 - **A scenario step fails** mid-run. The run stops at that step, names it, and leaves the chain as it is. A half-populated chain is confusing but recoverable; silently continuing past a failure is worse.
-- **Reset fails or leaves the node unusable.** The console says so and points at the documented manual path.
+- **Reset fails.** Each stage falls through to the next, and if all of them fail the console names `scripts/reset.sh` as the manual path rather than leaving the user guessing.
 - **The node is not the mock network.** The safety rail engages; the console renders in read-only mode with an explanation instead of half-working.
 - **An encrypted message cannot be decrypted** because the sandbox holds neither key. The detail says exactly that instead of showing an error.
 
