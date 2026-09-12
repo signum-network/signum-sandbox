@@ -2,19 +2,22 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { SandboxAccount } from '@/lib/accounts'
 import { issueToken } from '@/lib/send'
+import { useFromAccount } from '@/hooks/useFromAccount'
 import { AccountSelect, Field, SubmitButton, TextArea, TextInput } from './fields'
 
 export function TokenIssueForm({
   accounts,
+  forgerId,
   onSent,
   onError,
 }: {
   accounts: SandboxAccount[]
+  forgerId: string | null
   onSent: () => void
   onError: (message: string) => void
 }) {
   const { t } = useTranslation()
-  const [issuerId, setIssuerId] = useState('')
+  const [issuerId, setIssuerId] = useFromAccount(forgerId)
   const [tokenName, setTokenName] = useState('')
   const [tokenQuantity, setTokenQuantity] = useState('1000')
   const [tokenDecimals, setTokenDecimals] = useState('0')

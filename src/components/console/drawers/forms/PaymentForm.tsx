@@ -3,21 +3,25 @@ import { useTranslation } from 'react-i18next'
 import type { SandboxAccount } from '@/lib/accounts'
 import type { Contacts } from '@/lib/contacts'
 import { resolveRecipientPublicKey, sendPayment } from '@/lib/send'
+import { useFromAccount } from '@/hooks/useFromAccount'
+import { Toggle } from '@/components/console/Toggle'
 import { AccountSelect, Field, RecipientPicker, SubmitButton, TextArea, TextInput } from './fields'
 
 export function PaymentForm({
   accounts,
+  forgerId,
   contacts,
   onSent,
   onError,
 }: {
   accounts: SandboxAccount[]
+  forgerId: string | null
   contacts: Contacts
   onSent: () => void
   onError: (message: string) => void
 }) {
   const { t } = useTranslation()
-  const [fromId, setFromId] = useState('')
+  const [fromId, setFromId] = useFromAccount(forgerId)
   const [to, setTo] = useState('')
   const [amount, setAmount] = useState('')
   const [attach, setAttach] = useState(false)
@@ -53,10 +57,9 @@ export function PaymentForm({
       <Field label={t('console.send.amount')}>
         <TextInput value={amount} onChange={setAmount} placeholder="100" />
       </Field>
-      <label className="mb-2 flex items-center gap-2 text-[10px] text-[var(--muted)]">
-        <input type="checkbox" checked={attach} onChange={(e) => setAttach(e.target.checked)} />
-        {t('console.send.attach')}
-      </label>
+      <div className="mb-2">
+        <Toggle checked={attach} onChange={setAttach} label={t('console.send.attach')} />
+      </div>
       {attach && (
         <Field label={t('console.send.message')}>
           <TextArea value={message} onChange={setMessage} />

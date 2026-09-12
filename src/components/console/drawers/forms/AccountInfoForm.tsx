@@ -2,19 +2,22 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { SandboxAccount } from '@/lib/accounts'
 import { setAccountInfo } from '@/lib/send'
+import { useFromAccount } from '@/hooks/useFromAccount'
 import { AccountSelect, Field, SubmitButton, TextArea, TextInput } from './fields'
 
 export function AccountInfoForm({
   accounts,
+  forgerId,
   onSent,
   onError,
 }: {
   accounts: SandboxAccount[]
+  forgerId: string | null
   onSent: () => void
   onError: (message: string) => void
 }) {
   const { t } = useTranslation()
-  const [accountId, setAccountId] = useState('')
+  const [accountId, setAccountId] = useFromAccount(forgerId)
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
   const [busy, setBusy] = useState(false)

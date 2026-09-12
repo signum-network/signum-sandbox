@@ -63,22 +63,68 @@ export function SendDrawer({ store, contacts }: { store: AccountStore; contacts:
       </div>
 
       {kind === 'payment' && (
-        <PaymentForm accounts={store.accounts} contacts={contacts} onSent={onSent} onError={setNotice} />
+        <PaymentForm
+          accounts={store.accounts}
+          forgerId={store.forgerId}
+          contacts={contacts}
+          onSent={onSent}
+          onError={setNotice}
+        />
       )}
       {kind === 'multiOut' && (
-        <MultiOutForm accounts={store.accounts} contacts={contacts} onSent={onSent} onError={setNotice} />
+        <MultiOutForm
+          accounts={store.accounts}
+          forgerId={store.forgerId}
+          contacts={contacts}
+          onSent={onSent}
+          onError={setNotice}
+        />
       )}
       {kind === 'message' && (
-        <MessageForm accounts={store.accounts} contacts={contacts} onSent={onSent} onError={setNotice} />
+        <MessageForm
+          accounts={store.accounts}
+          forgerId={store.forgerId}
+          contacts={contacts}
+          onSent={onSent}
+          onError={setNotice}
+        />
       )}
-      {kind === 'accountInfo' && <AccountInfoForm accounts={store.accounts} onSent={onSent} onError={setNotice} />}
-      {kind === 'tokenIssue' && <TokenIssueForm accounts={store.accounts} onSent={onSent} onError={setNotice} />}
+      {kind === 'accountInfo' && (
+        <AccountInfoForm
+          accounts={store.accounts}
+          forgerId={store.forgerId}
+          onSent={onSent}
+          onError={setNotice}
+        />
+      )}
+      {kind === 'tokenIssue' && (
+        <TokenIssueForm
+          accounts={store.accounts}
+          forgerId={store.forgerId}
+          onSent={onSent}
+          onError={setNotice}
+        />
+      )}
       {kind === 'tokenTransfer' && (
-        <TokenTransferForm accounts={store.accounts} contacts={contacts} onSent={onSent} onError={setNotice} />
+        <TokenTransferForm
+          accounts={store.accounts}
+          forgerId={store.forgerId}
+          contacts={contacts}
+          onSent={onSent}
+          onError={setNotice}
+        />
       )}
-      {kind === 'alias' && <AliasForm accounts={store.accounts} onSent={onSent} onError={setNotice} />}
+      {kind === 'alias' && (
+        <AliasForm accounts={store.accounts} forgerId={store.forgerId} onSent={onSent} onError={setNotice} />
+      )}
       {kind === 'subscription' && (
-        <SubscriptionForm accounts={store.accounts} contacts={contacts} onSent={onSent} onError={setNotice} />
+        <SubscriptionForm
+          accounts={store.accounts}
+          forgerId={store.forgerId}
+          contacts={contacts}
+          onSent={onSent}
+          onError={setNotice}
+        />
       )}
 
       {notice && <p className="mt-2 text-[10px] text-[var(--blue3)]">{notice}</p>}

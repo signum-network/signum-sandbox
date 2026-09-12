@@ -5,21 +5,25 @@ import type { SandboxAccount } from '@/lib/accounts'
 import type { Contacts } from '@/lib/contacts'
 import { ledger } from '@/lib/ledger'
 import { resolveRecipientPublicKey, transferToken } from '@/lib/send'
+import { useFromAccount } from '@/hooks/useFromAccount'
+import { Select } from '@/components/console/Select'
 import { AccountSelect, Field, RecipientPicker, SubmitButton, TextInput } from './fields'
 
 export function TokenTransferForm({
   accounts,
+  forgerId,
   contacts,
   onSent,
   onError,
 }: {
   accounts: SandboxAccount[]
+  forgerId: string | null
   contacts: Contacts
   onSent: () => void
   onError: (message: string) => void
 }) {
   const { t } = useTranslation()
-  const [fromId, setFromId] = useState('')
+  const [fromId, setFromId] = useFromAccount(forgerId)
   const [to, setTo] = useState('')
   const [assetId, setAssetId] = useState('')
   const [quantity, setQuantity] = useState('')
@@ -61,19 +65,15 @@ export function TokenTransferForm({
         <RecipientPicker accounts={accounts} contacts={contacts} value={to} onChange={setTo} />
       </Field>
       <Field label={t('console.send.token')}>
-        <select
-          className="w-full border bg-transparent px-2 py-1 text-[11px] text-[var(--fg)]"
-          style={{ borderColor: 'var(--border2)' }}
+        <Select
           value={assetId}
-          onChange={(e) => setAssetId(e.target.value)}
-        >
-          <option value="">—</option>
-          {(tokens.data?.assets ?? []).map((asset) => (
-            <option key={asset.asset} value={asset.asset}>
-              {asset.name}
-            </option>
-          ))}
-        </select>
+          placeholder="—"
+          onChange={setAssetId}
+          options={(tokens.data?.assets ?? []).map((asset) => ({
+            value: asset.asset,
+            label: asset.name,
+          }))}
+        />
       </Field>
       <Field label={t('console.send.amount')}>
         <TextInput value={quantity} onChange={setQuantity} placeholder="1" />

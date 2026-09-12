@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next'
 import type { NodeState } from '@/lib/nodeState'
 import type { AccountStore } from '@/hooks/useAccounts'
 import { useForge } from '@/hooks/useForge'
+import { Select } from '@/components/console/Select'
+import { Toggle } from '@/components/console/Toggle'
 
 export function Header({
   state,
@@ -64,27 +66,16 @@ export function Header({
           </span>
         )}
 
-        <select
-          className="border bg-transparent px-2 py-1 text-[10px] text-[var(--fg)]"
-          style={border}
-          value={accounts.forgerId ?? ''}
-          onChange={(e) => accounts.setForger(e.target.value)}
-        >
-          <option value="">{t('console.forge.forger')}</option>
-          {accounts.accounts.map((a) => (
-            <option key={a.id} value={a.id}>{a.name}</option>
-          ))}
-        </select>
-
-        <label className="flex items-center gap-1 text-[10px] text-[var(--muted)]">
-          <input
-            type="checkbox"
-            checked={auto}
-            disabled={!canForge}
-            onChange={(e) => setAuto(e.target.checked)}
+        <div className="w-36">
+          <Select
+            value={accounts.forgerId ?? ''}
+            placeholder={t('console.forge.forger')}
+            onChange={accounts.setForger}
+            options={accounts.accounts.map((a) => ({ value: a.id, label: a.name }))}
           />
-          {t('console.forge.auto')}
-        </label>
+        </div>
+
+        <Toggle checked={auto} disabled={!canForge} onChange={setAuto} label={t('console.forge.auto')} />
 
         {(['send', 'chain', 'help'] as const).map((name) => (
           <button

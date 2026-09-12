@@ -3,21 +3,25 @@ import { useTranslation } from 'react-i18next'
 import type { SandboxAccount } from '@/lib/accounts'
 import type { Contacts } from '@/lib/contacts'
 import { resolveRecipientPublicKey, sendEncryptedMessage, sendPlainMessage } from '@/lib/send'
+import { useFromAccount } from '@/hooks/useFromAccount'
+import { Toggle } from '@/components/console/Toggle'
 import { AccountSelect, Field, RecipientPicker, SubmitButton, TextArea } from './fields'
 
 export function MessageForm({
   accounts,
+  forgerId,
   contacts,
   onSent,
   onError,
 }: {
   accounts: SandboxAccount[]
+  forgerId: string | null
   contacts: Contacts
   onSent: () => void
   onError: (message: string) => void
 }) {
   const { t } = useTranslation()
-  const [fromId, setFromId] = useState('')
+  const [fromId, setFromId] = useFromAccount(forgerId)
   const [to, setTo] = useState('')
   const [message, setMessage] = useState('')
   const [encrypt, setEncrypt] = useState(false)
@@ -62,10 +66,9 @@ export function MessageForm({
       <Field label={t('console.send.message')}>
         <TextArea value={message} onChange={setMessage} />
       </Field>
-      <label className="mb-2 flex items-center gap-2 text-[10px] text-[var(--muted)]">
-        <input type="checkbox" checked={encrypt} onChange={(e) => setEncrypt(e.target.checked)} />
-        {t('console.send.encrypt')}
-      </label>
+      <div className="mb-2">
+        <Toggle checked={encrypt} onChange={setEncrypt} label={t('console.send.encrypt')} />
+      </div>
       <SubmitButton label={t('console.send.submit')} busy={busy} onClick={() => void submit()} />
     </div>
   )

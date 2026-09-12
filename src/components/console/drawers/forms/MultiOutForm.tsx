@@ -3,21 +3,24 @@ import { useTranslation } from 'react-i18next'
 import type { SandboxAccount } from '@/lib/accounts'
 import type { Contacts } from '@/lib/contacts'
 import { resolveRecipientPublicKey, sendMultiOut } from '@/lib/send'
+import { useFromAccount } from '@/hooks/useFromAccount'
 import { AccountSelect, Field, knownRecipients, SubmitButton, TextArea } from './fields'
 
 export function MultiOutForm({
   accounts,
+  forgerId,
   contacts,
   onSent,
   onError,
 }: {
   accounts: SandboxAccount[]
+  forgerId: string | null
   contacts: Contacts
   onSent: () => void
   onError: (message: string) => void
 }) {
   const { t } = useTranslation()
-  const [fromId, setFromId] = useState('')
+  const [fromId, setFromId] = useFromAccount(forgerId)
   const [recipients, setRecipients] = useState('')
   const [busy, setBusy] = useState(false)
   const parties = knownRecipients(accounts, contacts)

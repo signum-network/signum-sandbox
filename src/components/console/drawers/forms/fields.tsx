@@ -1,6 +1,7 @@
 import { useId, type ReactNode } from 'react'
 import type { SandboxAccount } from '@/lib/accounts'
 import type { Contacts } from '@/lib/contacts'
+import { Select } from '@/components/console/Select'
 
 const border = { borderColor: 'var(--border2)' }
 
@@ -126,17 +127,12 @@ export function AccountSelect({
   onChange: (id: string) => void
 }) {
   return (
-    <select
-      className="w-full border bg-transparent px-2 py-1 text-[11px] text-[var(--fg)]"
-      style={border}
+    <Select
       value={value}
-      onChange={(e) => onChange(e.target.value)}
-    >
-      <option value="">—</option>
-      {accounts.map((a) => (
-        <option key={a.id} value={a.id}>{a.name} · {a.address}</option>
-      ))}
-    </select>
+      placeholder="—"
+      onChange={onChange}
+      options={accounts.map((a) => ({ value: a.id, label: a.name, sublabel: a.address }))}
+    />
   )
 }
 
