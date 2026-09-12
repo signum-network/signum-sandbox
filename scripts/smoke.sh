@@ -38,9 +38,27 @@ check() {
   fi
 }
 
+# The admin API always answers 200, errors and all, so a wrong or missing
+# API.adminKeyList shows up in the body instead of the status code.
+check_admin() {
+  body=$(curl -s -X POST "http://localhost:6876$1")
+  case "$body" in
+    *errorCode*)
+      echo "  FAIL $1 -> $body"
+      FAILED=1
+      ;;
+    *)
+      echo "  ok   $1"
+      ;;
+  esac
+}
+
 check "/index.html"
 check "/api-doc/index.html"
 check "/api?requestType=getBlockchainStatus"
+# #/console is served by the same index.html as / (hash routing), which the
+# check above already covers - no separate assertion needed.
+check_admin "/api?requestType=clearUnconfirmedTransactions&apiKey=sandbox"
 
 if ! grep -q "Running in headless mode" "$LOG"; then
   echo "  FAIL node did not start headless"

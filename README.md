@@ -63,23 +63,28 @@ downloads is committed.
 
 | URL | |
 |---|---|
-| `/` | the sandbox UI |
+| `/` | the sandbox UI, which leads to the console |
+| `/#/console` | the sandbox console — accounts, forging, transactions |
 | `/api-doc/` | the node's API documentation |
 | `/api` | the node's JSON API |
 | `/events` | the node's WebSocket event stream |
 
 ## Forging blocks
 
-The mock network accepts any nonce, so a block is one request away:
+The console's forge button mines a block on demand, and auto-forge keeps
+mining at an interval. Under the hood, the mock network accepts any nonce, so
+a block is one request away:
 
 ```bash
 curl -X POST "http://localhost:6876/api?requestType=submitNonce&secretPhrase=whatever&nonce=0"
 ```
 
-Leave out `accountId` — passing it routes the call into passthrough mining,
-which fails once the passphrase's account exists on chain. The forger receives
-10,000 SIGNA per block. Calls fired in rapid succession all report success but
-yield a single block, since they compete for the same height.
+That's the scriptable alternative when you want blocks from a shell or a test
+rather than the UI. Leave out `accountId` — passing it routes the call into
+passthrough mining, which fails once the passphrase's account exists on
+chain. The forger receives 10,000 SIGNA per block. Calls fired in rapid
+succession all report success but yield a single block, since they compete
+for the same height.
 
 ## Licence
 
