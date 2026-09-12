@@ -28,8 +28,13 @@ export function useNodeSocket() {
       socket = new WebSocket(`${scheme}://${window.location.host}/events`)
       socket.onopen = () => setConnected(true)
       socket.onmessage = (event) => {
-        if (isRefetchTrigger(parseEvent(String(event.data)))) {
-          void queryClient.invalidateQueries({ queryKey: ['blockchainStatus'] })
+        const name = parseEvent(String(event.data))
+        if (!isRefetchTrigger(name)) return
+        void queryClient.invalidateQueries({ queryKey: ['blockchainStatus'] })
+        void queryClient.invalidateQueries({ queryKey: ['unconfirmed'] })
+        // Only a new block changes the block list; a pending transaction does not.
+        if (name === 'BLOCK_PUSHED') {
+          void queryClient.invalidateQueries({ queryKey: ['blocks'] })
         }
       }
       socket.onclose = () => {
