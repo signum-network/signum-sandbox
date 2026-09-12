@@ -16,7 +16,7 @@ import type { SandboxAccount } from './accounts'
  * falls back to the raw value, which is what lets the caller degrade to plain
  * string comparison instead of throwing.
  */
-function toComparableId(value: string): string {
+export function toComparableId(value: string): string {
   const candidate = value.trim().toUpperCase()
   const withPrefix = candidate.split('-').length === 4 ? `TS-${candidate}` : candidate
   try {
