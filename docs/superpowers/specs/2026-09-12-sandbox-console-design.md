@@ -25,6 +25,8 @@ Checked against the pinned `signum-node.jar` (v3.9.11) API description and the i
 | `hashicon` is at `0.3.0` — the latest published version. | Pinned exactly, without a caret. |
 | `getNetworkInfo` is not an API request type; SignumJS derives it from `getConstants`. | Nothing changes for us — the existing call already works — but the network-name safety rail rides on `getConstants` data. |
 | A recipient the chain has never seen is **rejected** — `{"errorCode":4,"errorDescription":"Incorrect \"recipient\""}` — unless the sender passes `recipientPublicKey`, which the node turns into a `PublicKeyAnnouncement` attachment. Verified live, both directions. | Every send announces the recipient's public key: derived from the sandbox's own accounts, otherwise fetched from the node. Multi-out cannot do this at all — `MultioutRecipientAmount` has no room for a key — so it only reaches accounts already on chain. |
+| `getAccountsWithName` exists and answers **exact, case-insensitive** name lookups only — verified live: `Carol` and `carol` find the account, `Car` finds nothing. | A local address book is what makes an account findable by a name the user chose; the endpoint covers the case where someone types a full on-chain name. |
+| A block reward is credited straight to the forger's balance without emitting a transaction. | The stream will never show a "block reward" row, and the mock-up in this document is wrong about that. The `reward` kind stays in the code for a transaction that genuinely has no sender. |
 | Read-only endpoints for the three views all exist: `getUnconfirmedTransactions`, `getAccountTransactions`, `getBlocks`, `getBlock`, `getTransaction`, `getAccount`, `getAliases`, `getAsset`, `getAccountAssets`, `getAccountSubscriptions`. | The inspector needs no node change. |
 
 Both reset calls have since been run against the live mock node, and they do not behave alike:
@@ -34,7 +36,7 @@ Both reset calls have since been run against the live mock node, and they do not
 | `popOff` with `height=1` | Works. Returns the list of popped blocks; `numberOfBlocks` drops to 2 — genesis plus block 1. |
 | `fullReset` | **Silent no-op.** Answers `{"done":true}` and leaves the database byte-identical. The node log shows `Unable to execute clean as it has been disabled with the 'flyway.cleanDisabled' property`, and that failure is never propagated into the API response. |
 
-Reset therefore has three stages, and the first one that **demonstrably** worked wins. `popOff` down to height 1 is the real path: a sandbox chain is almost always shorter than the 1440-block limit, so rewinding to the start *is* a full reset, and it needs neither a restart nor a second mechanism. `fullReset` stays in the sequence because attempting it costs nothing and a later node build may repair it, but it is not counted on. And `scripts/reset.sh` — stop the node, remove `db/`, start it again — is the last resort the console names when neither API call moved the chain.
+Reset therefore has three stages, and the first one that **demonstrably** worked wins. `popOff` down to height 1 is the real path: a sandbox chain is almost always shorter than the 1440-block limit, so rewinding to the start *is* a full reset, and it needs neither a restart nor a second mechanism. `fullReset` stays in the sequence because attempting it costs nothing and a later node build may repair it, but it is not counted on. And the reset script — stop the node, remove `db/`, start it again — is the last resort the console names when neither API call moved the chain. It ships in both flavours, `reset.sh` and `reset.cmd`, and the console names whichever matches the platform the browser reports, because the deliverable is a local download and the instruction has to be one the reader can actually run.
 
 Because `fullReset` reports success while doing nothing, **`resetChain` measures instead of trusting**: after each stage it reads the height back and only reports that stage as successful if the chain actually returned to the start. Telling someone their chain was wiped when it was not is the worst outcome available after a destructive action they confirmed.
 
@@ -53,7 +55,9 @@ Because `fullReset` reports success while doing nothing, **`resetChain` measures
 11. **The passphrase safety rail:** passphrases live in plain `localStorage` because they are worthless on a mock chain — and the account store refuses to operate when the connected node is not the mock network.
 12. **Scenario accounts use obviously fake passphrases** (`sandbox-alice`, `sandbox-miner`); accounts created in the console get real generated mnemonics.
 13. **Reset walks three stages** — `popOff` to height 1, then `fullReset`, then a documented script — and verifies the height after each rather than trusting the response.
-14. **Delivery in two layers:** the developer core first, the newcomer layer on top.
+14. **A local address book.** Contacts are accounts the user does not own, given a name, kept as `accountId → name`. One resolution rule names an account everywhere: owned account, then contact, then on-chain name, then a shortened address.
+15. **Reset names the right script per platform.** The deliverable carries `start`/`reset` in both `.sh` and `.cmd` form, and the console names whichever matches the browser's platform.
+16. **Delivery in two layers:** the developer core first, the newcomer layer on top.
 
 ## Layout
 
@@ -132,6 +136,10 @@ An account is a name, a passphrase, and everything derived from it. Accounts are
 Accounts **created in the console** get a real generated mnemonic from `@signumjs/crypto`'s dictionary instead. This is where the tour teaches something, and a toy passphrase would teach the wrong thing: you should see once what a real seed looks like, that it *is* the account rather than a password guarding it, that nobody can restore it for you, and that it sits here in plain text in your browser only because here it is worth nothing. Import accepts any existing passphrase.
 
 An account only exists on chain once it has received something, so a freshly created account shows as *not yet on chain* until it does — this is a fact about Signum worth surfacing rather than hiding, and beginner mode explains it.
+
+**The address book.** Beside the accounts it owns, the console keeps contacts: accounts it does not own, each given a local name, stored as `accountId → name` without any key. They hold no secrets, so unlike the account store they are not gated by the network rail. A contact is added by hand in the Accounts tab, or straight from a transaction row when an unfamiliar address turns up in the stream.
+
+One rule names an account everywhere — the feed, the block list, the recipient picker: an account the sandbox **owns** uses its own name, otherwise a **contact** name, otherwise the **on-chain name**, otherwise a **shortened address** that keeps both ends so two accounts still look different. The feed deliberately stops before the on-chain name: resolving it per row would mean a `getAccount` for every line of a live stream.
 
 **The safety rail:** on startup the console compares the connected node's network name against the mock network. If they differ, the account store is unavailable, no passphrase is read or written, no transaction is signed, and the console shows why. A convenient wallet that keeps passphrases in plain text must never be one keystroke away from a real network.
 
