@@ -20,6 +20,8 @@ export interface AccountStore {
   available: boolean
   /** The network the node reported, for the message shown when unavailable. */
   networkName: string | undefined
+  /** The Reed-Solomon prefix this node's addresses use, for deriving one from a bare id. */
+  addressPrefix: string
   accounts: SandboxAccount[]
   forgerId: string | null
   forger: SandboxAccount | undefined
@@ -72,6 +74,7 @@ export function useAccounts(): AccountStore {
   return {
     available,
     networkName: network.data?.networkName,
+    addressPrefix: prefix,
     accounts,
     forgerId,
     forger: accounts.find((a) => a.id === forgerId),

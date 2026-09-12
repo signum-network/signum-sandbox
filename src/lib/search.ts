@@ -26,6 +26,21 @@ export function interpret(input: string): Query {
   return { kind: 'name', value: value.toLowerCase() }
 }
 
+/**
+ * The predicate both the owned-accounts list and the contact book filter
+ * through, so the one search field behaves the same way over both: a name
+ * query matches case-insensitively as a substring, an address query matches
+ * exactly (nobody types half an address), and every other kind — height, id,
+ * or no query at all — doesn't apply to an account-shaped row, so it passes
+ * everything rather than hiding rows a height or transaction id query was
+ * never meant to filter.
+ */
+export function matchesAccountQuery(name: string, address: string, query: Query): boolean {
+  if (query.kind === 'name') return name.toLowerCase().includes(query.value)
+  if (query.kind === 'address') return address === query.value
+  return true
+}
+
 export function matchesTransaction(tx: Transaction, query: Query): boolean {
   switch (query.kind) {
     case 'none':

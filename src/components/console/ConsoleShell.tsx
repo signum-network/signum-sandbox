@@ -92,7 +92,7 @@ export function ConsoleShell() {
               }}
             />
           )}
-          {tab === 'accounts' && <AccountsView store={accounts} query={query} />}
+          {tab === 'accounts' && <AccountsView store={accounts} contacts={contacts} query={query} />}
         </div>
         {drawer && (
           <div className="w-[34%] border p-3" style={{ borderColor: 'var(--blue2)' }}>

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { interpret, matchesTransaction } from './search'
+import { interpret, matchesAccountQuery, matchesTransaction } from './search'
 import type { Transaction } from '@signumjs/core'
 
 describe('interpret', () => {
@@ -59,5 +59,27 @@ describe('matchesTransaction', () => {
         { kind: 'name', value: 'pizza' },
       ),
     ).toBe(true)
+  })
+})
+
+describe('matchesAccountQuery', () => {
+  it('matches a name case-insensitively as a substring', () => {
+    expect(matchesAccountQuery('Alice', 'TS-AAAA', { kind: 'name', value: 'lic' })).toBe(true)
+    expect(matchesAccountQuery('Alice', 'TS-AAAA', { kind: 'name', value: 'bob' })).toBe(false)
+  })
+
+  it('matches an address exactly, not as a substring', () => {
+    expect(matchesAccountQuery('Alice', 'TS-AAAA', { kind: 'address', value: 'TS-AAAA' })).toBe(
+      true,
+    )
+    expect(matchesAccountQuery('Alice', 'TS-AAAA', { kind: 'address', value: 'TS-AA' })).toBe(
+      false,
+    )
+  })
+
+  it('passes everything through for a query kind that does not apply to accounts', () => {
+    expect(matchesAccountQuery('Alice', 'TS-AAAA', { kind: 'none' })).toBe(true)
+    expect(matchesAccountQuery('Alice', 'TS-AAAA', { kind: 'height', height: 5 })).toBe(true)
+    expect(matchesAccountQuery('Alice', 'TS-AAAA', { kind: 'id', value: '123' })).toBe(true)
   })
 })
