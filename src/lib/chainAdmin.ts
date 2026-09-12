@@ -1,22 +1,8 @@
 import { ledger } from './ledger'
+import { resetPlan, type ResetStage } from './resetPlan'
 
 /** Matches API.adminKeyList in conf/node.properties. */
 const ADMIN_KEY = 'sandbox'
-
-/** popOff reaches at most 1440 blocks back. */
-const POP_OFF_REACH = 1440
-
-export type ResetStage = 'popOff' | 'fullReset'
-
-/**
- * Reset walks these stages in order and stops at the first that works. popOff
- * is preferred because it needs no restart; on a chain too long for its reach
- * it cannot get back to the start, so it is not attempted at all.
- */
-export function resetPlan(height: number): ResetStage[] {
-  if (height <= 1) return []
-  return height - 1 <= POP_OFF_REACH ? ['popOff', 'fullReset'] : ['fullReset']
-}
 
 /**
  * These requests have no typed SignumJS method, so they go through the generic
@@ -42,17 +28,26 @@ export const clearUnconfirmed = () => admin('clearUnconfirmedTransactions')
 
 export type ResetOutcome = { succeeded: ResetStage } | { succeeded: null }
 
+/** Genesis plus block 1 — what a chain looks like once it is back at the start. */
+const START_HEIGHT = 2
+
+const currentHeight = async () =>
+  (await ledger.network.getBlockchainStatus()).numberOfBlocks
+
 /**
- * Attempts each stage of the plan and reports which one worked. A null result
- * means the caller has to tell the user to run scripts/reset.sh — silently
- * doing nothing after a confirmed destructive action is the worst outcome here.
+ * Attempts each stage and reads the chain back rather than trusting the answer.
+ * Verified against v3.9.11: `fullReset` responds {"done":true} and leaves the
+ * database untouched, because Flyway's clean is disabled in the node build. A
+ * stage that lies is exactly why success is measured, not reported.
+ *
+ * A null result means the caller has to tell the user to run scripts/reset.sh.
  */
 export async function resetChain(height: number): Promise<ResetOutcome> {
   for (const stage of resetPlan(height)) {
     try {
       if (stage === 'popOff') await popOffTo(1)
       else await fullReset()
-      return { succeeded: stage }
+      if ((await currentHeight()) <= START_HEIGHT) return { succeeded: stage }
     } catch {
       // Fall through to the next stage.
     }

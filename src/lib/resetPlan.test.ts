@@ -1,11 +1,5 @@
-// @vitest-environment jsdom
-//
-// chainAdmin.ts imports ./ledger, which reads window.location.origin at
-// module load time. The default vitest environment is plain node, where
-// window does not exist, so this file alone needs a DOM global to import
-// the module under test.
 import { describe, expect, it } from 'vitest'
-import { resetPlan } from './chainAdmin'
+import { resetPlan } from './resetPlan'
 
 describe('resetPlan', () => {
   it('rewinds with popOff on a short chain, and keeps fullReset behind it', () => {
