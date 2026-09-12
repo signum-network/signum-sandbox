@@ -3,6 +3,7 @@
 // export. Pulling it in this way also keeps the unused API sections out of the
 // bundle, since the package is sideEffects-free.
 import { createReadOnlyClient } from '@signumjs/core/createReadOnlyClient'
+import { LedgerClientFactory } from '@signumjs/core'
 
 /**
  * Requests always target the page origin. In production the node serves the page,
@@ -20,3 +21,10 @@ export const nodeHost = window.location.origin
 export const nodeAddress = __NODE_ADDRESS__ ?? window.location.origin
 
 export const ledger = createReadOnlyClient({ nodeHost })
+
+/**
+ * The full client, for everything that writes. Kept separate from `ledger` so
+ * that read paths keep pulling in only the read-only surface, and so that
+ * "does this code sign something?" is answerable by looking at the import.
+ */
+export const signingLedger = LedgerClientFactory.createClient({ nodeHost })
