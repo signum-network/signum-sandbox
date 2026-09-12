@@ -7,7 +7,8 @@ import {
 } from '@signumjs/core'
 import { Amount } from '@signumjs/util'
 import { src44 } from '@signumjs/standards'
-import { signingLedger } from './ledger'
+import { ledger, signingLedger } from './ledger'
+import { knownPublicKey } from './recipient'
 import type { SandboxAccount } from './accounts'
 
 const { DescriptorDataBuilder } = src44
@@ -41,10 +42,39 @@ export const toNumericId = (addressOrId: string) =>
  */
 const asId = (result: TransactionId | UnsignedTransaction) => (result as TransactionId).transaction
 
+/**
+ * The recipient's public key, announced on every send that has a recipient.
+ *
+ * The node rejects a transaction to an account it has never seen unless the
+ * sender announces its public key, and a freshly created sandbox account is
+ * exactly that. Rather than deciding case by case when it is needed, the key is
+ * always resolved and always passed: from the sandbox's own accounts when it
+ * owns the recipient, otherwise from the node, which already knows it for
+ * anyone who has transacted. Undefined means nobody knows it, and the send will
+ * fail — which is the honest outcome, not something to hide.
+ *
+ * The functions below take the resolved key as a required argument, so a form
+ * cannot quietly omit it.
+ */
+export async function resolveRecipientPublicKey(
+  to: string,
+  accounts: SandboxAccount[],
+): Promise<string | undefined> {
+  const own = knownPublicKey(to, accounts)
+  if (own) return own
+  try {
+    const account = await ledger.account.getAccount({ accountId: toNumericId(to) })
+    return account.publicKey || undefined
+  } catch {
+    return undefined
+  }
+}
+
 export async function sendPayment(
   from: SandboxAccount,
   to: string,
   signa: string,
+  recipientPublicKey: string | undefined,
   message?: string,
 ) {
   return asId(
@@ -52,11 +82,18 @@ export async function sendPayment(
       ...base(from),
       amountPlanck: Amount.fromSigna(signa).getPlanck(),
       recipientId: toNumericId(to),
+      recipientPublicKey,
       attachment: message ? new AttachmentMessage({ message, messageIsText: true }) : undefined,
     }),
   )
 }
 
+/**
+ * Multi-out cannot announce anything: `MultioutRecipientAmount` carries only a
+ * recipient and an amount, with no room for a public key. A recipient the chain
+ * has never seen therefore cannot be paid this way — a protocol limit, not an
+ * omission here. The form warns instead.
+ */
 export async function sendMultiOut(
   from: SandboxAccount,
   recipients: { address: string; signa: string }[],
@@ -72,13 +109,19 @@ export async function sendMultiOut(
   )
 }
 
-export async function sendPlainMessage(from: SandboxAccount, to: string, message: string) {
+export async function sendPlainMessage(
+  from: SandboxAccount,
+  to: string,
+  message: string,
+  recipientPublicKey: string | undefined,
+) {
   return asId(
     await signingLedger.message.sendMessage({
       ...base(from),
       message,
       messageIsText: true,
       recipientId: toNumericId(to),
+      recipientPublicKey,
     }),
   )
 }
@@ -148,6 +191,7 @@ export async function transferToken(
   to: string,
   assetId: string,
   quantity: string,
+  recipientPublicKey: string | undefined,
 ) {
   return asId(
     await signingLedger.asset.transferAsset({
@@ -155,6 +199,7 @@ export async function transferToken(
       assetId,
       quantity,
       recipientId: toNumericId(to),
+      recipientPublicKey,
     }),
   )
 }
@@ -170,12 +215,14 @@ export async function createSubscription(
   to: string,
   signa: string,
   frequency: number,
+  recipientPublicKey: string | undefined,
 ) {
   return asId(
     await signingLedger.transaction.createSubscription({
       ...base(from),
       amountPlanck: Amount.fromSigna(signa).getPlanck(),
       recipientId: toNumericId(to),
+      recipientPublicKey,
       frequency,
     }),
   )

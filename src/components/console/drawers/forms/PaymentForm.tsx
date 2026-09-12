@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { SandboxAccount } from '@/lib/accounts'
-import { sendPayment } from '@/lib/send'
+import { resolveRecipientPublicKey, sendPayment } from '@/lib/send'
 import { AccountSelect, Field, SubmitButton, TextArea, TextInput } from './fields'
 
 export function PaymentForm({
@@ -26,7 +26,8 @@ export function PaymentForm({
     if (!from || !to || !amount) return
     setBusy(true)
     try {
-      await sendPayment(from, to, amount, attach ? message : undefined)
+      const recipientPublicKey = await resolveRecipientPublicKey(to, accounts)
+      await sendPayment(from, to, amount, recipientPublicKey, attach ? message : undefined)
       setTo('')
       setAmount('')
       setMessage('')

@@ -24,6 +24,7 @@ Checked against the pinned `signum-node.jar` (v3.9.11) API description and the i
 | `@signumjs/standards` exists at the same version (3.3.4) and carries SRC44 `DescriptorData`. | SRC44 is parsed and built by the reference implementation, not by us. |
 | `hashicon` is at `0.3.0` — the latest published version. | Pinned exactly, without a caret. |
 | `getNetworkInfo` is not an API request type; SignumJS derives it from `getConstants`. | Nothing changes for us — the existing call already works — but the network-name safety rail rides on `getConstants` data. |
+| A recipient the chain has never seen is **rejected** — `{"errorCode":4,"errorDescription":"Incorrect \"recipient\""}` — unless the sender passes `recipientPublicKey`, which the node turns into a `PublicKeyAnnouncement` attachment. Verified live, both directions. | Every send announces the recipient's public key: derived from the sandbox's own accounts, otherwise fetched from the node. Multi-out cannot do this at all — `MultioutRecipientAmount` has no room for a key — so it only reaches accounts already on chain. |
 | Read-only endpoints for the three views all exist: `getUnconfirmedTransactions`, `getAccountTransactions`, `getBlocks`, `getBlock`, `getTransaction`, `getAccount`, `getAliases`, `getAsset`, `getAccountAssets`, `getAccountSubscriptions`. | The inspector needs no node change. |
 
 Both reset calls have since been run against the live mock node, and they do not behave alike:
