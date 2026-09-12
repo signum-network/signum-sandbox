@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useQuery } from '@tanstack/react-query'
+import { Amount } from '@signumjs/util'
 import type { AccountStore } from '@/hooks/useAccounts'
+import { ledger } from '@/lib/ledger'
 import { Identicon } from '../Identicon'
 
 export function AccountsView({ store }: { store: AccountStore }) {
@@ -79,6 +82,7 @@ export function AccountsView({ store }: { store: AccountStore }) {
             <Identicon value={account.address} />
             <span className="font-bold text-[var(--blue3)]">{account.name}</span>
             <span className="text-[var(--muted)]">{account.address}</span>
+            <span className="text-[var(--muted)]"><Balance id={account.id} /></span>
             <span className="ml-auto flex items-center gap-2">
               <button
                 className={button}
@@ -96,4 +100,21 @@ export function AccountsView({ store }: { store: AccountStore }) {
       </ul>
     </div>
   )
+}
+
+function Balance({ id }: { id: string }) {
+  const { t } = useTranslation()
+  const balance = useQuery({
+    queryKey: ['balance', id],
+    queryFn: () => ledger.account.getAccountBalance(id),
+    retry: false,
+  })
+
+  // An account that has never received anything does not exist on chain yet,
+  // and the node answers with an error rather than a zero balance.
+  if (balance.isError) {
+    return <span className="text-[var(--muted)]">{t('console.accounts.notOnChain')}</span>
+  }
+  if (!balance.data) return null
+  return <span>{Amount.fromPlanck(balance.data.balanceNQT).getSigna()} SIGNA</span>
 }

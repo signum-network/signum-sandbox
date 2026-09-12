@@ -3,9 +3,12 @@ import { useTranslation } from 'react-i18next'
 import { Link } from '@tanstack/react-router'
 import { useNodeState } from '@/hooks/useNodeState'
 import { useAccounts } from '@/hooks/useAccounts'
+import { useChainFeed } from '@/hooks/useChainFeed'
 import { Unreachable } from '@/components/startpage'
 import { Header } from './Header'
 import { AccountsView } from './views/AccountsView'
+import { TransactionsView } from './views/TransactionsView'
+import { BlocksView } from './views/BlocksView'
 
 export type ConsoleTab = 'transactions' | 'blocks' | 'accounts'
 export type DrawerName = 'send' | 'chain' | 'help' | null
@@ -18,6 +21,7 @@ export function ConsoleShell() {
   const [drawer, setDrawer] = useState<DrawerName>(null)
   const { state, nodeAddress } = useNodeState()
   const accounts = useAccounts()
+  const feed = useChainFeed(state.kind === 'ready' ? state.height : null)
 
   if (state.kind === 'unreachable') {
     return (
@@ -56,7 +60,11 @@ export function ConsoleShell() {
 
       <div className="flex gap-3">
         <div className="min-h-[320px] flex-1 border p-3" style={{ borderColor: 'var(--border2)' }}>
-          {tab === 'accounts' ? <AccountsView store={accounts} /> : tab}
+          {tab === 'transactions' && (
+            <TransactionsView items={feed.items} accounts={accounts.accounts} />
+          )}
+          {tab === 'blocks' && <BlocksView blocks={feed.blocks} onSelect={() => setTab('transactions')} />}
+          {tab === 'accounts' && <AccountsView store={accounts} />}
         </div>
         {drawer && (
           <div className="w-[34%] border p-3" style={{ borderColor: 'var(--blue2)' }}>
