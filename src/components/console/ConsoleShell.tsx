@@ -11,6 +11,7 @@ import { AccountsView } from './views/AccountsView'
 import { TransactionsView } from './views/TransactionsView'
 import { BlocksView } from './views/BlocksView'
 import { SearchField } from './views/SearchField'
+import { SendDrawer } from './drawers/SendDrawer'
 
 export type ConsoleTab = 'transactions' | 'blocks' | 'accounts'
 export type DrawerName = 'send' | 'chain' | 'help' | null
@@ -91,6 +92,7 @@ export function ConsoleShell() {
                 ✕
               </button>
             </div>
+            {drawer === 'send' && <SendDrawer store={accounts} />}
           </div>
         )}
       </div>
