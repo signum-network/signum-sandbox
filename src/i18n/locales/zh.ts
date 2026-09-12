@@ -51,7 +51,8 @@ export default {
     accounts: {
       create: '创建账户',
       import: '导入密语',
-      name: '名称',
+      localLabel: '本地标签',
+      nameHint: '仅保存在此浏览器中的私有标签，不会发送到链上 — 链上名称需单独设置，通过发送 → 账户信息',
       passphrase: '密语',
       balance: '余额',
       remove: '移除',

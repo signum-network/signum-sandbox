@@ -1,22 +1,22 @@
 import { useTranslation } from 'react-i18next'
 import type { Block } from '@signumjs/core'
-import { nodeHost } from '@/lib/ledger'
 import type { SandboxAccount } from '@/lib/accounts'
-import { displayName, type Contacts } from '@/lib/contacts'
+import type { Contacts } from '@/lib/contacts'
 import { matchesBlock, type ResolvedQuery } from '@/lib/search'
+import { BlockRow } from './BlockRow'
 
 export function BlocksView({
   blocks,
   accounts,
   contacts,
   query,
-  onSelect,
+  onSelectTransaction,
 }: {
   blocks: Block[]
   accounts: SandboxAccount[]
   contacts: Contacts
   query: ResolvedQuery
-  onSelect: (height: number) => void
+  onSelectTransaction: (transactionId: string) => void
 }) {
   const { t } = useTranslation()
 
@@ -36,32 +36,15 @@ export function BlocksView({
 
   return (
     <ul>
-      {shown.map((block) => {
-        const count = block.numberOfTransactions
-        return (
-          <li
-            key={block.block}
-            className="flex items-center justify-between border-b py-2 text-[11px]"
-            style={{ borderColor: 'var(--border2)' }}
-          >
-            <button className="text-left" onClick={() => onSelect(block.height)}>
-              <span className="font-bold text-[var(--blue3)]">#{block.height}</span>
-              <span className="text-[var(--muted)]">
-                {' '}· {count === 0 ? t('console.blocks.empty') : t('console.blocks.count', { count })}
-                {' '}· {t('console.blocks.forger')} {displayName(block.generatorRS, accounts, contacts)}
-              </span>
-            </button>
-            <a
-              className="text-[var(--muted)] underline"
-              target="_blank"
-              rel="noreferrer"
-              href={`${nodeHost}/api?requestType=getBlock&height=${block.height}`}
-            >
-              ↗
-            </a>
-          </li>
-        )
-      })}
+      {shown.map((block) => (
+        <BlockRow
+          key={block.block}
+          block={block}
+          accounts={accounts}
+          contacts={contacts}
+          onSelectTransaction={onSelectTransaction}
+        />
+      ))}
     </ul>
   )
 }

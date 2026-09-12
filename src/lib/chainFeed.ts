@@ -8,6 +8,14 @@ export interface FeedItem {
   tx: FeedTransaction
 }
 
+/**
+ * Block.transactions is typed as string[] | Transaction[]: ids unless the
+ * request asked for the whole objects. Every caller here asks for objects
+ * (see useChainFeed and BlockRow), so this guard is what makes that
+ * assumption explicit instead of a cast repeated at each call site.
+ */
+export const isTransaction = (t: string | Transaction): t is Transaction => typeof t !== 'string'
+
 const newestFirst = (a: FeedTransaction, b: FeedTransaction) => b.timestamp - a.timestamp
 
 /**

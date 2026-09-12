@@ -51,7 +51,9 @@ export default {
     accounts: {
       create: 'Criar conta',
       import: 'Importar frase-passe',
-      name: 'Nome',
+      localLabel: 'Etiqueta local',
+      nameHint:
+        'Uma etiqueta privada guardada apenas neste navegador, que não é enviada para a cadeia — o nome na cadeia é definido em separado, em Enviar → Informação da conta',
       passphrase: 'Frase-passe',
       balance: 'Saldo',
       remove: 'Remover',

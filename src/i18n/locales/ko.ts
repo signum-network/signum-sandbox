@@ -51,7 +51,9 @@ export default {
     accounts: {
       create: '계정 만들기',
       import: '패스프레이즈 가져오기',
-      name: '이름',
+      localLabel: '로컬 라벨',
+      nameHint:
+        '이 브라우저에만 저장되는 개인 라벨이며 체인으로 전송되지 않습니다 — 온체인 이름은 별도로 보내기 → 계정 정보에서 설정합니다',
       passphrase: '패스프레이즈',
       balance: '잔액',
       remove: '제거',

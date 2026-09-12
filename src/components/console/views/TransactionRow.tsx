@@ -37,7 +37,7 @@ function SaveContactField({
         className="border bg-transparent px-2 py-[2px] text-[11px] text-[var(--fg)]"
         style={{ borderColor: 'var(--border2)' }}
         value={name}
-        placeholder={t('console.accounts.name')}
+        placeholder={t('console.accounts.localLabel')}
         onChange={(e) => setName(e.target.value)}
       />
       <button

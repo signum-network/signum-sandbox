@@ -51,7 +51,9 @@ export default {
     accounts: {
       create: 'Account anlegen',
       import: 'Passphrase importieren',
-      name: 'Name',
+      localLabel: 'Lokale Bezeichnung',
+      nameHint:
+        'Eine private Bezeichnung, die nur in diesem Browser gespeichert wird und nicht auf die Chain gelangt — ein Name auf der Chain wird separat über Senden → Account-Info gesetzt',
       passphrase: 'Passphrase',
       balance: 'Guthaben',
       remove: 'Entfernen',

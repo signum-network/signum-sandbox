@@ -16,7 +16,12 @@ export function AccountsView({
   query: Query
 }) {
   const { t } = useTranslation()
-  const [name, setName] = useState('')
+  // Two separate fields, not one shared between the two actions below: typing
+  // a label to create an account and typing one to import a passphrase are
+  // different intents, and sharing state made it look like one was feeding
+  // the other.
+  const [createName, setCreateName] = useState('')
+  const [importName, setImportName] = useState('')
   const [passphrase, setPassphrase] = useState('')
 
   if (!store.available) {
@@ -44,25 +49,49 @@ export function AccountsView({
         {t('console.accounts.sectionOwned')}
       </div>
 
+      {/*
+        A name typed here never reaches the chain — it is the same kind of
+        private label a contact gets, just for an address the sandbox also
+        holds the passphrase for. Said once, plainly, rather than left for
+        the reader to guess from an unlabelled input.
+      */}
+      <p className="mb-2 text-[10px] text-[var(--muted)]">{t('console.accounts.nameHint')}</p>
+
+      {/*
+        Two stacked, dividing-lined rows rather than one wrapping line: create
+        and import are unrelated actions that happened to share a row before,
+        which read as one blended action. Stacking with a rule between them
+        costs one extra line of height and buys the two an obvious boundary.
+      */}
       <div className="mb-3 flex flex-wrap items-center gap-2">
         <input
           className={field}
           style={border}
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder={t('console.accounts.name')}
+          value={createName}
+          onChange={(e) => setCreateName(e.target.value)}
+          placeholder={t('console.accounts.localLabel')}
         />
         <button
           className={button}
           style={border}
           onClick={() => {
-            if (!name.trim()) return
-            store.create(name.trim())
-            setName('')
+            if (!createName.trim()) return
+            store.create(createName.trim())
+            setCreateName('')
           }}
         >
           {t('console.accounts.create')}
         </button>
+      </div>
+
+      <div className="mb-3 flex flex-wrap items-center gap-2 border-t pt-2" style={border}>
+        <input
+          className={field}
+          style={border}
+          value={importName}
+          onChange={(e) => setImportName(e.target.value)}
+          placeholder={t('console.accounts.localLabel')}
+        />
         <input
           className={field}
           style={border}
@@ -74,9 +103,9 @@ export function AccountsView({
           className={button}
           style={border}
           onClick={() => {
-            if (!name.trim() || !passphrase.trim()) return
-            store.importPassphrase(name.trim(), passphrase.trim())
-            setName('')
+            if (!importName.trim() || !passphrase.trim()) return
+            store.importPassphrase(importName.trim(), passphrase.trim())
+            setImportName('')
             setPassphrase('')
           }}
         >

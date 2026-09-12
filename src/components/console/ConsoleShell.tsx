@@ -92,8 +92,11 @@ export function ConsoleShell() {
               accounts={accounts.accounts}
               contacts={contacts.contacts}
               query={resolved}
-              onSelect={(height) => {
-                setSearch(String(height))
+              // The block row itself only expands in place; leaving this tab
+              // is the consequence of clicking one of the transactions inside
+              // it, not of clicking the block.
+              onSelectTransaction={(transactionId) => {
+                setSearch(transactionId)
                 setTab('transactions')
               }}
             />

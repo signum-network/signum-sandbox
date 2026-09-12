@@ -62,7 +62,9 @@ export default {
     accounts: {
       create: 'Create account',
       import: 'Import passphrase',
-      name: 'Name',
+      localLabel: 'Local label',
+      nameHint:
+        'A private label kept in this browser, not sent to the chain — an on-chain name is set separately, via Send → Account info',
       passphrase: 'Passphrase',
       balance: 'Balance',
       remove: 'Remove',

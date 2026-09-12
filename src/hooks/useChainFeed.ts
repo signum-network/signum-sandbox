@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import type { Block, Transaction } from '@signumjs/core'
 import { ledger } from '@/lib/ledger'
-import { mergeFeed, type FeedItem } from '@/lib/chainFeed'
+import { isTransaction, mergeFeed, type FeedItem } from '@/lib/chainFeed'
 
 /** How far back the console looks. A sandbox chain is short; this is generous. */
 const RECENT_BLOCKS = 25
@@ -46,10 +46,6 @@ export function useChainFeed(
     retry: false,
   })
 
-  // Block.transactions is typed as string[] | Transaction[]: ids unless the
-  // request asked for the whole objects, which ours does. The guard is what
-  // makes that assumption explicit instead of a cast.
-  const isTransaction = (t: string | Transaction): t is Transaction => typeof t !== 'string'
   const confirmed: Transaction[] = (blocks.data ?? []).flatMap((b) =>
     (b.transactions ?? []).filter(isTransaction),
   )

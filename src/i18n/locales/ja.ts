@@ -51,7 +51,9 @@ export default {
     accounts: {
       create: 'アカウントを作成',
       import: 'パスフレーズをインポート',
-      name: '名前',
+      localLabel: 'ローカルラベル',
+      nameHint:
+        'このブラウザだけに保存される非公開のラベルで、チェーンには送信されません — オンチェーン名は別に、送信 → アカウント情報 から設定します',
       passphrase: 'パスフレーズ',
       balance: '残高',
       remove: '削除',

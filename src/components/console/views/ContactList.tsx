@@ -64,7 +64,7 @@ export function ContactList({
           style={border}
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder={t('console.accounts.name')}
+          placeholder={t('console.accounts.localLabel')}
         />
         <button
           className={button}
