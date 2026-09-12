@@ -6,9 +6,15 @@ import { mergeFeed, type FeedItem } from '@/lib/chainFeed'
 /** How far back the console looks. A sandbox chain is short; this is generous. */
 const RECENT_BLOCKS = 25
 
-export function useBlocks(height: number | null) {
+export function useBlocks(height: number | null, connected: boolean) {
   return useQuery({
-    queryKey: ['blocks', height],
+    // height is deliberately not part of the key: a changing key forces a hard
+    // TanStack Query transition (data goes undefined until refetch), which
+    // unmounts the feed's <ul> for its "empty" placeholder on every block and
+    // destroys each row's open/closed state. useNodeSocket already invalidates
+    // ['blocks'] on BLOCK_PUSHED, so a stable key plus that invalidation is
+    // enough; refetchInterval below covers the socket-down case.
+    queryKey: ['blocks'],
     queryFn: async () => {
       const firstIndex = 0
       const lastIndex = RECENT_BLOCKS - 1
@@ -16,15 +22,19 @@ export function useBlocks(height: number | null) {
       return blocks
     },
     enabled: height !== null,
+    refetchInterval: connected ? false : 10_000,
     retry: false,
   })
 }
 
-export function useChainFeed(height: number | null): {
+export function useChainFeed(
+  height: number | null,
+  connected: boolean,
+): {
   items: FeedItem[]
   blocks: Block[]
 } {
-  const blocks = useBlocks(height)
+  const blocks = useBlocks(height, connected)
 
   const unconfirmed = useQuery({
     queryKey: ['unconfirmed'],
@@ -32,6 +42,7 @@ export function useChainFeed(height: number | null): {
       const { unconfirmedTransactions } = await ledger.transaction.getUnconfirmedTransactions()
       return unconfirmedTransactions
     },
+    refetchInterval: connected ? false : 10_000,
     retry: false,
   })
 

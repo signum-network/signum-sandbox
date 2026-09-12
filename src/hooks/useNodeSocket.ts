@@ -30,11 +30,14 @@ export function useNodeSocket() {
       socket.onmessage = (event) => {
         const name = parseEvent(String(event.data))
         if (!isRefetchTrigger(name)) return
-        void queryClient.invalidateQueries({ queryKey: ['blockchainStatus'] })
         void queryClient.invalidateQueries({ queryKey: ['unconfirmed'] })
-        // Only a new block changes the block list; a pending transaction does not.
+        // Only a new block changes confirmed state: the block list, chain
+        // status, and the balances of known accounts. A pending transaction
+        // touches none of those.
         if (name === 'BLOCK_PUSHED') {
           void queryClient.invalidateQueries({ queryKey: ['blocks'] })
+          void queryClient.invalidateQueries({ queryKey: ['blockchainStatus'] })
+          void queryClient.invalidateQueries({ queryKey: ['balance'] })
         }
       }
       socket.onclose = () => {

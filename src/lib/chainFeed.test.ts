@@ -1,8 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import { mergeFeed, type FeedTransaction } from './chainFeed'
 
-const tx = (id: string, timestamp: number, confirmations?: number): FeedTransaction =>
-  ({ transaction: id, timestamp, confirmations }) as FeedTransaction
+const tx = (
+  id: string,
+  timestamp: number,
+  confirmations?: number,
+  height?: number,
+): FeedTransaction => ({ transaction: id, timestamp, confirmations, height }) as FeedTransaction
 
 describe('mergeFeed', () => {
   it('puts unconfirmed transactions above confirmed ones regardless of time', () => {
@@ -29,5 +33,11 @@ describe('mergeFeed', () => {
 
   it('survives a chain reset, where the confirmed set is suddenly empty', () => {
     expect(mergeFeed([], [])).toEqual([])
+  })
+
+  it('orders confirmed transactions by block height, not by timestamp', () => {
+    // c1 was built earlier (lower timestamp) but confirmed in the later, higher block.
+    const feed = mergeFeed([], [tx('c1', 5, undefined, 20), tx('c2', 999, undefined, 10)])
+    expect(feed.map((f) => f.id)).toEqual(['c1', 'c2'])
   })
 })

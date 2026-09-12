@@ -24,9 +24,9 @@ export function ConsoleShell() {
   const { t } = useTranslation()
   const [tab, setTab] = useState<ConsoleTab>('transactions')
   const [drawer, setDrawer] = useState<DrawerName>(null)
-  const { state, nodeAddress } = useNodeState()
+  const { state, nodeAddress, connected } = useNodeState()
   const accounts = useAccounts()
-  const feed = useChainFeed(state.kind === 'ready' ? state.height : null)
+  const feed = useChainFeed(state.kind === 'ready' ? state.height : null, connected)
   const [search, setSearch] = useState('')
   const query = interpret(search)
 

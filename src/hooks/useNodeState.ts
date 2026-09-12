@@ -13,7 +13,7 @@ import { useNodeSocket } from './useNodeSocket'
 type StatusWithTimestamp = BlockchainStatus & { lastBlockTimestamp: number }
 const asStatus = (s: BlockchainStatus) => s as StatusWithTimestamp
 
-export function useNodeState(): { state: NodeState; nodeAddress: string } {
+export function useNodeState(): { state: NodeState; nodeAddress: string; connected: boolean } {
   const { connected } = useNodeSocket()
 
   const status = useQuery({
@@ -36,6 +36,7 @@ export function useNodeState(): { state: NodeState; nodeAddress: string } {
 
   return {
     nodeAddress,
+    connected,
     state: deriveNodeState({
       status: status.data
         ? {
