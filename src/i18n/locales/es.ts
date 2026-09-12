@@ -32,6 +32,7 @@ export default {
       fee: 'Comisión',
       undecryptable: 'Cifrado — el sandbox no tiene ninguna de las dos claves',
       none: 'Aún no hay transacciones',
+      saveContact: 'Guardar como contacto',
     },
     kind: {
       payment: 'Pago',
@@ -71,6 +72,7 @@ export default {
       sent: 'Enviado — aparece como sin confirmar',
       recipients: 'Destinatarios',
       recipientHint: 'Uno por línea: dirección, importe',
+      knownParties: 'Contactos conocidos:',
       tokenName: 'Nombre del token',
       tokenQuantity: 'Cantidad',
       tokenDecimals: 'Decimales',

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from '@tanstack/react-query'
 import type { AccountStore } from '@/hooks/useAccounts'
+import type { Contacts } from '@/lib/contacts'
 import { PaymentForm } from './forms/PaymentForm'
 import { MultiOutForm } from './forms/MultiOutForm'
 import { MessageForm } from './forms/MessageForm'
@@ -26,7 +27,7 @@ const KINDS: SendKind[] = [
   'tokenIssue', 'tokenTransfer', 'alias', 'subscription',
 ]
 
-export function SendDrawer({ store }: { store: AccountStore }) {
+export function SendDrawer({ store, contacts }: { store: AccountStore; contacts: Contacts }) {
   const { t } = useTranslation()
   const client = useQueryClient()
   const [kind, setKind] = useState<SendKind>('payment')
@@ -62,15 +63,23 @@ export function SendDrawer({ store }: { store: AccountStore }) {
       </div>
 
       {kind === 'payment' && (
-        <PaymentForm accounts={store.accounts} onSent={onSent} onError={setNotice} />
+        <PaymentForm accounts={store.accounts} contacts={contacts} onSent={onSent} onError={setNotice} />
       )}
-      {kind === 'multiOut' && <MultiOutForm accounts={store.accounts} onSent={onSent} onError={setNotice} />}
-      {kind === 'message' && <MessageForm accounts={store.accounts} onSent={onSent} onError={setNotice} />}
+      {kind === 'multiOut' && (
+        <MultiOutForm accounts={store.accounts} contacts={contacts} onSent={onSent} onError={setNotice} />
+      )}
+      {kind === 'message' && (
+        <MessageForm accounts={store.accounts} contacts={contacts} onSent={onSent} onError={setNotice} />
+      )}
       {kind === 'accountInfo' && <AccountInfoForm accounts={store.accounts} onSent={onSent} onError={setNotice} />}
       {kind === 'tokenIssue' && <TokenIssueForm accounts={store.accounts} onSent={onSent} onError={setNotice} />}
-      {kind === 'tokenTransfer' && <TokenTransferForm accounts={store.accounts} onSent={onSent} onError={setNotice} />}
+      {kind === 'tokenTransfer' && (
+        <TokenTransferForm accounts={store.accounts} contacts={contacts} onSent={onSent} onError={setNotice} />
+      )}
       {kind === 'alias' && <AliasForm accounts={store.accounts} onSent={onSent} onError={setNotice} />}
-      {kind === 'subscription' && <SubscriptionForm accounts={store.accounts} onSent={onSent} onError={setNotice} />}
+      {kind === 'subscription' && (
+        <SubscriptionForm accounts={store.accounts} contacts={contacts} onSent={onSent} onError={setNotice} />
+      )}
 
       {notice && <p className="mt-2 text-[10px] text-[var(--blue3)]">{notice}</p>}
     </div>

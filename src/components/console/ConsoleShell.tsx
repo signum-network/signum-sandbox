@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Link } from '@tanstack/react-router'
 import { useNodeState } from '@/hooks/useNodeState'
 import { useAccounts } from '@/hooks/useAccounts'
+import { useContacts } from '@/hooks/useContacts'
 import { useChainFeed } from '@/hooks/useChainFeed'
 import { Unreachable } from '@/components/startpage'
 import { interpret } from '@/lib/search'
@@ -26,6 +27,7 @@ export function ConsoleShell() {
   const [drawer, setDrawer] = useState<DrawerName>(null)
   const { state, nodeAddress, connected } = useNodeState()
   const accounts = useAccounts()
+  const contacts = useContacts()
   const feed = useChainFeed(state.kind === 'ready' ? state.height : null, connected)
   const [search, setSearch] = useState('')
   const query = interpret(search)
@@ -71,11 +73,19 @@ export function ConsoleShell() {
       <div className="flex gap-3">
         <div className="min-h-[320px] flex-1 border p-3" style={{ borderColor: 'var(--border2)' }}>
           {tab === 'transactions' && (
-            <TransactionsView items={feed.items} accounts={accounts.accounts} query={query} />
+            <TransactionsView
+              items={feed.items}
+              accounts={accounts.accounts}
+              contacts={contacts.contacts}
+              onAddContact={contacts.add}
+              query={query}
+            />
           )}
           {tab === 'blocks' && (
             <BlocksView
               blocks={feed.blocks}
+              accounts={accounts.accounts}
+              contacts={contacts.contacts}
               onSelect={(height) => {
                 setSearch(String(height))
                 setTab('transactions')
@@ -94,7 +104,7 @@ export function ConsoleShell() {
                 ✕
               </button>
             </div>
-            {drawer === 'send' && <SendDrawer store={accounts} />}
+            {drawer === 'send' && <SendDrawer store={accounts} contacts={contacts.contacts} />}
             {drawer === 'chain' && <ChainDrawer height={state.height} />}
             {drawer === 'help' && <HelpDrawer />}
           </div>

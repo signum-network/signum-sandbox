@@ -32,6 +32,7 @@ export default {
       fee: 'Gebühr',
       undecryptable: 'Verschlüsselt — die Sandbox hat keinen der beiden Schlüssel',
       none: 'Noch keine Transaktionen',
+      saveContact: 'Als Kontakt speichern',
     },
     kind: {
       payment: 'Zahlung',
@@ -71,6 +72,7 @@ export default {
       sent: 'Gesendet — erscheint als unbestätigt',
       recipients: 'Empfänger',
       recipientHint: 'Einer pro Zeile: Adresse, Betrag',
+      knownParties: 'Bekannte Kontakte:',
       tokenName: 'Token-Name',
       tokenQuantity: 'Menge',
       tokenDecimals: 'Nachkommastellen',

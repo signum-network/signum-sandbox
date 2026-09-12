@@ -32,6 +32,7 @@ export default {
       fee: '手续费',
       undecryptable: '已加密 — 沙盒不持有任何一把密钥',
       none: '还没有交易',
+      saveContact: '另存为联系人',
     },
     kind: {
       payment: '付款',
@@ -71,6 +72,7 @@ export default {
       sent: '已发送 — 将显示为未确认',
       recipients: '收款人',
       recipientHint: '每行一个：地址, 金额',
+      knownParties: '已知联系人:',
       tokenName: '代币名称',
       tokenQuantity: '数量',
       tokenDecimals: '小数位数',

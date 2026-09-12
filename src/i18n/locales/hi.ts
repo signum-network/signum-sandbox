@@ -32,6 +32,7 @@ export default {
       fee: 'शुल्क',
       undecryptable: 'एन्क्रिप्टेड — सैंडबॉक्स के पास इनमें से कोई भी कुंजी नहीं है',
       none: 'अभी तक कोई लेनदेन नहीं',
+      saveContact: 'संपर्क के रूप में सहेजें',
     },
     kind: {
       payment: 'भुगतान',
@@ -71,6 +72,7 @@ export default {
       sent: 'भेजा गया — यह अपुष्ट के रूप में दिखेगा',
       recipients: 'प्राप्तकर्ता',
       recipientHint: 'प्रति पंक्ति एक: पता, राशि',
+      knownParties: 'ज्ञात पक्ष:',
       tokenName: 'टोकन नाम',
       tokenQuantity: 'मात्रा',
       tokenDecimals: 'दशमलव स्थान',

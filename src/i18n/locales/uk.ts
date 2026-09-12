@@ -32,6 +32,7 @@ export default {
       fee: 'Комісія',
       undecryptable: 'Зашифровано — у пісочниці немає жодного з ключів',
       none: 'Поки що немає транзакцій',
+      saveContact: 'Зберегти як контакт',
     },
     kind: {
       payment: 'Платіж',
@@ -71,6 +72,7 @@ export default {
       sent: 'Надіслано — з’являється як непідтверджене',
       recipients: 'Отримувачі',
       recipientHint: 'По одному на рядок: адреса, сума',
+      knownParties: 'Відомі контакти:',
       tokenName: 'Назва токена',
       tokenQuantity: 'Кількість',
       tokenDecimals: 'Десяткові знаки',

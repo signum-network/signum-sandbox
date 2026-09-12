@@ -1,15 +1,18 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { SandboxAccount } from '@/lib/accounts'
+import type { Contacts } from '@/lib/contacts'
 import { createSubscription, resolveRecipientPublicKey } from '@/lib/send'
-import { AccountSelect, Field, SubmitButton, TextInput } from './fields'
+import { AccountSelect, Field, RecipientPicker, SubmitButton, TextInput } from './fields'
 
 export function SubscriptionForm({
   accounts,
+  contacts,
   onSent,
   onError,
 }: {
   accounts: SandboxAccount[]
+  contacts: Contacts
   onSent: () => void
   onError: (message: string) => void
 }) {
@@ -44,7 +47,7 @@ export function SubscriptionForm({
         <AccountSelect accounts={accounts} value={fromId} onChange={setFromId} />
       </Field>
       <Field label={t('console.send.to')}>
-        <TextInput value={to} onChange={setTo} placeholder="TS-…" />
+        <RecipientPicker accounts={accounts} contacts={contacts} value={to} onChange={setTo} />
       </Field>
       <Field label={t('console.send.amount')}>
         <TextInput value={amount} onChange={setAmount} placeholder="100" />

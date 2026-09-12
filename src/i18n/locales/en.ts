@@ -43,6 +43,7 @@ export default {
       fee: 'Fee',
       undecryptable: 'Encrypted — the sandbox holds neither key',
       none: 'No transactions yet',
+      saveContact: 'Save as contact',
     },
     kind: {
       payment: 'Payment',
@@ -82,6 +83,7 @@ export default {
       sent: 'Sent — it appears as unconfirmed',
       recipients: 'Recipients',
       recipientHint: 'One per line: address, amount',
+      knownParties: 'Known parties:',
       tokenName: 'Token name',
       tokenQuantity: 'Quantity',
       tokenDecimals: 'Decimals',

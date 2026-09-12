@@ -32,6 +32,7 @@ export default {
       fee: '手数料',
       undecryptable: '暗号化済み — サンドボックスはどちらの鍵も持っていません',
       none: 'まだ取引がありません',
+      saveContact: '連絡先として保存',
     },
     kind: {
       payment: '支払い',
@@ -71,6 +72,7 @@ export default {
       sent: '送信済み — 未確認として表示されます',
       recipients: '受信者',
       recipientHint: '1 行に 1 件：アドレス、金額',
+      knownParties: '既知の相手:',
       tokenName: 'トークン名',
       tokenQuantity: '数量',
       tokenDecimals: '小数桁数',

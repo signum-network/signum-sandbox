@@ -1,12 +1,18 @@
 import { useTranslation } from 'react-i18next'
 import type { Block } from '@signumjs/core'
 import { nodeHost } from '@/lib/ledger'
+import type { SandboxAccount } from '@/lib/accounts'
+import { displayName, type Contacts } from '@/lib/contacts'
 
 export function BlocksView({
   blocks,
+  accounts,
+  contacts,
   onSelect,
 }: {
   blocks: Block[]
+  accounts: SandboxAccount[]
+  contacts: Contacts
   onSelect: (height: number) => void
 }) {
   const { t } = useTranslation()
@@ -25,7 +31,7 @@ export function BlocksView({
               <span className="font-bold text-[var(--blue3)]">#{block.height}</span>
               <span className="text-[var(--muted)]">
                 {' '}· {count === 0 ? t('console.blocks.empty') : t('console.blocks.count', { count })}
-                {' '}· {t('console.blocks.forger')} {block.generatorRS}
+                {' '}· {t('console.blocks.forger')} {displayName(block.generatorRS, accounts, contacts)}
               </span>
             </button>
             <a

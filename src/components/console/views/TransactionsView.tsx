@@ -1,16 +1,21 @@
 import { useTranslation } from 'react-i18next'
 import type { FeedItem } from '@/lib/chainFeed'
 import type { SandboxAccount } from '@/lib/accounts'
+import type { Contacts } from '@/lib/contacts'
 import { matchesTransaction, type Query } from '@/lib/search'
 import { TransactionRow } from './TransactionRow'
 
 export function TransactionsView({
   items,
   accounts,
+  contacts,
+  onAddContact,
   query,
 }: {
   items: FeedItem[]
   accounts: SandboxAccount[]
+  contacts: Contacts
+  onAddContact: (accountIdOrAddress: string, name: string) => void
   query: Query
 }) {
   const { t } = useTranslation()
@@ -37,7 +42,13 @@ export function TransactionsView({
   return (
     <ul>
       {shown.map((item) => (
-        <TransactionRow key={item.id} item={item} accounts={accounts} />
+        <TransactionRow
+          key={item.id}
+          item={item}
+          accounts={accounts}
+          contacts={contacts}
+          onAddContact={onAddContact}
+        />
       ))}
     </ul>
   )

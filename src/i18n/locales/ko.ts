@@ -32,6 +32,7 @@ export default {
       fee: '수수료',
       undecryptable: '암호화됨 — 샌드박스는 두 키 중 어느 것도 갖고 있지 않습니다',
       none: '아직 트랜잭션이 없습니다',
+      saveContact: '연락처로 저장',
     },
     kind: {
       payment: '결제',
@@ -71,6 +72,7 @@ export default {
       sent: '전송됨 — 미확인 상태로 표시됩니다',
       recipients: '수신자',
       recipientHint: '한 줄에 하나씩: 주소, 금액',
+      knownParties: '알려진 상대:',
       tokenName: '토큰 이름',
       tokenQuantity: '수량',
       tokenDecimals: '소수 자릿수',
