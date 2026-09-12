@@ -59,8 +59,7 @@ export function EntryList() {
       <Entry
         title={t('entry.dashboard.title')}
         description={t('entry.dashboard.description')}
-        badge={t('entry.comingSoon')}
-        disabled
+        href="#/console"
       />
     </div>
   )
