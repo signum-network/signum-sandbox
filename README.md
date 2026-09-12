@@ -51,6 +51,7 @@ is served by the node itself and talks to its own origin.
 |---|---|
 | `./scripts/bootstrap.sh` | fetches node artifacts; `--latest` resolves the newest release |
 | `./scripts/start.sh` | starts the node headless; `--gui` for the node's own window |
+| `./scripts/reset.sh` | stops the node, drops the chain, starts it again |
 | `bun run test` | unit tests |
 | `./scripts/smoke.sh` | starts the node and checks every mount responds |
 | `./scripts/package.sh` | assembles the release deliverable |
