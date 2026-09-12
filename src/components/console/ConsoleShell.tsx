@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from '@tanstack/react-router'
+import { useAccounts } from '@/hooks/useAccounts'
+import { AccountsView } from './views/AccountsView'
 
 export type ConsoleTab = 'transactions' | 'blocks' | 'accounts'
 
@@ -9,6 +11,7 @@ const TABS: ConsoleTab[] = ['transactions', 'blocks', 'accounts']
 export function ConsoleShell() {
   const { t } = useTranslation()
   const [tab, setTab] = useState<ConsoleTab>('transactions')
+  const accounts = useAccounts()
 
   return (
     <div className="mx-auto max-w-6xl p-6">
@@ -36,7 +39,7 @@ export function ConsoleShell() {
       </div>
 
       <div className="min-h-[320px] border p-3" style={{ borderColor: 'var(--border2)' }}>
-        {tab}
+        {tab === 'accounts' ? <AccountsView store={accounts} /> : tab}
       </div>
     </div>
   )
