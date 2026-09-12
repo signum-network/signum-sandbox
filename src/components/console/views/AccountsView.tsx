@@ -4,9 +4,10 @@ import { useQuery } from '@tanstack/react-query'
 import { Amount } from '@signumjs/util'
 import type { AccountStore } from '@/hooks/useAccounts'
 import { ledger } from '@/lib/ledger'
+import type { Query } from '@/lib/search'
 import { Identicon } from '../Identicon'
 
-export function AccountsView({ store }: { store: AccountStore }) {
+export function AccountsView({ store, query }: { store: AccountStore; query: Query }) {
   const { t } = useTranslation()
   const [name, setName] = useState('')
   const [passphrase, setPassphrase] = useState('')
@@ -25,6 +26,12 @@ export function AccountsView({ store }: { store: AccountStore }) {
   const field = 'border bg-transparent px-2 py-1 text-[11px] text-[var(--fg)]'
   const button = 'border px-3 py-1 text-[10px] uppercase tracking-[1px] text-[var(--blue3)]'
   const border = { borderColor: 'var(--border2)' }
+
+  const shown = store.accounts.filter((account) => {
+    if (query.kind === 'name') return account.name.toLowerCase().includes(query.value)
+    if (query.kind === 'address') return account.address === query.value
+    return true
+  })
 
   return (
     <div>
@@ -68,12 +75,12 @@ export function AccountsView({ store }: { store: AccountStore }) {
         </button>
       </div>
 
-      {store.accounts.length === 0 && (
+      {shown.length === 0 && (
         <p className="text-[11px] text-[var(--muted)]">{t('console.accounts.none')}</p>
       )}
 
       <ul>
-        {store.accounts.map((account) => (
+        {shown.map((account) => (
           <li
             key={account.id}
             className="flex items-center gap-3 border-b py-2 text-[11px]"

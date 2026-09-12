@@ -1,14 +1,17 @@
 import { useTranslation } from 'react-i18next'
 import type { FeedItem } from '@/lib/chainFeed'
 import type { SandboxAccount } from '@/lib/accounts'
+import { matchesTransaction, type Query } from '@/lib/search'
 import { TransactionRow } from './TransactionRow'
 
 export function TransactionsView({
   items,
   accounts,
+  query,
 }: {
   items: FeedItem[]
   accounts: SandboxAccount[]
+  query: Query
 }) {
   const { t } = useTranslation()
 
@@ -21,9 +24,19 @@ export function TransactionsView({
     )
   }
 
+  const shown = items.filter((item) => matchesTransaction(item.tx, query))
+
+  if (shown.length === 0) {
+    return (
+      <div className="p-4">
+        <p className="text-[11px] text-[var(--muted)]">{t('console.tx.none')}</p>
+      </div>
+    )
+  }
+
   return (
     <ul>
-      {items.map((item) => (
+      {shown.map((item) => (
         <TransactionRow key={item.id} item={item} accounts={accounts} />
       ))}
     </ul>
