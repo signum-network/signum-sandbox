@@ -47,7 +47,7 @@ export default {
       reward: 'Blockprämie',
       other: 'Transaktion',
     },
-    blocks: { count: '{{count}} Transaktionen', empty: 'Leer', forger: 'Forger' },
+    blocks: { count: '{{count}} Transaktionen', empty: 'Leer', forger: 'Forger', none: 'Noch keine Blöcke', noMatch: 'Keine passenden Blöcke' },
     accounts: {
       create: 'Account anlegen',
       import: 'Passphrase importieren',

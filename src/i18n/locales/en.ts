@@ -58,7 +58,7 @@ export default {
       reward: 'Block reward',
       other: 'Transaction',
     },
-    blocks: { count: '{{count}} transactions', empty: 'Empty', forger: 'Forger' },
+    blocks: { count: '{{count}} transactions', empty: 'Empty', forger: 'Forger', none: 'No blocks yet', noMatch: 'No blocks match' },
     accounts: {
       create: 'Create account',
       import: 'Import passphrase',

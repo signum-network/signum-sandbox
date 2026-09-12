@@ -47,7 +47,7 @@ export default {
       reward: '블록 보상',
       other: '트랜잭션',
     },
-    blocks: { count: '트랜잭션 {{count}}건', empty: '비어 있음', forger: '포저' },
+    blocks: { count: '트랜잭션 {{count}}건', empty: '비어 있음', forger: '포저', none: '아직 블록이 없습니다', noMatch: '일치하는 블록이 없습니다' },
     accounts: {
       create: '계정 만들기',
       import: '패스프레이즈 가져오기',

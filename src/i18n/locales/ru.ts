@@ -47,7 +47,7 @@ export default {
       reward: 'Награда за блок',
       other: 'Транзакция',
     },
-    blocks: { count: '{{count}} транзакций', empty: 'Пусто', forger: 'Кузнец' },
+    blocks: { count: '{{count}} транзакций', empty: 'Пусто', forger: 'Кузнец', none: 'Блоков пока нет', noMatch: 'Нет подходящих блоков' },
     accounts: {
       create: 'Создать счёт',
       import: 'Импортировать кодовую фразу',

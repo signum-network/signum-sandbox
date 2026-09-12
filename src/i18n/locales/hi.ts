@@ -47,7 +47,7 @@ export default {
       reward: 'ब्लॉक इनाम',
       other: 'लेनदेन',
     },
-    blocks: { count: '{{count}} लेनदेन', empty: 'खाली', forger: 'फ़ोर्जर' },
+    blocks: { count: '{{count}} लेनदेन', empty: 'खाली', forger: 'फ़ोर्जर', none: 'अभी कोई ब्लॉक नहीं', noMatch: 'कोई ब्लॉक मेल नहीं खाता' },
     accounts: {
       create: 'खाता बनाएँ',
       import: 'पासफ़्रेज़ आयात करें',

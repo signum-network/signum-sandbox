@@ -47,7 +47,7 @@ export default {
       reward: 'Recompensa de bloco',
       other: 'Transação',
     },
-    blocks: { count: '{{count}} transações', empty: 'Vazio', forger: 'Forjador' },
+    blocks: { count: '{{count}} transações', empty: 'Vazio', forger: 'Forjador', none: 'Ainda não há blocos', noMatch: 'Nenhum bloco corresponde' },
     accounts: {
       create: 'Criar conta',
       import: 'Importar frase-passe',

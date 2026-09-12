@@ -47,7 +47,7 @@ export default {
       reward: '出块奖励',
       other: '交易',
     },
-    blocks: { count: '{{count}} 笔交易', empty: '空', forger: '铸块者' },
+    blocks: { count: '{{count}} 笔交易', empty: '空', forger: '铸块者', none: '暂无区块', noMatch: '没有匹配的区块' },
     accounts: {
       create: '创建账户',
       import: '导入密语',

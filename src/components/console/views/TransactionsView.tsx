@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 import type { FeedItem } from '@/lib/chainFeed'
 import type { SandboxAccount } from '@/lib/accounts'
 import type { Contacts } from '@/lib/contacts'
-import { matchesTransaction, type Query } from '@/lib/search'
+import { matchesTransaction, type ResolvedQuery } from '@/lib/search'
 import { TransactionRow } from './TransactionRow'
 
 export function TransactionsView({
@@ -16,7 +16,7 @@ export function TransactionsView({
   accounts: SandboxAccount[]
   contacts: Contacts
   onAddContact: (accountIdOrAddress: string, name: string) => void
-  query: Query
+  query: ResolvedQuery
 }) {
   const { t } = useTranslation()
 

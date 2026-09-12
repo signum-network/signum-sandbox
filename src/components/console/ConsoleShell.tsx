@@ -6,7 +6,8 @@ import { useAccounts } from '@/hooks/useAccounts'
 import { useContacts } from '@/hooks/useContacts'
 import { useChainFeed } from '@/hooks/useChainFeed'
 import { Unreachable } from '@/components/startpage'
-import { interpret } from '@/lib/search'
+import { interpret, resolveQuery } from '@/lib/search'
+import { useNameLookup } from '@/hooks/useNameLookup'
 import { Header } from './Header'
 import { AccountsView } from './views/AccountsView'
 import { TransactionsView } from './views/TransactionsView'
@@ -31,6 +32,10 @@ export function ConsoleShell() {
   const feed = useChainFeed(state.kind === 'ready' ? state.height : null, connected)
   const [search, setSearch] = useState('')
   const query = interpret(search)
+  const namedAccountIds = useNameLookup(query)
+  // Resolved once here rather than per row: an address and a name both end up
+  // meaning "this account", and only the name kind ever asks the node.
+  const resolved = resolveQuery(query, accounts.accounts, contacts.contacts, namedAccountIds)
 
   if (state.kind === 'unreachable') {
     return (
@@ -78,7 +83,7 @@ export function ConsoleShell() {
               accounts={accounts.accounts}
               contacts={contacts.contacts}
               onAddContact={contacts.add}
-              query={query}
+              query={resolved}
             />
           )}
           {tab === 'blocks' && (
@@ -86,6 +91,7 @@ export function ConsoleShell() {
               blocks={feed.blocks}
               accounts={accounts.accounts}
               contacts={contacts.contacts}
+              query={resolved}
               onSelect={(height) => {
                 setSearch(String(height))
                 setTab('transactions')

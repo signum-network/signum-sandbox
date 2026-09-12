@@ -3,23 +3,40 @@ import type { Block } from '@signumjs/core'
 import { nodeHost } from '@/lib/ledger'
 import type { SandboxAccount } from '@/lib/accounts'
 import { displayName, type Contacts } from '@/lib/contacts'
+import { matchesBlock, type ResolvedQuery } from '@/lib/search'
 
 export function BlocksView({
   blocks,
   accounts,
   contacts,
+  query,
   onSelect,
 }: {
   blocks: Block[]
   accounts: SandboxAccount[]
   contacts: Contacts
+  query: ResolvedQuery
   onSelect: (height: number) => void
 }) {
   const { t } = useTranslation()
 
+  const shown = blocks.filter((block) => matchesBlock(block, query))
+
+  // A filter that matched nothing is not an empty chain, and saying so would be
+  // the same small lie the transaction stream is careful to avoid.
+  if (shown.length === 0) {
+    return (
+      <div className="p-4">
+        <p className="text-[11px] text-[var(--muted)]">
+          {blocks.length === 0 ? t('console.blocks.none') : t('console.blocks.noMatch')}
+        </p>
+      </div>
+    )
+  }
+
   return (
     <ul>
-      {blocks.map((block) => {
+      {shown.map((block) => {
         const count = block.numberOfTransactions
         return (
           <li

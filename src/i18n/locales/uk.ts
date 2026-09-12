@@ -47,7 +47,7 @@ export default {
       reward: 'Винагорода за блок',
       other: 'Транзакція',
     },
-    blocks: { count: '{{count}} транзакцій', empty: 'Порожньо', forger: 'Форджер' },
+    blocks: { count: '{{count}} транзакцій', empty: 'Порожньо', forger: 'Форджер', none: 'Ще немає блоків', noMatch: 'Немає відповідних блоків' },
     accounts: {
       create: 'Створити рахунок',
       import: 'Імпортувати парольну фразу',

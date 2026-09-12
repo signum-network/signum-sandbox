@@ -47,7 +47,7 @@ export default {
       reward: 'ブロック報酬',
       other: '取引',
     },
-    blocks: { count: '{{count}} 件の取引', empty: '空', forger: 'フォージャー' },
+    blocks: { count: '{{count}} 件の取引', empty: '空', forger: 'フォージャー', none: 'まだブロックがありません', noMatch: '一致するブロックがありません' },
     accounts: {
       create: 'アカウントを作成',
       import: 'パスフレーズをインポート',
