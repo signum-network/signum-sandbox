@@ -107,7 +107,7 @@ export default {
       resetConfirm: '모든 블록, 계정, 트랜잭션이 삭제됩니다. 계속하시겠습니까?',
       resetDone: '체인이 처음 상태로 돌아갔습니다',
       resetAlreadyAtStart: '초기화할 필요 없음 — 체인이 이미 시작 상태입니다',
-      resetManual: '두 초기화 호출 모두 실패했습니다. ./scripts/reset.sh 를 실행하세요',
+      resetManual: '두 초기화 호출 모두 실패했습니다. {{command}} 를 실행하세요',
       height: '높이',
     },
     guard: {

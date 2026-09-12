@@ -107,7 +107,7 @@ export default {
       resetConfirm: 'すべてのブロック、アカウント、取引が削除されます。続行しますか？',
       resetDone: 'チェーンは最初の状態に戻りました',
       resetAlreadyAtStart: 'リセットの必要はありません — チェーンはすでに最初の状態です',
-      resetManual: 'どちらのリセット呼び出しも失敗しました。./scripts/reset.sh を実行してください',
+      resetManual: 'どちらのリセット呼び出しも失敗しました。{{command}} を実行してください',
       height: '高さ',
     },
     guard: {

@@ -107,7 +107,7 @@ export default {
       resetConfirm: 'Das löscht jeden Block, Account und jede Transaktion. Fortfahren?',
       resetDone: 'Die Chain steht wieder am Anfang',
       resetAlreadyAtStart: 'Nichts zurückzusetzen — die Chain ist bereits am Anfang',
-      resetManual: 'Keiner der beiden Reset-Aufrufe hat funktioniert. Führe ./scripts/reset.sh aus',
+      resetManual: 'Keiner der beiden Reset-Aufrufe hat funktioniert. Führe {{command}} aus',
       height: 'Höhe',
     },
     guard: {

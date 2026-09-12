@@ -107,7 +107,7 @@ export default {
       resetConfirm: '这将删除每一个区块、账户和交易。是否继续？',
       resetDone: '链已回到起点',
       resetAlreadyAtStart: '无需重置 — 链已经处于起始状态',
-      resetManual: '两个重置调用都没有成功。请运行 ./scripts/reset.sh',
+      resetManual: '两个重置调用都没有成功。请运行 {{command}}',
       height: '高度',
     },
     guard: {

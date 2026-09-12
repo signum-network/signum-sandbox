@@ -107,7 +107,7 @@ export default {
       resetConfirm: 'इससे हर ब्लॉक, खाता और लेनदेन मिट जाएगा। जारी रखें?',
       resetDone: 'चेन फिर से शुरुआत में है',
       resetAlreadyAtStart: 'रीसेट करने के लिए कुछ नहीं — चेन पहले से ही शुरुआत में है',
-      resetManual: 'दोनों में से कोई भी रीसेट कॉल काम नहीं आया। ./scripts/reset.sh चलाएँ',
+      resetManual: 'दोनों में से कोई भी रीसेट कॉल काम नहीं आया। {{command}} चलाएँ',
       height: 'ऊँचाई',
     },
     guard: {

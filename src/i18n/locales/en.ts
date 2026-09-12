@@ -118,7 +118,7 @@ export default {
       resetConfirm: 'This deletes every block, account and transaction. Continue?',
       resetDone: 'The chain is back at the start',
       resetAlreadyAtStart: 'Nothing to reset — the chain is already at the start',
-      resetManual: 'Neither reset call worked. Run ./scripts/reset.sh',
+      resetManual: 'Neither reset call worked. Run {{command}}',
       height: 'Height',
     },
     guard: {

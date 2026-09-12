@@ -9,7 +9,8 @@ A local Signum node running an offline mock network, with a UI built for getting
 Download the latest release, unpack it, and run:
 
 ```bash
-./scripts/start.sh
+./scripts/start.sh      # macOS, Linux
+scripts\start.cmd       # Windows
 ```
 
 Then open **http://localhost:6876/**. You need Java 21 or newer.
@@ -50,8 +51,8 @@ is served by the node itself and talks to its own origin.
 | Command | Does |
 |---|---|
 | `./scripts/bootstrap.sh` | fetches node artifacts; `--latest` resolves the newest release |
-| `./scripts/start.sh` | starts the node headless; `--gui` for the node's own window |
-| `./scripts/reset.sh` | stops the node, drops the chain, starts it again |
+| `./scripts/start.sh` / `scripts\start.cmd` | starts the node headless; `--gui` for the node's own window |
+| `./scripts/reset.sh` / `scripts\reset.cmd` | stops the node, drops the chain, starts it again |
 | `bun run test` | unit tests |
 | `./scripts/smoke.sh` | starts the node and checks every mount responds |
 | `./scripts/package.sh` | assembles the release deliverable |

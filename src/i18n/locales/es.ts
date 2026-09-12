@@ -107,7 +107,7 @@ export default {
       resetConfirm: 'Esto elimina todos los bloques, cuentas y transacciones. ¿Continuar?',
       resetDone: 'La cadena ha vuelto al inicio',
       resetAlreadyAtStart: 'Nada que reiniciar — la cadena ya está al principio',
-      resetManual: 'Ninguna de las dos llamadas de reinicio funcionó. Ejecuta ./scripts/reset.sh',
+      resetManual: 'Ninguna de las dos llamadas de reinicio funcionó. Ejecuta {{command}}',
       height: 'Altura',
     },
     guard: {

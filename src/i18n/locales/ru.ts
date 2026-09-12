@@ -107,7 +107,7 @@ export default {
       resetConfirm: 'Это удалит все блоки, счета и транзакции. Продолжить?',
       resetDone: 'Цепочка снова в начале',
       resetAlreadyAtStart: 'Нечего сбрасывать — цепочка уже в начале',
-      resetManual: 'Ни один из вызовов сброса не сработал. Выполните ./scripts/reset.sh',
+      resetManual: 'Ни один из вызовов сброса не сработал. Выполните {{command}}',
       height: 'Высота',
     },
     guard: {

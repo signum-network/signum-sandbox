@@ -107,7 +107,7 @@ export default {
       resetConfirm: 'Isto apaga todos os blocos, contas e transações. Continuar?',
       resetDone: 'A cadeia voltou ao início',
       resetAlreadyAtStart: 'Nada para reiniciar — a cadeia já está no início',
-      resetManual: 'Nenhuma das chamadas de reinício funcionou. Execute ./scripts/reset.sh',
+      resetManual: 'Nenhuma das chamadas de reinício funcionou. Execute {{command}}',
       height: 'Altura',
     },
     guard: {

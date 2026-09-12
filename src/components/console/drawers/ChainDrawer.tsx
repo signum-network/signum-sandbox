@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from '@tanstack/react-query'
 import { resetChain } from '@/lib/chainAdmin'
+import { resetScriptCommand } from '@/lib/platform'
 
 export function ChainDrawer({ height }: { height: number | null }) {
   const { t } = useTranslation()
@@ -19,7 +20,7 @@ export function ChainDrawer({ height }: { height: number | null }) {
         ? t('console.chain.resetDone')
         : outcome.kind === 'alreadyAtStart'
           ? t('console.chain.resetAlreadyAtStart')
-          : t('console.chain.resetManual'),
+          : t('console.chain.resetManual', { command: resetScriptCommand(navigator.userAgent) }),
     )
     void client.invalidateQueries()
   }
