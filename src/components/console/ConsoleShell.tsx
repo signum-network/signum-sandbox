@@ -12,6 +12,8 @@ import { TransactionsView } from './views/TransactionsView'
 import { BlocksView } from './views/BlocksView'
 import { SearchField } from './views/SearchField'
 import { SendDrawer } from './drawers/SendDrawer'
+import { ChainDrawer } from './drawers/ChainDrawer'
+import { HelpDrawer } from './drawers/HelpDrawer'
 
 export type ConsoleTab = 'transactions' | 'blocks' | 'accounts'
 export type DrawerName = 'send' | 'chain' | 'help' | null
@@ -93,6 +95,8 @@ export function ConsoleShell() {
               </button>
             </div>
             {drawer === 'send' && <SendDrawer store={accounts} />}
+            {drawer === 'chain' && <ChainDrawer height={state.height} />}
+            {drawer === 'help' && <HelpDrawer />}
           </div>
         )}
       </div>
