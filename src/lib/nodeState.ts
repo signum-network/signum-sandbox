@@ -37,17 +37,30 @@ export type NodeState =
 export function deriveNodeState(input: DeriveInput): NodeState {
   if (input.statusFailed && !input.status) return { kind: 'unreachable' }
 
+  const height = input.status?.numberOfBlocks ?? null
+
   return {
     kind: 'ready',
     networkName: input.networkName ?? null,
     version: input.status?.version ?? null,
-    height: input.status?.numberOfBlocks ?? null,
+    height,
     cumulativeDifficulty: input.status?.cumulativeDifficulty ?? null,
-    lastBlockAgeMs:
-      input.lastBlockMs === undefined ? null : Math.max(0, input.now - input.lastBlockMs),
+    lastBlockAgeMs: lastBlockAge(input, height),
     connection: input.socketConnected ? 'live' : 'polling',
     scanning: input.status?.isScanning ?? false,
   }
+}
+
+/**
+ * The genesis block of a mock chain carries a synthetic timestamp a few minutes
+ * into the Signum epoch, so presenting it as an age would claim the chain is
+ * over a decade old. Until a block has actually been forged there is no
+ * meaningful age to show.
+ */
+function lastBlockAge(input: DeriveInput, height: number | null): number | null {
+  if (input.lastBlockMs === undefined) return null
+  if (height !== null && height <= 1) return null
+  return Math.max(0, input.now - input.lastBlockMs)
 }
 
 const MINUTE = 60_000

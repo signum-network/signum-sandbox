@@ -62,6 +62,26 @@ describe('deriveNodeState', () => {
     })
   })
 
+  it('treats the genesis timestamp as no age at all', () => {
+    // A fresh mock chain carries a synthetic genesis timestamp (1234 seconds
+    // into the Signum epoch), which would otherwise read as "12 years ago".
+    const state = deriveNodeState({
+      ...base,
+      status: { ...status, numberOfBlocks: 1 },
+      lastBlockMs: 1_407_724_834_000,
+      now: 1_789_000_000_000,
+    })
+    if (state.kind !== 'ready') throw new Error('expected ready')
+    expect(state.height).toBe(1)
+    expect(state.lastBlockAgeMs).toBeNull()
+  })
+
+  it('reports a real age as soon as a block has been forged', () => {
+    const state = deriveNodeState({ ...base, status: { ...status, numberOfBlocks: 2 } })
+    if (state.kind !== 'ready') throw new Error('expected ready')
+    expect(state.lastBlockAgeMs).toBe(12_000)
+  })
+
   it('does not report a negative age when the node clock runs ahead', () => {
     const state = deriveNodeState({ ...base, now: base.lastBlockMs! - 5_000 })
     if (state.kind !== 'ready') throw new Error('expected ready')
