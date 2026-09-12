@@ -5,7 +5,6 @@ export interface DeriveInput {
   status?: {
     numberOfBlocks: number
     version: string
-    cumulativeDifficulty: string
     isScanning: boolean
   }
   /** Timestamp of the last block in epoch milliseconds. */
@@ -23,7 +22,6 @@ export type NodeState =
       networkName: string | null
       version: string | null
       height: number | null
-      cumulativeDifficulty: string | null
       lastBlockAgeMs: number | null
       connection: Connection
       scanning: boolean
@@ -44,7 +42,6 @@ export function deriveNodeState(input: DeriveInput): NodeState {
     networkName: input.networkName ?? null,
     version: input.status?.version ?? null,
     height,
-    cumulativeDifficulty: input.status?.cumulativeDifficulty ?? null,
     lastBlockAgeMs: lastBlockAge(input, height),
     connection: input.socketConnected ? 'live' : 'polling',
     scanning: input.status?.isScanning ?? false,

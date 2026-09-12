@@ -137,11 +137,10 @@ Tiles in this step:
 |---|---|
 | Block Height | `numberOfBlocks` |
 | Last Block | `lastBlockTimestamp`, rendered as elapsed time |
-| Cumulative Difficulty | `cumulativeDifficulty` |
 
 The header shows `version` from the same response and `networkName` from `getNetworkInfo`. `isScanning` drives a scanning indicator.
 
-Three tiles is deliberately sparse. Cumulative difficulty in particular is a developer-facing number rather than a newcomer-friendly one; it earns its place only until richer metrics unblock. The left panel is expected to be revisited once `getState` is available, and the layout is explicitly not final.
+Two tiles is deliberately sparse. Cumulative difficulty was carried here at first and then dropped: it is a number for people who already know what it means, and a sandbox aimed at newcomers is the wrong place to spend a tile on it. Everything else worth showing waits on `getState`, so the left panel is expected to be revisited and the layout is explicitly not final.
 
 Transactions, accounts, minted coins, contracts and tokens are **not** shown in this step — `getBlockchainStatus` does not carry them, and `getState` is unusable on the released node. When the sandbox pins a node release containing commit `dcb7e5d2`, `getState` alone fills the whole tile set and these tiles are added without touching component structure.
 

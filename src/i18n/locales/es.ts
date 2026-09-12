@@ -2,7 +2,7 @@ export default {
   tagline: 'Tu propia blockchain. Sin costes, sin riesgo, sin fricción.',
   status: { live: 'en vivo', polling: 'consultando', offline: 'sin conexión', scanning: 'escaneando' },
   panel: { nodeState: 'Estado del nodo' },
-  tile: { height: 'Altura de bloque', lastBlock: 'Último bloque', difficulty: 'Dificultad acumulada' },
+  tile: { height: 'Altura de bloque', lastBlock: 'Último bloque' },
   entry: {
     apiDocs: { title: 'Documentación API', description: 'Prueba toda la API JSON de forma interactiva' },
     dashboard: { title: 'Panel del nodo mock', description: 'Forja bloques, explora cuentas y transacciones' },

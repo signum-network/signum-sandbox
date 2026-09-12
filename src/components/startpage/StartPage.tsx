@@ -29,7 +29,6 @@ export function StartPage() {
         <NodeStatePanel
           height={state.height}
           lastBlockAgeMs={state.lastBlockAgeMs}
-          cumulativeDifficulty={state.cumulativeDifficulty}
         />
         <EntryList />
       </div>

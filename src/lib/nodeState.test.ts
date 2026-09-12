@@ -4,7 +4,6 @@ import { deriveNodeState, relativeParts, type DeriveInput } from './nodeState'
 const status = {
   numberOfBlocks: 1284,
   version: 'v3.9.11',
-  cumulativeDifficulty: '1006632960',
   isScanning: false,
 }
 
@@ -38,7 +37,6 @@ describe('deriveNodeState', () => {
       networkName: 'Signum-LOCAL-MOCK',
       version: 'v3.9.11',
       height: 1284,
-      cumulativeDifficulty: '1006632960',
       lastBlockAgeMs: 12_000,
       connection: 'live',
       scanning: false,
@@ -57,8 +55,7 @@ describe('deriveNodeState', () => {
     })
     expect(state).toEqual({
       kind: 'ready', networkName: null, version: null, height: null,
-      cumulativeDifficulty: null, lastBlockAgeMs: null,
-      connection: 'polling', scanning: false,
+      lastBlockAgeMs: null, connection: 'polling', scanning: false,
     })
   })
 

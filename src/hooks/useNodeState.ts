@@ -41,7 +41,6 @@ export function useNodeState(): { state: NodeState; nodeAddress: string } {
         ? {
             numberOfBlocks: status.data.numberOfBlocks,
             version: status.data.version,
-            cumulativeDifficulty: status.data.cumulativeDifficulty,
             isScanning: status.data.isScanning,
           }
         : undefined,

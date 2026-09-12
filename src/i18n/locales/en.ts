@@ -10,7 +10,6 @@ export default {
   tile: {
     height: 'Block Height',
     lastBlock: 'Last Block',
-    difficulty: 'Cumulative Difficulty',
   },
   entry: {
     apiDocs: { title: 'API Docs', description: 'Try the full JSON API interactively' },

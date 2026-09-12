@@ -5,7 +5,6 @@ import { relativeParts } from '@/lib/nodeState'
 interface Props {
   height: number | null
   lastBlockAgeMs: number | null
-  cumulativeDifficulty: string | null
 }
 
 const PLACEHOLDER = '—'
@@ -19,7 +18,7 @@ function Metric({ label, children }: { label: string; children: React.ReactNode 
   )
 }
 
-export function NodeStatePanel({ height, lastBlockAgeMs, cumulativeDifficulty }: Props) {
+export function NodeStatePanel({ height, lastBlockAgeMs }: Props) {
   const { t, i18n } = useTranslation()
 
   const lastBlock = () => {
@@ -36,11 +35,6 @@ export function NodeStatePanel({ height, lastBlockAgeMs, cumulativeDifficulty }:
           {height === null ? PLACEHOLDER : <AnimatedNumber value={height} />}
         </Metric>
         <Metric label={t('tile.lastBlock')}>{lastBlock()}</Metric>
-        <Metric label={t('tile.difficulty')}>
-          {cumulativeDifficulty === null
-            ? PLACEHOLDER
-            : BigInt(cumulativeDifficulty).toLocaleString(i18n.language)}
-        </Metric>
       </div>
     </Card>
   )
