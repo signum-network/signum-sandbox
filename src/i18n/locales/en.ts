@@ -1,5 +1,5 @@
 export default {
-  tagline: 'Your own blockchain. No costs, no risk, no friction.',
+  tagline: 'A throwaway Signum chain to build against. Break it, reset it, start over.',
   status: {
     live: 'live',
     polling: 'polling',

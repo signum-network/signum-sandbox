@@ -1,5 +1,5 @@
 export default {
-  tagline: '自分だけのブロックチェーン。コストなし、リスクなし、摩擦なし。',
+  tagline: '使い捨てできる Signum チェーンで開発。壊して、リセットして、やり直す。',
   status: { live: 'ライブ', polling: 'ポーリング中', offline: 'オフライン', scanning: 'スキャン中' },
   panel: { nodeState: 'ノードの状態' },
   tile: { height: 'ブロック高', lastBlock: '最新ブロック' },

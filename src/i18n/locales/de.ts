@@ -1,5 +1,5 @@
 export default {
-  tagline: 'Deine eigene Blockchain. Keine Kosten, kein Risiko, keine Reibung.',
+  tagline: 'Eine Signum-Chain zum Wegwerfen. Kaputtmachen, zurücksetzen, von vorn.',
   status: { live: 'live', polling: 'Abfrage', offline: 'offline', scanning: 'Scan läuft' },
   panel: { nodeState: 'Node-Zustand' },
   tile: { height: 'Blockhöhe', lastBlock: 'Letzter Block' },

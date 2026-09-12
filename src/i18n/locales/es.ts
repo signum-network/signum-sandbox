@@ -1,5 +1,5 @@
 export default {
-  tagline: 'Tu propia blockchain. Sin costes, sin riesgo, sin fricción.',
+  tagline: 'Una cadena Signum desechable donde desarrollar. Rómpela, reiníciala, empieza de nuevo.',
   status: { live: 'en vivo', polling: 'consultando', offline: 'sin conexión', scanning: 'escaneando' },
   panel: { nodeState: 'Estado del nodo' },
   tile: { height: 'Altura de bloque', lastBlock: 'Último bloque' },

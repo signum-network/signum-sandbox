@@ -1,5 +1,5 @@
 export default {
-  tagline: 'A sua própria blockchain. Sem custos, sem risco, sem atrito.',
+  tagline: 'Uma cadeia Signum descartável para desenvolver. Quebre-a, reinicie-a, comece de novo.',
   status: { live: 'ao vivo', polling: 'consultando', offline: 'desligado', scanning: 'a analisar' },
   panel: { nodeState: 'Estado do nó' },
   tile: { height: 'Altura do bloco', lastBlock: 'Último bloco' },
