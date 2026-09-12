@@ -8,8 +8,8 @@ import { isRefetchTrigger, parseEvent } from '@/lib/socketEvents'
  * The node exposes /events on its dedicated WebSocket port (6877 here) and, as
  * a side effect of both connectors sharing one servlet context, on the API port
  * as well - verified against v3.9.11: both deliver byte-identical events. We
- * follow the page origin, which keeps the socket same-origin in production and
- * lets the Vite proxy handle development, with VITE_WS_URL as an escape hatch.
+ * follow the page origin, exactly as the API client does, so both take the same
+ * route: same-origin in production, through the Vite proxy in development.
  *
  * No subscription message is needed; events arrive on connect.
  */
@@ -25,8 +25,7 @@ export function useNodeSocket() {
     const open = () => {
       if (disposed) return
       const scheme = window.location.protocol === 'https:' ? 'wss' : 'ws'
-      const url = import.meta.env.VITE_WS_URL ?? `${scheme}://${window.location.host}/events`
-      socket = new WebSocket(url)
+      socket = new WebSocket(`${scheme}://${window.location.host}/events`)
       socket.onopen = () => setConnected(true)
       socket.onmessage = (event) => {
         if (isRefetchTrigger(parseEvent(String(event.data)))) {

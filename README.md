@@ -24,7 +24,28 @@ bun run build            # builds the UI into html/sandbox
 ```
 
 For UI work, `bun run dev` serves the UI on http://localhost:5173 with `/api` and
-`/events` proxied to the node, so changes reload without rebuilding.
+`/events` proxied to the node, so changes reload without rebuilding. The node
+has to be running separately — `bun run dev` alone will report that it cannot
+find one.
+
+### Pointing the dev server at another node
+
+Copy `.env.example` to `.env.local` and set the node you want:
+
+```
+VITE_NODE_URL=http://192.168.15.3:6876
+```
+
+Or pass it inline, which takes precedence:
+
+```bash
+VITE_NODE_URL=http://192.168.15.3:6876 bun run dev
+```
+
+Both the API and the event socket follow, and both travel through the Vite
+proxy, so the browser never makes a cross-origin request and the node needs no
+CORS configuration. The variable affects development only: a production build
+is served by the node itself and talks to its own origin.
 
 | Command | Does |
 |---|---|

@@ -19,6 +19,10 @@ dist/
 node_modules/
 tsconfig.tsbuildinfo
 
+# Local configuration
+.env.local
+.env.*.local
+
 # IDE
 .idea/
 .vscode/

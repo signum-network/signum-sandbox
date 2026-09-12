@@ -4,7 +4,19 @@
 // bundle, since the package is sideEffects-free.
 import { createReadOnlyClient } from '@signumjs/core/createReadOnlyClient'
 
-/** Same origin in production (the node serves us); the Vite proxy handles development. */
-export const nodeHost = import.meta.env.VITE_NODE_URL ?? window.location.origin
+/**
+ * Requests always target the page origin. In production the node serves the page,
+ * so that is the node. In development the Vite proxy forwards /api and /events to
+ * whichever node it was configured with, which keeps every request same-origin
+ * and out of reach of CORS.
+ */
+export const nodeHost = window.location.origin
+
+/**
+ * The address to name when nothing answers. It differs from nodeHost only in
+ * development, where the page comes from the dev server and telling the user to
+ * look for a node there would send them to the wrong place.
+ */
+export const nodeAddress = __NODE_ADDRESS__ ?? window.location.origin
 
 export const ledger = createReadOnlyClient({ nodeHost })

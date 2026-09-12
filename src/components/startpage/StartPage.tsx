@@ -6,13 +6,13 @@ import { EntryList } from './EntryList'
 import { Unreachable } from './Unreachable'
 
 export function StartPage() {
-  const { state, nodeHost } = useNodeState()
+  const { state, nodeAddress } = useNodeState()
   useBlockChime(state.kind === 'ready' ? state.height : null)
 
   if (state.kind === 'unreachable') {
     return (
       <div className="mx-auto max-w-5xl p-6">
-        <Unreachable nodeHost={nodeHost} />
+        <Unreachable nodeAddress={nodeAddress} />
       </div>
     )
   }

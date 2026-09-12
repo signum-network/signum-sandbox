@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { ChainTime } from '@signumjs/util'
 import type { BlockchainStatus } from '@signumjs/core'
-import { ledger, nodeHost } from '@/lib/ledger'
+import { ledger, nodeAddress } from '@/lib/ledger'
 import { deriveNodeState, type NodeState } from '@/lib/nodeState'
 import { useNodeSocket } from './useNodeSocket'
 
@@ -13,7 +13,7 @@ import { useNodeSocket } from './useNodeSocket'
 type StatusWithTimestamp = BlockchainStatus & { lastBlockTimestamp: number }
 const asStatus = (s: BlockchainStatus) => s as StatusWithTimestamp
 
-export function useNodeState(): { state: NodeState; nodeHost: string } {
+export function useNodeState(): { state: NodeState; nodeAddress: string } {
   const { connected } = useNodeSocket()
 
   const status = useQuery({
@@ -35,7 +35,7 @@ export function useNodeState(): { state: NodeState; nodeHost: string } {
     : undefined
 
   return {
-    nodeHost,
+    nodeAddress,
     state: deriveNodeState({
       status: status.data
         ? {
