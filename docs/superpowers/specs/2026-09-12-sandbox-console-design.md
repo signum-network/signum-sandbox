@@ -26,9 +26,16 @@ Checked against the pinned `signum-node.jar` (v3.9.11) API description and the i
 | `getNetworkInfo` is not an API request type; SignumJS derives it from `getConstants`. | Nothing changes for us — the existing call already works — but the network-name safety rail rides on `getConstants` data. |
 | Read-only endpoints for the three views all exist: `getUnconfirmedTransactions`, `getAccountTransactions`, `getBlocks`, `getBlock`, `getTransaction`, `getAccount`, `getAliases`, `getAsset`, `getAccountAssets`, `getAccountSubscriptions`. | The inspector needs no node change. |
 
-Unverified and to be checked during implementation: how `fullReset` and `popOff` actually behave on the offline mock network. `fullReset` is documented as "resets the node and forces a resync" — with no peers there is nothing to resync from, which is exactly what we want, but it has not been run yet.
+Both reset calls have since been run against the live mock node, and they do not behave alike:
 
-Reset therefore has three stages, and the first one that works wins. `popOff` down to height 1 is the preferred path: a sandbox chain is almost always shorter than the 1440-block limit, so rewinding to the start *is* a full reset, and it needs neither a restart nor a second mechanism. `fullReset` is the fallback for a chain that has grown past that limit. And `scripts/reset.sh` — stop the node, remove `db/`, start it again — is the last resort the console names when neither API call worked.
+| Call | What actually happens on v3.9.11 |
+|---|---|
+| `popOff` with `height=1` | Works. Returns the list of popped blocks; `numberOfBlocks` drops to 2 — genesis plus block 1. |
+| `fullReset` | **Silent no-op.** Answers `{"done":true}` and leaves the database byte-identical. The node log shows `Unable to execute clean as it has been disabled with the 'flyway.cleanDisabled' property`, and that failure is never propagated into the API response. |
+
+Reset therefore has three stages, and the first one that **demonstrably** worked wins. `popOff` down to height 1 is the real path: a sandbox chain is almost always shorter than the 1440-block limit, so rewinding to the start *is* a full reset, and it needs neither a restart nor a second mechanism. `fullReset` stays in the sequence because attempting it costs nothing and a later node build may repair it, but it is not counted on. And `scripts/reset.sh` — stop the node, remove `db/`, start it again — is the last resort the console names when neither API call moved the chain.
+
+Because `fullReset` reports success while doing nothing, **`resetChain` measures instead of trusting**: after each stage it reads the height back and only reports that stage as successful if the chain actually returned to the start. Telling someone their chain was wiped when it was not is the worst outcome available after a destructive action they confirmed.
 
 ## Decisions
 
@@ -44,7 +51,7 @@ Reset therefore has three stages, and the first one that works wins. `popOff` do
 10. **The tour drives real actions and waits for real chain state**, rather than narrating over the UI.
 11. **The passphrase safety rail:** passphrases live in plain `localStorage` because they are worthless on a mock chain — and the account store refuses to operate when the connected node is not the mock network.
 12. **Scenario accounts use obviously fake passphrases** (`sandbox-alice`, `sandbox-miner`); accounts created in the console get real generated mnemonics.
-13. **Reset walks three stages** — `popOff` to height 1, then `fullReset`, then a documented script.
+13. **Reset walks three stages** — `popOff` to height 1, then `fullReset`, then a documented script — and verifies the height after each rather than trusting the response.
 14. **Delivery in two layers:** the developer core first, the newcomer layer on top.
 
 ## Layout
@@ -93,7 +100,7 @@ The expanded detail decodes the payload rather than restating the JSON: a plain 
 
 **Auto-forge** produces a block on a fixed interval, **off by default**. It is what a developer switches on so their application's transactions confirm without switching windows; leaving it off by default preserves the newcomer's cause-and-effect between pressing a button and seeing a block.
 
-**Reset** sits behind a confirmation and walks the three stages above — `popOff` to height 1, then `fullReset`, then the script it tells you to run. Afterwards the console is back in its empty state, offering the scenarios again.
+**Reset** sits behind a confirmation and walks the three stages above — `popOff` to height 1, then `fullReset`, then the script it tells you to run — checking the height after each rather than believing the answer. Afterwards the console is back in its empty state, offering the scenarios again.
 
 **Advanced tools** are hidden behind a switch in the Chain drawer. It currently holds `popOff` with −1, −10 and −100 blocks. The same switch is the place for any later tool that would confuse more than it helps.
 
@@ -256,4 +263,4 @@ Smart contracts, reward recipient, marketplace, asset trading, the faucet, distr
 
 ## Open risks
 
-The admin API's behaviour on the offline mock network is documented but untested; `fullReset` is the one call whose failure would cost a feature, and the fallback is a script. The scenario vocabulary will feel too narrow the first time someone wants a step it does not have — that is the accepted price of a declarative format, and widening it later is additive. And the tour's coupling to the components is the part most likely to be underestimated: if it is not built in with the components, it will be built twice.
+`fullReset` turned out to be a silent no-op, so on a chain longer than `popOff`'s 1440-block reach the only working reset is the script. That is a narrow case — a sandbox chain rarely gets that long — but it is the one place where a button becomes an instruction. The scenario vocabulary will feel too narrow the first time someone wants a step it does not have — that is the accepted price of a declarative format, and widening it later is additive. And the tour's coupling to the components is the part most likely to be underestimated: if it is not built in with the components, it will be built twice.
