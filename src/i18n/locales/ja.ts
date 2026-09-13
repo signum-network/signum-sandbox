@@ -122,6 +122,7 @@ export default {
       resetManual: 'どちらのリセット呼び出しも失敗しました。{{command}} を実行してください',
       height: '高さ',
     },
+    pager: { range: '{{from}}–{{to}} / 全 {{total}}', page: '{{page}} / {{pages}} ページ' },
     watch: {
       watch: '監視',
       stop: '監視をやめる',

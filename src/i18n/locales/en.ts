@@ -133,6 +133,7 @@ export default {
       resetManual: 'Neither reset call worked. Run {{command}}',
       height: 'Height',
     },
+    pager: { range: '{{from}}–{{to}} of {{total}}', page: 'Page {{page}} of {{pages}}' },
     watch: {
       watch: 'Watch',
       stop: 'Stop watching',

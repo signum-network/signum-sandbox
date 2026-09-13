@@ -122,6 +122,7 @@ export default {
       resetManual: 'Nenhuma das chamadas de reinício funcionou. Execute {{command}}',
       height: 'Altura',
     },
+    pager: { range: '{{from}}–{{to}} de {{total}}', page: 'Página {{page}} de {{pages}}' },
     watch: {
       watch: 'Observar',
       stop: 'Parar de observar',

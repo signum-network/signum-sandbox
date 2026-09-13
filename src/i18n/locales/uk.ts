@@ -122,6 +122,7 @@ export default {
       resetManual: 'Жоден із викликів скидання не спрацював. Виконайте {{command}}',
       height: 'Висота',
     },
+    pager: { range: '{{from}}–{{to}} з {{total}}', page: 'Сторінка {{page}} з {{pages}}' },
     watch: {
       watch: 'Спостерігати',
       stop: 'Припинити спостереження',

@@ -4,7 +4,7 @@ import { useNodeState } from '@/hooks/useNodeState'
 import { useAccounts } from '@/hooks/useAccounts'
 import { useContacts } from '@/hooks/useContacts'
 import { useWatched } from '@/hooks/useWatched'
-import { useChainFeed } from '@/hooks/useChainFeed'
+import { useBlockPage, useChainFeed } from '@/hooks/useChainFeed'
 import { Unreachable } from '@/components/startpage'
 import { AppHeader } from '@/components/AppHeader'
 import { ConsoleButton, RowButton } from './ConsoleButton'
@@ -36,12 +36,22 @@ export function ConsoleShell() {
   const watched = useWatched()
   const feed = useChainFeed(state.kind === 'ready' ? state.height : null, connected)
   const [search, setSearch] = useState('')
+  const [txPage, setTxPage] = useState(0)
+  const [blockPage, setBlockPage] = useState(0)
+  // A page index belongs to the list it indexed. Narrowing the filter makes
+  // the old position meaningless, so it goes back to the top rather than
+  // leaving someone on an empty page wondering where the rows went.
+  const changeSearch = (value: string) => {
+    setSearch(value)
+    setTxPage(0)
+    setBlockPage(0)
+  }
   const query = interpret(search)
   // Handing one transaction to the stream: the stream owns payload decoding,
   // contact saving and the raw link, so every "show me this one" gesture in
   // the console routes there rather than growing its own copy.
   const showTransaction = (transactionId: string) => {
-    setSearch(transactionId)
+    changeSearch(transactionId)
     setTab('transactions')
   }
 
@@ -49,6 +59,10 @@ export function ConsoleShell() {
   // Resolved once here rather than per row: an address and a name both end up
   // meaning "this account", and only the name kind ever asks the node.
   const resolved = resolveQuery(query, accounts.accounts, contacts.contacts, namedAccountIds)
+
+  // The Blocks tab walks the whole chain, so it fetches its own page rather
+  // than sharing the stream's fixed window at the tip.
+  const blocks = useBlockPage(blockPage, connected, state.kind === 'ready')
 
   if (state.kind === 'unreachable') {
     return (
@@ -88,7 +102,7 @@ export function ConsoleShell() {
             </ConsoleButton>
           ))}
         </div>
-        <SearchField value={search} onChange={setSearch} />
+        <SearchField value={search} onChange={changeSearch} />
       </div>
 
       <div className="flex gap-3">
@@ -100,14 +114,19 @@ export function ConsoleShell() {
               contacts={contacts.contacts}
               onAddContact={contacts.add}
               query={resolved}
+              page={txPage}
+              onPage={setTxPage}
             />
           )}
           {tab === 'blocks' && (
             <BlocksView
-              blocks={feed.blocks}
+              blocks={blocks.data ?? []}
               accounts={accounts.accounts}
               contacts={contacts.contacts}
               query={resolved}
+              page={blockPage}
+              onPage={setBlockPage}
+              chainLength={state.height ?? 0}
               // The block row itself only expands in place; leaving this tab
               // is the consequence of clicking one of the transactions inside
               // it, not of clicking the block.

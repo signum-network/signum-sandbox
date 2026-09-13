@@ -3,6 +3,8 @@ import type { FeedItem } from '@/lib/chainFeed'
 import type { SandboxAccount } from '@/lib/accounts'
 import type { Contacts } from '@/lib/contacts'
 import { matchesTransaction, type ResolvedQuery } from '@/lib/search'
+import { paginate } from '@/lib/paginate'
+import { Pager } from '../Pager'
 import { TransactionRow } from './TransactionRow'
 
 export function TransactionsView({
@@ -11,12 +13,16 @@ export function TransactionsView({
   contacts,
   onAddContact,
   query,
+  page,
+  onPage,
 }: {
   items: FeedItem[]
   accounts: SandboxAccount[]
   contacts: Contacts
   onAddContact: (accountIdOrAddress: string, name: string) => void
   query: ResolvedQuery
+  page: number
+  onPage: (page: number) => void
 }) {
   const { t } = useTranslation()
 
@@ -29,9 +35,10 @@ export function TransactionsView({
     )
   }
 
-  const shown = items.filter((item) => matchesTransaction(item.tx, query))
+  const matching = items.filter((item) => matchesTransaction(item.tx, query))
+  const shown = paginate(matching, page)
 
-  if (shown.length === 0) {
+  if (matching.length === 0) {
     return (
       <div className="p-4">
         <p className="text-[11px] text-[var(--muted)]">{t('console.tx.none')}</p>
@@ -40,16 +47,19 @@ export function TransactionsView({
   }
 
   return (
-    <ul>
-      {shown.map((item) => (
-        <TransactionRow
-          key={item.id}
-          item={item}
-          accounts={accounts}
-          contacts={contacts}
-          onAddContact={onAddContact}
-        />
-      ))}
-    </ul>
+    <>
+      <ul>
+        {shown.items.map((item) => (
+          <TransactionRow
+            key={item.id}
+            item={item}
+            accounts={accounts}
+            contacts={contacts}
+            onAddContact={onAddContact}
+          />
+        ))}
+      </ul>
+      <Pager {...shown} onPage={onPage} />
+    </>
   )
 }

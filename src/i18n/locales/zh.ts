@@ -121,6 +121,7 @@ export default {
       resetManual: '两个重置调用都没有成功。请运行 {{command}}',
       height: '高度',
     },
+    pager: { range: '{{from}}–{{to}} / 共 {{total}}', page: '第 {{page}} / {{pages}} 页' },
     watch: {
       watch: '关注',
       stop: '取消关注',

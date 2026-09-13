@@ -122,6 +122,7 @@ export default {
       resetManual: 'Ninguna de las dos llamadas de reinicio funcionó. Ejecuta {{command}}',
       height: 'Altura',
     },
+    pager: { range: '{{from}}–{{to}} de {{total}}', page: 'Página {{page}} de {{pages}}' },
     watch: {
       watch: 'Observar',
       stop: 'Dejar de observar',

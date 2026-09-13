@@ -122,6 +122,7 @@ export default {
       resetManual: 'Keiner der beiden Reset-Aufrufe hat funktioniert. Führe {{command}} aus',
       height: 'Höhe',
     },
+    pager: { range: '{{from}}–{{to}} von {{total}}', page: 'Seite {{page}} von {{pages}}' },
     watch: {
       watch: 'Beobachten',
       stop: 'Nicht mehr beobachten',

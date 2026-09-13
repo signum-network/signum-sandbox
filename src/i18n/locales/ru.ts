@@ -122,6 +122,7 @@ export default {
       resetManual: 'Ни один из вызовов сброса не сработал. Выполните {{command}}',
       height: 'Высота',
     },
+    pager: { range: '{{from}}–{{to}} из {{total}}', page: 'Страница {{page}} из {{pages}}' },
     watch: {
       watch: 'Наблюдать',
       stop: 'Перестать наблюдать',

@@ -122,6 +122,7 @@ export default {
       resetManual: '두 초기화 호출 모두 실패했습니다. {{command}} 를 실행하세요',
       height: '높이',
     },
+    pager: { range: '{{from}}–{{to}} / 전체 {{total}}', page: '{{page}} / {{pages}} 페이지' },
     watch: {
       watch: '관찰',
       stop: '관찰 중지',

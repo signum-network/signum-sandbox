@@ -122,6 +122,7 @@ export default {
       resetManual: 'दोनों में से कोई भी रीसेट कॉल काम नहीं आया। {{command}} चलाएँ',
       height: 'ऊँचाई',
     },
+    pager: { range: '{{total}} में से {{from}}–{{to}}', page: 'पृष्ठ {{page}} / {{pages}}' },
     watch: {
       watch: 'निगरानी',
       stop: 'निगरानी बंद करें',
