@@ -1,3 +1,4 @@
+import { TransactionAdvancedPaymentSubtype, TransactionType } from '@signumjs/core'
 import type { FeedItem } from './chainFeed'
 import type { ConsoleTab, DrawerName } from './consoleNav'
 
@@ -79,33 +80,55 @@ export interface Observation {
   accountCount: number
   forgerChosen: boolean
   /**
-   * How many transactions in the stream this browser sent — counted, not
-   * flagged, so a step can ask for one *more* than there was when it began.
-   * The tour can be started at any time, including on a chain already full of
-   * the user's own transactions.
+   * The ids of the transactions in the stream this browser sent — identified,
+   * not counted.
+   *
+   * Counting was the first attempt and it was wrong in both directions. The
+   * tour can be started at any time, including on a chain already full of the
+   * user's own transactions, so "there is one" proves nothing; and a count
+   * falls as well as rises — pending transactions confirm, and confirmed ones
+   * age out of the feed's fifty-block window — so "there is one more than
+   * before" can be false at the very moment the user did the thing. Asking
+   * whether a *particular* transaction is new, or has stopped waiting,
+   * survives both.
    */
-  ownedUnconfirmed: number
-  ownedConfirmed: number
+  ownedSent: ReadonlySet<string>
+  /** The subset of `ownedSent` still waiting for a block. */
+  ownedUnconfirmed: ReadonlySet<string>
   tab: ConsoleTab
   drawer: DrawerName
 }
 
 /**
- * Whether any transaction in the stream came from an account this browser
- * owns, split by whether it has made it into a block.
+ * A subscription paying out.
  *
- * Only the sender counts. The tour asks the user to send something, and a
- * payment arriving from elsewhere — a subscription firing, say — is not
- * them doing it.
+ * The chain issues these on the subscriber's behalf, so the sender is an
+ * account this browser owns and every "did you send something?" test would
+ * count it. It is the one transaction a user can appear to make while doing
+ * nothing at all, which is exactly what the tour must not accept as progress
+ * — someone who set up a standing order earlier would watch a step complete
+ * itself while they read it.
+ */
+const isSubscriptionPayout = (item: FeedItem) =>
+  item.tx.type === TransactionType.AdvancedPayment &&
+  item.tx.subtype === TransactionAdvancedPaymentSubtype.SubscriptionPayment
+
+/**
+ * The transactions in the stream that came from an account this browser owns
+ * and that a person actually sent, with the ones still waiting for a block
+ * named separately.
+ *
+ * Only the sender counts: a payment arriving from elsewhere is not the user
+ * doing something.
  */
 export function observeFeed(
   items: FeedItem[],
   ownedIds: ReadonlySet<string>,
-): { ownedUnconfirmed: number; ownedConfirmed: number } {
-  const mine = items.filter((i) => ownedIds.has(i.tx.sender))
+): { ownedSent: ReadonlySet<string>; ownedUnconfirmed: ReadonlySet<string> } {
+  const mine = items.filter((i) => ownedIds.has(i.tx.sender) && !isSubscriptionPayout(i))
   return {
-    ownedUnconfirmed: mine.filter((i) => !i.confirmed).length,
-    ownedConfirmed: mine.filter((i) => i.confirmed).length,
+    ownedSent: new Set(mine.map((i) => i.id)),
+    ownedUnconfirmed: new Set(mine.filter((i) => !i.confirmed).map((i) => i.id)),
   }
 }
 
@@ -131,19 +154,21 @@ export function isStepComplete(
     case 'heightRose':
       return now.height > baseline.height
     case 'sentSomething':
-      return now.ownedUnconfirmed > baseline.ownedUnconfirmed
+      // A transaction that was not there when the step began. Not "one more
+      // than there was": a block landing in between confirms what was pending
+      // and can leave the pending count lower than it started, and a fast
+      // block can carry the new transaction straight past the pending list.
+      return [...now.ownedSent].some((id) => !baseline.ownedSent.has(id))
     case 'somethingSettled':
-      // One more of yours has landed than had landed when the step began --
-      // or nothing of yours is waiting at all, neither now nor when the step
-      // began. Auto-forging can settle the payment while the step before this
-      // one is still being read, which leaves the confirmed count already
-      // raised and nothing left to wait for; without the second clause the
-      // step would wait for an event that has happened, and the tour would
-      // dead-end on the one setting a newcomer is most likely to have left on.
-      return (
-        now.ownedConfirmed > baseline.ownedConfirmed ||
-        (baseline.ownedUnconfirmed === 0 && now.ownedUnconfirmed === 0)
-      )
+      // Waiting is over when something that was waiting no longer is. If
+      // nothing was waiting when the step began, there is nothing to wait for
+      // — auto-forging can settle the payment while the step before this one
+      // is still being read, and a step that waits for an event already past
+      // is a dead end on the one setting a newcomer is most likely to leave
+      // running.
+      return baseline.ownedUnconfirmed.size === 0
+        ? now.ownedUnconfirmed.size === 0
+        : [...baseline.ownedUnconfirmed].some((id) => !now.ownedUnconfirmed.has(id))
     case 'tabActive':
       return now.tab === step.completion.tab
     case 'drawerOpen':

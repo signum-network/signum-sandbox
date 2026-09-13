@@ -4,6 +4,18 @@ import { ConsoleButton, RowButton } from '@/components/console/ConsoleButton'
 import { TOUR_USE_CASES } from '@/lib/tour'
 import type { TourStore } from '@/hooks/useTour'
 
+/**
+ * Below every popover in the console, not above.
+ *
+ * The one step that points at a dropdown — choosing a forger — would
+ * otherwise paint an opaque card straight over the options it is asking the
+ * user to choose from: Select's panel opens 4px under its trigger, the
+ * callout sits 10px under the same trigger, and at an equal z-index the
+ * callout wins for being later in the tree. The control being explained has
+ * to be the thing you can see and press.
+ */
+const OVERLAY_Z = 30
+
 const CALLOUT_WIDTH = 300
 /** The last step is a list, not a sentence, and 300px is a column of words. */
 const FINALE_WIDTH = 460
@@ -19,11 +31,11 @@ interface Box {
 /**
  * The ring around what the step is about, and the card that explains it.
  *
- * The ring is drawn, not dimmed: a full-screen scrim would have to let clicks
- * through to the highlighted control, and a scrim with a hole in it is a lot
- * of geometry for a console the user is meant to keep using while the tour
- * runs. Nothing here blocks the page — the card is the only thing that takes
- * a click, and even it can be walked away from.
+ * The dimming is one box shadow, not a stack of panels: a 9999px spread from
+ * the ring darkens everything outside it and leaves the target lit, with no
+ * geometry to compute. It takes no clicks, so the console stays usable while
+ * the tour runs — the card is the only thing here that can be pressed, and
+ * even it can be walked away from.
  */
 export function TourOverlay({ tour }: { tour: TourStore }) {
   const { t } = useTranslation()
@@ -31,29 +43,42 @@ export function TourOverlay({ tour }: { tour: TourStore }) {
   const target = tour.step?.target ?? null
 
   useLayoutEffect(() => {
-    if (!target) {
-      setBox(null)
-      return
-    }
     const measure = () => {
+      if (!target) {
+        setBox(null)
+        return
+      }
       const el = document.querySelector(`[data-tour="${target}"]`)
       if (!el) {
         setBox(null)
         return
       }
       const r = el.getBoundingClientRect()
-      setBox({ top: r.top, left: r.left, width: r.width, height: r.height })
+      // A fresh object on every tick would re-render this component three
+      // times a second for the whole tour, for a rectangle that mostly does
+      // not move.
+      setBox((previous) =>
+        previous &&
+        previous.top === r.top &&
+        previous.left === r.left &&
+        previous.width === r.width &&
+        previous.height === r.height
+          ? previous
+          : { top: r.top, left: r.left, width: r.width, height: r.height },
+      )
     }
     measure()
     // The console reflows constantly — the auto-forge cluster appears, rows
     // page, drawers open — and a ring left behind at a stale rectangle points
     // at nothing. Re-measuring on a slow interval costs a rect read per tick
     // and never goes stale.
-    const timer = window.setInterval(measure, 300)
+    const timer = target ? window.setInterval(measure, 300) : undefined
+    // Registered even with no target: a centred card is positioned from the
+    // viewport width, so it has to move when the viewport does.
     window.addEventListener('resize', measure)
     window.addEventListener('scroll', measure, true)
     return () => {
-      window.clearInterval(timer)
+      if (timer !== undefined) window.clearInterval(timer)
       window.removeEventListener('resize', measure)
       window.removeEventListener('scroll', measure, true)
     }
@@ -76,8 +101,9 @@ export function TourOverlay({ tour }: { tour: TourStore }) {
     <>
       {box && (
         <div
-          className="pointer-events-none fixed z-40"
+          className="pointer-events-none fixed"
           style={{
+            zIndex: OVERLAY_Z,
             top: box.top - 4,
             left: box.left - 4,
             width: box.width + 8,
@@ -89,8 +115,9 @@ export function TourOverlay({ tour }: { tour: TourStore }) {
       )}
 
       <div
-        className="themed-scroll console-scroll fixed z-50 overflow-y-auto p-3"
+        className="themed-scroll console-scroll fixed overflow-y-auto p-3"
         style={{
+          zIndex: OVERLAY_Z,
           // The finale is the one card tall enough to run off a short screen,
           // so it is pinned near the top and scrolls inside itself rather than
           // hiding its own last idea and its own button below the fold.

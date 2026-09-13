@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import type { Transaction } from '@signumjs/core'
+import {
+  TransactionAdvancedPaymentSubtype,
+  TransactionType,
+  type Transaction,
+} from '@signumjs/core'
 import type { FeedItem } from './chainFeed'
 import en from '@/i18n/locales/en'
 import {
@@ -15,8 +19,8 @@ const base: Observation = {
   height: 10,
   accountCount: 0,
   forgerChosen: false,
-  ownedUnconfirmed: 0,
-  ownedConfirmed: 0,
+  ownedSent: new Set<string>(),
+  ownedUnconfirmed: new Set<string>(),
   tab: 'transactions',
   drawer: null,
 }
@@ -60,41 +64,63 @@ describe('isStepComplete', () => {
     expect(isStepComplete(picking, { ...base, forgerChosen: true }, base, false)).toBe(true)
   })
 
-  it('completes when you send something, and separately when it settles', () => {
-    const sending = step({ completion: { kind: 'sentSomething' } })
-    const settling = step({ completion: { kind: 'somethingSettled' } })
-    expect(isStepComplete(sending, { ...base, ownedUnconfirmed: 1 }, base, false)).toBe(true)
-    expect(isStepComplete(settling, { ...base, ownedUnconfirmed: 1 }, base, false)).toBe(false)
-    expect(isStepComplete(settling, { ...base, ownedConfirmed: 1 }, base, false)).toBe(true)
+  const sending = step({ completion: { kind: 'sentSomething' } })
+  const settling = step({ completion: { kind: 'somethingSettled' } })
+  const at = (sent: string[], pending: string[] = sent): Observation => ({
+    ...base,
+    ownedSent: new Set(sent),
+    ownedUnconfirmed: new Set(pending),
   })
 
-  // The reason these are counts and not booleans. Someone who takes the tour
-  // from the help drawer on a chain they have already used starts with their
-  // own transactions all over the feed. A boolean would read as "you already
-  // did it" and skip both steps; a count only completes on one more than
-  // there was when the step began.
+  it('completes when you send something, and separately when it settles', () => {
+    expect(isStepComplete(sending, at(['tx1']), base, false)).toBe(true)
+    expect(isStepComplete(settling, at(['tx1']), at(['tx1']), false)).toBe(false)
+    expect(isStepComplete(settling, at(['tx1'], []), at(['tx1']), false)).toBe(true)
+  })
+
+  // Someone who takes the tour from the help drawer on a chain they have
+  // already used starts with their own transactions all over the feed. What
+  // was already there proves nothing.
   it('is not satisfied by transactions that were already there', () => {
-    const used = { ...base, ownedUnconfirmed: 3, ownedConfirmed: 7 }
-    const sending = step({ completion: { kind: 'sentSomething' } })
-    const settling = step({ completion: { kind: 'somethingSettled' } })
+    const used = at(['old1', 'old2', 'old3'], ['old1'])
     expect(isStepComplete(sending, used, used, false)).toBe(false)
     expect(isStepComplete(settling, used, used, false)).toBe(false)
-    expect(isStepComplete(sending, { ...used, ownedUnconfirmed: 4 }, used, false)).toBe(true)
-    expect(isStepComplete(settling, { ...used, ownedConfirmed: 8 }, used, false)).toBe(true)
+    expect(isStepComplete(sending, at(['old1', 'old2', 'old3', 'new'], ['old1']), used, false)).toBe(
+      true,
+    )
+    expect(isStepComplete(settling, at(['old1', 'old2', 'old3'], []), used, false)).toBe(true)
+  })
+
+  // Why sending is not "the pending count went up". A block landing between
+  // the step starting and the user sending confirms what was already waiting,
+  // so the pending count can be *lower* at the very moment they did the thing.
+  it('sees a send even when a block confirmed the backlog first', () => {
+    const backlog = at(['old1', 'old2'])
+    const afterBlockAndSend = at(['old1', 'old2', 'new'], ['new'])
+    expect(isStepComplete(sending, afterBlockAndSend, backlog, false)).toBe(true)
+  })
+
+  // And why sending is not "it appeared in the pending list" either: a block
+  // can carry a fresh transaction straight past it.
+  it('sees a send that went into a block before anyone looked', () => {
+    expect(isStepComplete(sending, at(['new'], []), base, false)).toBe(true)
   })
 
   // The tour can be left running while auto-forge is on, and then the payment
-  // settles while the step before this one is still on screen. The step's goal
-  // is "nothing of yours is still waiting", so it is already met -- a rule that
-  // only watched the confirmed count would wait for an event already past.
+  // settles while the step before this one is still on screen. Nothing of
+  // yours is waiting, so the step's goal is already met -- waiting for an
+  // event already past is a dead end.
   it('does not wait for something that has already settled', () => {
-    const settling = step({ completion: { kind: 'somethingSettled' } })
-    const nothingPending = { ...base, ownedUnconfirmed: 0, ownedConfirmed: 5 }
+    const nothingPending = at(['tx1'], [])
     expect(isStepComplete(settling, nothingPending, nothingPending, false)).toBe(true)
-    // But something visibly waiting is still worth waiting for.
-    expect(
-      isStepComplete(settling, { ...nothingPending, ownedUnconfirmed: 1 }, nothingPending, false),
-    ).toBe(false)
+    expect(isStepComplete(settling, at(['tx1', 'tx2'], ['tx2']), nothingPending, false)).toBe(false)
+  })
+
+  // The feed holds fifty blocks. A confirmed transaction ages out of it, so a
+  // settled step that watched a confirmed count could miss its own answer.
+  // Leaving the pending list is what settling means here.
+  it('settles even when the transaction has aged out of the feed', () => {
+    expect(isStepComplete(settling, at([], []), at(['tx1']), false)).toBe(true)
   })
 
   it('completes when the named tab or drawer is showing', () => {
@@ -107,35 +133,59 @@ describe('isStepComplete', () => {
   })
 })
 
-const item = (sender: string, confirmed: boolean): FeedItem => ({
-  id: `${sender}-${String(confirmed)}`,
-  confirmed,
-  tx: { transaction: '1', sender, timestamp: 0 } as Transaction,
-})
+const item = (id: string, sender: string, confirmed: boolean, tx: Partial<Transaction> = {}) =>
+  ({
+    id,
+    confirmed,
+    tx: { transaction: id, sender, timestamp: 0, ...tx } as Transaction,
+  }) as FeedItem
 
 describe('observeFeed', () => {
   const owned = new Set(['111'])
 
-  it('counts nothing in an empty feed', () => {
-    expect(observeFeed([], owned)).toEqual({ ownedUnconfirmed: 0, ownedConfirmed: 0 })
+  it('finds nothing in an empty feed', () => {
+    expect(observeFeed([], owned)).toEqual({
+      ownedSent: new Set(),
+      ownedUnconfirmed: new Set(),
+    })
   })
 
   it('ignores transactions from accounts you do not own', () => {
-    expect(observeFeed([item('999', false), item('999', true)], owned)).toEqual({
-      ownedUnconfirmed: 0,
-      ownedConfirmed: 0,
+    const theirs = [item('a', '999', false), item('b', '999', true)]
+    expect(observeFeed(theirs, owned)).toEqual({
+      ownedSent: new Set(),
+      ownedUnconfirmed: new Set(),
     })
   })
 
-  it('counts waiting and settled separately', () => {
-    expect(observeFeed([item('111', false)], owned)).toEqual({
-      ownedUnconfirmed: 1,
-      ownedConfirmed: 0,
+  it('names what is waiting as a subset of what was sent', () => {
+    const mine = [item('a', '111', false), item('b', '111', true)]
+    expect(observeFeed(mine, owned)).toEqual({
+      ownedSent: new Set(['a', 'b']),
+      ownedUnconfirmed: new Set(['a']),
     })
-    expect(observeFeed([item('111', false), item('111', true)], owned)).toEqual({
-      ownedUnconfirmed: 1,
-      ownedConfirmed: 1,
+  })
+
+  // The chain sends these on the subscriber's behalf, so the sender is an
+  // owned account and nobody pressed anything. A step that accepted one would
+  // complete itself while the user read it.
+  it('ignores a subscription paying out, which the user did not send', () => {
+    const payout = item('a', '111', false, {
+      type: TransactionType.AdvancedPayment,
+      subtype: TransactionAdvancedPaymentSubtype.SubscriptionPayment,
     })
+    expect(observeFeed([payout], owned)).toEqual({
+      ownedSent: new Set(),
+      ownedUnconfirmed: new Set(),
+    })
+  })
+
+  it('still counts the transaction that sets a subscription up', () => {
+    const subscribe = item('a', '111', false, {
+      type: TransactionType.AdvancedPayment,
+      subtype: TransactionAdvancedPaymentSubtype.SubscriptionSubscribe,
+    })
+    expect(observeFeed([subscribe], owned).ownedSent).toEqual(new Set(['a']))
   })
 })
 
@@ -173,6 +223,20 @@ describe('TOUR_STEPS', () => {
   // step is given.
   it('gives every step either a chain rule or an acknowledge button', () => {
     for (const s of TOUR_STEPS) expect(s.completion.kind).toBeTruthy()
+  })
+
+  // The one change that can ship a blank card: adding a step. Its id is a
+  // translation key the same way a glossary term is, and locales.test.ts only
+  // holds the other nine in step with English -- it cannot tell that English
+  // itself is missing something.
+  it('has a title and a body for every step', () => {
+    const steps = (
+      en as unknown as { tour: { step: Record<string, { title?: string; body?: string }> } }
+    ).tour.step
+    for (const s of TOUR_STEPS) {
+      expect(steps[s.id]?.title, `${s.id}.title`).toBeTruthy()
+      expect(steps[s.id]?.body, `${s.id}.body`).toBeTruthy()
+    }
   })
 
   // The overlay lays the finale out differently and reads its list from

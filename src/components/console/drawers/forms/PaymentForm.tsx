@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Amount } from '@signumjs/util'
 import { feeFor } from '@/lib/fees'
 import { useTranslation } from 'react-i18next'
@@ -31,6 +31,14 @@ export function PaymentForm({
   const [fromId, setFromId] = useFromAccount(forgerId)
   const [to, setTo] = useState('')
   const [amount, setAmount] = useState(initialSigna ?? '')
+
+  // The tour opens this drawer one step before it suggests an amount, so by
+  // the time the suggestion exists the field has long since been initialised
+  // and useState ignores it. Filled on arrival instead, and only on arrival:
+  // the tour proposes a number, it does not hold the field.
+  useEffect(() => {
+    if (initialSigna) setAmount(initialSigna)
+  }, [initialSigna])
   const [attach, setAttach] = useState(false)
   const payload = usePayload()
   const [fee, setFee] = useState(feeFor('payment').getSigna())
