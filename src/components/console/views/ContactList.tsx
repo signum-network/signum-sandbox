@@ -5,6 +5,7 @@ import type { Contacts } from '@/lib/contacts'
 import { matchesAccountQuery, type Query } from '@/lib/search'
 import { Identicon } from '../Identicon'
 import { ConsoleButton } from '../ConsoleButton'
+import { Term } from '../Term'
 
 /**
  * A contact only ever stores an id (see Contacts in src/lib/contacts.ts); the
@@ -52,7 +53,7 @@ export function ContactList({
   return (
     <div className="mt-5 border-t pt-3" style={{ borderColor: 'var(--border2)' }}>
       <div className="mb-2 text-[10px] font-bold uppercase tracking-[2px] text-[var(--muted)]">
-        {t('console.accounts.sectionContacts')}
+        <Term id="contact">{t('console.accounts.sectionContacts')}</Term>
       </div>
 
       <div className="mb-3 flex flex-wrap items-center gap-2">

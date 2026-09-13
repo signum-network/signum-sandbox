@@ -8,6 +8,7 @@ import { AUTO_INTERVALS_S, MAINNET_INTERVAL_S, formatInterval } from '@/lib/auto
 import { Countdown } from '@/components/console/Countdown'
 import { Toggle } from '@/components/console/Toggle'
 import { ConsoleButton } from '@/components/console/ConsoleButton'
+import { Term } from '@/components/console/Term'
 import { sfx, useAudio } from '@/audio'
 
 export function Header({
@@ -64,7 +65,9 @@ export function Header({
         exactly when the chain does.
       */}
       <span className="text-[11px]">
-        <span className="text-[var(--muted)]">{t('console.chain.height')} </span>
+        <span className="text-[var(--muted)]">
+          <Term id="height">{t('console.chain.height')}</Term>{' '}
+        </span>
         <span className="font-bold text-[var(--blue3)]">{state.height ?? '—'}</span>
       </span>
 
@@ -120,7 +123,7 @@ export function Header({
         />
 
         <ConsoleButton disabled={!canForge || busy} onClick={() => void forgeClicked()}>
-          ⛏ {t('console.forge.action')}
+          ⛏ <Term id="forge">{t('console.forge.action')}</Term>
         </ConsoleButton>
 
         {requested && (

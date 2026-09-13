@@ -7,6 +7,7 @@ import { displayName, type Contacts } from '@/lib/contacts'
 import { isTransaction } from '@/lib/chainFeed'
 import { summarize } from '@/lib/txSummary'
 import { RowButton } from '../ConsoleButton'
+import { Term } from '../Term'
 
 /**
  * A block only ever quotes a name it can already resolve locally (owned
@@ -83,7 +84,8 @@ export function BlockRow({
             {' '}
             · {count === 0 ? t('console.blocks.empty') : t('console.blocks.count', { count })}
             {' '}
-            · {t('console.blocks.forger')} {displayName(block.generatorRS, accounts, contacts)}
+            · <Term id="forger">{t('console.blocks.forger')}</Term>{' '}
+            {displayName(block.generatorRS, accounts, contacts)}
           </span>
         </RowButton>
         <a
