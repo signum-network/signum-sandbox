@@ -69,7 +69,8 @@ export function Header({
         <div className="w-36">
           <Select
             value={accounts.forgerId ?? ''}
-            placeholder={t('console.forge.forger')}
+            placeholder={t('console.forge.chooseForger')}
+            emptyLabel={t('console.accounts.none')}
             onChange={accounts.setForger}
             options={accounts.accounts.map((a) => ({ value: a.id, label: a.name }))}
           />

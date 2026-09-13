@@ -17,8 +17,7 @@ export default {
       action: '생성',
       requested: '블록 생성 요청됨',
       failed: '생성 실패 — {{message}}',
-      auto: '자동',
-      forger: '포저',
+      auto: '자동', chooseForger: '포저 선택',
     },
     empty: {
       title: '아직 아무 일도 없습니다',
@@ -78,6 +77,10 @@ export default {
       addContact: '연락처 추가',
       contactAddress: '주소 또는 계정 Id',
       noContacts: '아직 연락처가 없습니다',
+      publicKey: '공개 키',
+      unconfirmed: '미확인',
+      recent: '최근 활동',
+      noRecent: '아직 없음',
     },
     send: {
       from: '보내는 사람',

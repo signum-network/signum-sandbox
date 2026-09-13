@@ -17,8 +17,7 @@ export default {
       action: 'Кувати',
       requested: 'Блок запитано',
       failed: 'Помилка кування — {{message}}',
-      auto: 'авто',
-      forger: 'Форджер',
+      auto: 'авто', chooseForger: 'Обрати форджера',
     },
     empty: {
       title: 'Поки що нічого не сталося',
@@ -78,6 +77,10 @@ export default {
       addContact: 'Додати контакт',
       contactAddress: 'Адреса або id рахунку',
       noContacts: 'Поки що немає контактів',
+      publicKey: 'Відкритий ключ',
+      unconfirmed: 'непідтверджено',
+      recent: 'Остання активність',
+      noRecent: 'Ще нічого',
     },
     send: {
       from: 'Від',

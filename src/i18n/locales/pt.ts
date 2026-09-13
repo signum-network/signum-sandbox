@@ -17,8 +17,7 @@ export default {
       action: 'Forjar',
       requested: 'Bloco solicitado',
       failed: 'Falha ao forjar — {{message}}',
-      auto: 'auto',
-      forger: 'Forjador',
+      auto: 'auto', chooseForger: 'Escolher um forjador',
     },
     empty: {
       title: 'Ainda não aconteceu nada',
@@ -78,6 +77,10 @@ export default {
       addContact: 'Adicionar contacto',
       contactAddress: 'Endereço ou id da conta',
       noContacts: 'Ainda não há contactos',
+      publicKey: 'Chave pública',
+      unconfirmed: 'não confirmado',
+      recent: 'Atividade recente',
+      noRecent: 'Nada ainda',
     },
     send: {
       from: 'De',

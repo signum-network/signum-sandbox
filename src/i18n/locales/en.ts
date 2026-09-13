@@ -28,8 +28,7 @@ export default {
       action: 'Forge',
       requested: 'Block requested',
       failed: 'Forge failed — {{message}}',
-      auto: 'auto',
-      forger: 'Forger',
+      auto: 'auto', chooseForger: 'Choose a forger',
     },
     empty: {
       title: 'Nothing has happened yet',
@@ -89,6 +88,10 @@ export default {
       addContact: 'Add contact',
       contactAddress: 'Address or account id',
       noContacts: 'No contacts yet',
+      publicKey: 'Public key',
+      unconfirmed: 'unconfirmed',
+      recent: 'Recent activity',
+      noRecent: 'Nothing yet',
     },
     send: {
       from: 'From',

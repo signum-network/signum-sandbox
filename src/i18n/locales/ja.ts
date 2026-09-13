@@ -17,8 +17,7 @@ export default {
       action: '生成',
       requested: 'ブロックをリクエスト済み',
       failed: '生成に失敗しました — {{message}}',
-      auto: '自動',
-      forger: 'フォージャー',
+      auto: '自動', chooseForger: 'フォージャーを選択',
     },
     empty: {
       title: 'まだ何も起きていません',
@@ -78,6 +77,10 @@ export default {
       addContact: '連絡先を追加',
       contactAddress: 'アドレスまたはアカウントId',
       noContacts: 'まだ連絡先がありません',
+      publicKey: '公開鍵',
+      unconfirmed: '未確認',
+      recent: '最近の活動',
+      noRecent: 'まだありません',
     },
     send: {
       from: '送信元',

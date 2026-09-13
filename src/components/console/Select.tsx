@@ -21,12 +21,19 @@ export function Select({
   value,
   options,
   placeholder,
+  emptyLabel,
   onChange,
   disabled,
 }: {
   value: string
   options: SelectOption[]
   placeholder: string
+  /**
+   * Shown inside the panel when there is nothing to choose. Without it an
+   * empty list rendered the placeholder as its single line, which read as an
+   * option — "Forger" looked like an account called Forger.
+   */
+  emptyLabel?: string
   onChange: (value: string) => void
   disabled?: boolean
 }) {
@@ -108,7 +115,7 @@ export function Select({
           >
             {options.length === 0 && (
               <p className="px-2 py-1.5 text-[10px]" style={{ color: 'var(--muted)' }}>
-                {placeholder}
+                {emptyLabel ?? '—'}
               </p>
             )}
             {options.map((o) => (

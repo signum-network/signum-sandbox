@@ -17,8 +17,7 @@ export default {
       action: 'Forgen',
       requested: 'Block angefordert',
       failed: 'Forgen fehlgeschlagen — {{message}}',
-      auto: 'auto',
-      forger: 'Forger',
+      auto: 'auto', chooseForger: 'Forger wählen',
     },
     empty: {
       title: 'Noch ist nichts passiert',
@@ -78,6 +77,10 @@ export default {
       addContact: 'Kontakt hinzufügen',
       contactAddress: 'Adresse oder Account-Id',
       noContacts: 'Noch keine Kontakte',
+      publicKey: 'Public Key',
+      unconfirmed: 'unbestätigt',
+      recent: 'Letzte Aktivität',
+      noRecent: 'Noch nichts',
     },
     send: {
       from: 'Von',

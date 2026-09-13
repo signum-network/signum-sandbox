@@ -17,8 +17,7 @@ export default {
       action: '铸造',
       requested: '已请求铸造区块',
       failed: '铸造失败 — {{message}}',
-      auto: '自动',
-      forger: '铸块者',
+      auto: '自动', chooseForger: '选择铸块者',
     },
     empty: {
       title: '还什么都没发生',
@@ -77,6 +76,10 @@ export default {
       addContact: '添加联系人',
       contactAddress: '地址或账户Id',
       noContacts: '还没有联系人',
+      publicKey: '公钥',
+      unconfirmed: '未确认',
+      recent: '近期活动',
+      noRecent: '暂无',
     },
     send: {
       from: '发送方',

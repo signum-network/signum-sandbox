@@ -17,8 +17,7 @@ export default {
       action: 'फ़ोर्ज करें',
       requested: 'ब्लॉक का अनुरोध किया गया',
       failed: 'फ़ोर्ज विफल — {{message}}',
-      auto: 'ऑटो',
-      forger: 'फ़ोर्जर',
+      auto: 'ऑटो', chooseForger: 'फ़ोर्जर चुनें',
     },
     empty: {
       title: 'अभी तक कुछ नहीं हुआ है',
@@ -78,6 +77,10 @@ export default {
       addContact: 'संपर्क जोड़ें',
       contactAddress: 'पता या खाता आईडी',
       noContacts: 'अभी तक कोई संपर्क नहीं',
+      publicKey: 'सार्वजनिक कुंजी',
+      unconfirmed: 'अपुष्ट',
+      recent: 'हाल की गतिविधि',
+      noRecent: 'अभी कुछ नहीं',
     },
     send: {
       from: 'से',

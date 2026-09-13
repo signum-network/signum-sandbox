@@ -19,7 +19,7 @@ const asRecord = (tx: Transaction) => (tx.attachment ?? {}) as Record<string, un
  * the reference implementation rather than JSON.parse is what makes "is this
  * SRC44?" the same question here as everywhere else in the ecosystem.
  */
-function src44Fields(description: string): PayloadField[] | null {
+export function src44Fields(description: string): PayloadField[] | null {
   try {
     const data = DescriptorData.parse(description, false)
     const fields: PayloadField[] = []

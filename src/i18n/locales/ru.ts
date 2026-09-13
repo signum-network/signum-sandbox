@@ -17,8 +17,7 @@ export default {
       action: 'Ковать',
       requested: 'Блок запрошен',
       failed: 'Ошибка ковки — {{message}}',
-      auto: 'авто',
-      forger: 'Кузнец',
+      auto: 'авто', chooseForger: 'Выбрать кузнеца',
     },
     empty: {
       title: 'Пока ничего не произошло',
@@ -78,6 +77,10 @@ export default {
       addContact: 'Добавить контакт',
       contactAddress: 'Адрес или id счёта',
       noContacts: 'Пока нет контактов',
+      publicKey: 'Открытый ключ',
+      unconfirmed: 'не подтверждено',
+      recent: 'Последняя активность',
+      noRecent: 'Пока ничего',
     },
     send: {
       from: 'От',

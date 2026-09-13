@@ -32,6 +32,14 @@ export function ConsoleShell() {
   const feed = useChainFeed(state.kind === 'ready' ? state.height : null, connected)
   const [search, setSearch] = useState('')
   const query = interpret(search)
+  // Handing one transaction to the stream: the stream owns payload decoding,
+  // contact saving and the raw link, so every "show me this one" gesture in
+  // the console routes there rather than growing its own copy.
+  const showTransaction = (transactionId: string) => {
+    setSearch(transactionId)
+    setTab('transactions')
+  }
+
   const namedAccountIds = useNameLookup(query)
   // Resolved once here rather than per row: an address and a name both end up
   // meaning "this account", and only the name kind ever asks the node.
@@ -95,13 +103,17 @@ export function ConsoleShell() {
               // The block row itself only expands in place; leaving this tab
               // is the consequence of clicking one of the transactions inside
               // it, not of clicking the block.
-              onSelectTransaction={(transactionId) => {
-                setSearch(transactionId)
-                setTab('transactions')
-              }}
+              onSelectTransaction={showTransaction}
             />
           )}
-          {tab === 'accounts' && <AccountsView store={accounts} contacts={contacts} query={query} />}
+          {tab === 'accounts' && (
+            <AccountsView
+              store={accounts}
+              contacts={contacts}
+              query={query}
+              onSelectTransaction={showTransaction}
+            />
+          )}
         </div>
         {drawer && (
           <div className="w-[34%] border p-3" style={{ borderColor: 'var(--blue2)' }}>

@@ -10,10 +10,12 @@ export function AccountsView({
   store,
   contacts,
   query,
+  onSelectTransaction,
 }: {
   store: AccountStore
   contacts: ContactStore
   query: Query
+  onSelectTransaction: (transactionId: string) => void
 }) {
   const { t } = useTranslation()
   // Two separate fields, not one shared between the two actions below: typing
@@ -122,6 +124,9 @@ export function AccountsView({
           <AccountRow
             key={account.id}
             account={account}
+            accounts={store.accounts}
+            contacts={contacts.contacts}
+            onSelectTransaction={onSelectTransaction}
             isForger={store.forgerId === account.id}
             onSetForger={() => store.setForger(account.id)}
             onRemove={() => store.remove(account.id)}

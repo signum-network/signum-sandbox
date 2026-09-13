@@ -121,15 +121,18 @@ export function AccountSelect({
   accounts,
   value,
   onChange,
+  emptyAccountsLabel,
 }: {
   accounts: SandboxAccount[]
   value: string
   onChange: (id: string) => void
+  emptyAccountsLabel?: string
 }) {
   return (
     <Select
       value={value}
       placeholder="—"
+      emptyLabel={emptyAccountsLabel}
       onChange={onChange}
       options={accounts.map((a) => ({ value: a.id, label: a.name, sublabel: a.address }))}
     />
