@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { isRefetchTrigger, parseEvent } from '@/lib/socketEvents'
+import { STALE_ON_BLOCK, STALE_ON_PENDING } from '@/lib/queryKeys'
 
 /**
  * SIP-50 event socket.
@@ -30,14 +31,15 @@ export function useNodeSocket() {
       socket.onmessage = (event) => {
         const name = parseEvent(String(event.data))
         if (!isRefetchTrigger(name)) return
-        void queryClient.invalidateQueries({ queryKey: ['unconfirmed'] })
-        // Only a new block changes confirmed state: the block list, chain
-        // status, and the balances of known accounts. A pending transaction
-        // touches none of those.
+        for (const key of STALE_ON_PENDING) {
+          void queryClient.invalidateQueries({ queryKey: [key] })
+        }
+        // A pending transaction changes only the pool; everything else is
+        // confirmed state and waits for a block.
         if (name === 'BLOCK_PUSHED') {
-          void queryClient.invalidateQueries({ queryKey: ['blocks'] })
-          void queryClient.invalidateQueries({ queryKey: ['blockchainStatus'] })
-          void queryClient.invalidateQueries({ queryKey: ['balance'] })
+          for (const key of STALE_ON_BLOCK) {
+            void queryClient.invalidateQueries({ queryKey: [key] })
+          }
         }
       }
       socket.onclose = () => {
