@@ -67,7 +67,7 @@ export function MessageForm({
       <Field label={t('console.send.to')}>
         <RecipientPicker accounts={accounts} contacts={contacts} value={to} onChange={setTo} />
       </Field>
-      <PayloadEditor state={payload} label={t('console.send.message')} />
+      <PayloadEditor state={payload} label={t('console.send.message')} variant="attachment" />
       <div className="mb-2">
         <Toggle checked={encrypt} onChange={setEncrypt} label={t('console.send.encrypt')} />
       </div>

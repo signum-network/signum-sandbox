@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   SRC44_MAX_BYTES,
@@ -7,7 +8,9 @@ import {
   type Src44Fields,
 } from '@/lib/src44'
 import { Select } from '@/components/console/Select'
+import { ConsoleButton } from '@/components/console/ConsoleButton'
 import { Field, TextArea, TextInput } from './fields'
+import { CustomFields } from './CustomFields'
 
 /**
  * The structured payload editor, shared by everything that can carry one:
@@ -17,26 +20,43 @@ import { Field, TextArea, TextInput } from './fields'
  * SRC44 in a sandbox — you can read what will land on chain, and see the byte
  * count against the limit before the node counts it for you.
  */
+export type Src44Variant = 'profile' | 'attachment'
+
 export function Src44Form({
   fields,
   onChange,
+  variant = 'profile',
 }: {
   fields: Src44Fields
   onChange: (fields: Src44Fields) => void
+  /**
+   * What the descriptor is for, which decides what leads.
+   *
+   * A profile is mostly the standard's own keys — a name, a picture, a link.
+   * A transaction attachment rarely carries a name at all and is mostly an
+   * application's own fields, so those come first there. Nothing is removed
+   * either way; `nm` in particular stays optional in both.
+   */
+  variant?: Src44Variant
 }) {
   const { t } = useTranslation()
   const set = <K extends keyof Src44Fields>(key: K, value: Src44Fields[K]) =>
     onChange({ ...fields, [key]: value })
 
+  const [open, setOpen] = useState(false)
+  const attachment = variant === 'attachment'
   const result = buildSrc44(fields)
   const json = 'json' in result ? result.json : null
   const size = json ? byteLength(json) : 0
 
   return (
     <div>
-      <Field label={t('console.src44.name')}>
-        <TextInput value={fields.name} onChange={(v) => set('name', v)} />
-      </Field>
+      {/*
+        What leads depends on what the descriptor is for. Everything stays
+        reachable either way — the disclosure reorders, it does not remove.
+      */}
+      {attachment && <CustomFields fields={fields.custom} onChange={(v) => set('custom', v)} />}
+
       <Field label={t('console.src44.description')}>
         <TextArea value={fields.description} onChange={(v) => set('description', v)} />
       </Field>
@@ -52,27 +72,65 @@ export function Src44Form({
           }))}
         />
       </Field>
-      <Field label={t('console.src44.avatar')}>
-        <TextInput
-          value={fields.avatarCid}
-          onChange={(v) => set('avatarCid', v)}
-          placeholder="Qm…"
-        />
-      </Field>
-      {fields.avatarCid !== '' && (
-        <Field label={t('console.src44.avatarMime')}>
-          <TextInput value={fields.avatarMime} onChange={(v) => set('avatarMime', v)} />
-        </Field>
+
+      {!attachment && (
+        <>
+          <Field label={t('console.src44.name')}>
+            <TextInput value={fields.name} onChange={(v) => set('name', v)} />
+          </Field>
+          <Field label={t('console.src44.avatar')}>
+            <TextInput
+              value={fields.avatarCid}
+              onChange={(v) => set('avatarCid', v)}
+              placeholder="Qm…"
+            />
+          </Field>
+          {fields.avatarCid !== '' && (
+            <Field label={t('console.src44.avatarMime')}>
+              <TextInput value={fields.avatarMime} onChange={(v) => set('avatarMime', v)} />
+            </Field>
+          )}
+        </>
       )}
-      <Field label={t('console.src44.homePage')}>
-        <TextInput value={fields.homePage} onChange={(v) => set('homePage', v)} />
-      </Field>
-      <Field label={t('console.src44.social')}>
-        <TextArea value={fields.socialLinks} onChange={(v) => set('socialLinks', v)} />
-      </Field>
-      <Field label={t('console.src44.custom')}>
-        <TextArea value={fields.custom} onChange={(v) => set('custom', v)} />
-      </Field>
+
+      <div className="mb-2">
+        <ConsoleButton onClick={() => setOpen(!open)}>
+          {open ? t('console.src44.fewer') : t('console.src44.more')}
+        </ConsoleButton>
+      </div>
+
+      {open && (
+        <>
+          {!attachment && (
+            <CustomFields fields={fields.custom} onChange={(v) => set('custom', v)} />
+          )}
+          {attachment && (
+            <>
+              <Field label={t('console.src44.name')}>
+                <TextInput value={fields.name} onChange={(v) => set('name', v)} />
+              </Field>
+              <Field label={t('console.src44.avatar')}>
+                <TextInput
+                  value={fields.avatarCid}
+                  onChange={(v) => set('avatarCid', v)}
+                  placeholder="Qm…"
+                />
+              </Field>
+              {fields.avatarCid !== '' && (
+                <Field label={t('console.src44.avatarMime')}>
+                  <TextInput value={fields.avatarMime} onChange={(v) => set('avatarMime', v)} />
+                </Field>
+              )}
+            </>
+          )}
+          <Field label={t('console.src44.homePage')}>
+            <TextInput value={fields.homePage} onChange={(v) => set('homePage', v)} />
+          </Field>
+          <Field label={t('console.src44.social')}>
+            <TextArea value={fields.socialLinks} onChange={(v) => set('socialLinks', v)} />
+          </Field>
+        </>
+      )}
 
       <div className="mb-2 text-[9px] uppercase tracking-[1px] text-[var(--muted)]">
         {t('console.src44.preview')}{' '}

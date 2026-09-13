@@ -4,7 +4,7 @@ import {
   SRC44_MAX_BYTES,
   buildSrc44,
   byteLength,
-  parseCustomFields,
+  namedFields,
   type Src44Fields,
 } from './src44'
 
@@ -15,32 +15,17 @@ const json = (result: ReturnType<typeof buildSrc44>) => {
   return JSON.parse(result.json) as Record<string, unknown>
 }
 
-describe('parseCustomFields', () => {
-  it('reads one key = value per line', () => {
-    expect(parseCustomFields('a = 1\nb = two')).toEqual([
-      ['a', '1'],
-      ['b', 'two'],
-    ])
+describe('namedFields', () => {
+  it('keeps the rows that name something', () => {
+    expect(namedFields([{ key: 'a', value: '1' }])).toEqual([{ key: 'a', value: '1' }])
   })
 
-  it('keeps a value containing an equals sign whole', () => {
-    expect(parseCustomFields('url = https://x?a=1')).toEqual([['url', 'https://x?a=1']])
+  it('drops a row with no key, since an empty row names nothing', () => {
+    expect(namedFields([{ key: '', value: '1' }, { key: '  ', value: '2' }])).toEqual([])
   })
 
-  it('drops a line with no separator rather than guessing', () => {
-    expect(parseCustomFields('just words\na = 1')).toEqual([['a', '1']])
-  })
-
-  it('drops a line with an empty key', () => {
-    expect(parseCustomFields(' = 1')).toEqual([])
-  })
-
-  it('allows an empty value', () => {
-    expect(parseCustomFields('a =')).toEqual([['a', '']])
-  })
-
-  it('ignores blank lines and surrounding space', () => {
-    expect(parseCustomFields('\n  a = 1  \n\n')).toEqual([['a', '1']])
+  it('keeps a row whose value is empty, which is a real thing to say', () => {
+    expect(namedFields([{ key: 'a', value: '' }])).toEqual([{ key: 'a', value: '' }])
   })
 })
 
@@ -76,7 +61,23 @@ describe('buildSrc44', () => {
   })
 
   it('carries custom fields', () => {
-    expect(json(buildSrc44(fields({ custom: 'role = miner' })))).toMatchObject({ role: 'miner' })
+    expect(
+      json(buildSrc44(fields({ custom: [{ key: 'role', value: 'miner' }] }))),
+    ).toMatchObject({ role: 'miner' })
+  })
+
+  it('ignores a half-filled custom row rather than refusing the whole descriptor', () => {
+    // An unnamed row contributes nothing, so what comes out is the bare
+    // descriptor: a version and nothing else.
+    expect(Object.keys(json(buildSrc44(fields({ custom: [{ key: '', value: 'orphan' }] }))))).toEqual([
+      'vs',
+    ])
+  })
+
+  it('leaves the name out when there is none, since an attachment rarely has one', () => {
+    expect(json(buildSrc44(fields({ custom: [{ key: 'role', value: 'miner' }] })))).not.toHaveProperty(
+      'nm',
+    )
   })
 
   it('reports the standard’s own complaint instead of throwing', () => {

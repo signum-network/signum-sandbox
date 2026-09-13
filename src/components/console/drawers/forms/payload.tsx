@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { EMPTY_SRC44, buildSrc44, type Src44Fields } from '@/lib/src44'
 import { Toggle } from '@/components/console/Toggle'
 import { Field, TextArea } from './fields'
-import { Src44Form } from './Src44Form'
+import { Src44Form, type Src44Variant } from './Src44Form'
 
 export interface PayloadState {
   structured: boolean
@@ -48,7 +48,15 @@ export function usePayload(initiallyStructured = false): PayloadState {
   }
 }
 
-export function PayloadEditor({ state, label }: { state: PayloadState; label: string }) {
+export function PayloadEditor({
+  state,
+  label,
+  variant,
+}: {
+  state: PayloadState
+  label: string
+  variant?: Src44Variant
+}) {
   const { t } = useTranslation()
   return (
     <>
@@ -60,7 +68,7 @@ export function PayloadEditor({ state, label }: { state: PayloadState; label: st
         />
       </div>
       {state.structured ? (
-        <Src44Form fields={state.fields} onChange={state.setFields} />
+        <Src44Form fields={state.fields} onChange={state.setFields} variant={variant} />
       ) : (
         <Field label={label}>
           <TextArea value={state.plain} onChange={state.setPlain} />

@@ -28,8 +28,17 @@ export interface Src44Fields {
   homePage: string
   /** One URL per line. */
   socialLinks: string
-  /** One `key = value` per line. */
-  custom: string
+  custom: CustomField[]
+}
+
+/**
+ * A field SRC44 does not name, which is most of what a transaction attachment
+ * carries: the standard's own keys describe a profile, and an attachment is
+ * usually an application's own data travelling under its own names.
+ */
+export interface CustomField {
+  key: string
+  value: string
 }
 
 export const EMPTY_SRC44: Src44Fields = {
@@ -40,7 +49,7 @@ export const EMPTY_SRC44: Src44Fields = {
   avatarMime: 'image/png',
   homePage: '',
   socialLinks: '',
-  custom: '',
+  custom: [],
 }
 
 const lines = (text: string) =>
@@ -49,20 +58,9 @@ const lines = (text: string) =>
     .map((line) => line.trim())
     .filter((line) => line !== '')
 
-/**
- * `key = value` per line, because a developer typing an experimental payload
- * should not also have to type JSON punctuation. A line without a separator is
- * dropped rather than guessed at; the preview shows what survived.
- */
-export function parseCustomFields(text: string): [string, string][] {
-  return lines(text).flatMap((line) => {
-    const at = line.indexOf('=')
-    if (at <= 0) return []
-    const key = line.slice(0, at).trim()
-    const value = line.slice(at + 1).trim()
-    return key === '' ? [] : [[key, value] as [string, string]]
-  })
-}
+/** A row with no key names nothing, so it is left out rather than guessed at. */
+export const namedFields = (custom: CustomField[]) =>
+  custom.filter((field) => field.key.trim() !== '')
 
 export type Src44Result = { json: string } | { error: string }
 
@@ -83,8 +81,8 @@ export function buildSrc44(fields: Src44Fields): Src44Result {
     if (fields.homePage) builder.setHomePage(fields.homePage)
     const social = lines(fields.socialLinks)
     if (social.length > 0) builder.setSocialMediaLinks(social)
-    for (const [key, value] of parseCustomFields(fields.custom)) {
-      builder.setCustomField(key, value)
+    for (const { key, value } of namedFields(fields.custom)) {
+      builder.setCustomField(key.trim(), value)
     }
     return { json: builder.build().stringify() }
   } catch (error) {
