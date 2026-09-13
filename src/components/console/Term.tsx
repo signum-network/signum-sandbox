@@ -41,12 +41,11 @@ export function Term({ id, children }: { id: GlossaryTerm; children?: ReactNode 
           event.preventDefault()
         }}
         className="inline-flex"
-        // The panel is a child of the word it explains, so it inherits the
-        // word's typography. Half the labels in this console are set in
-        // uppercase with wide tracking -- a button, a toggle, a form field --
-        // and a paragraph of explanation rendered that way is unreadable, and
-        // looks like a different component from the one beside it. The word
-        // keeps its host's styling; the sentence about it does not.
+        // The icon is a child of the word it explains, so it inherits the
+        // word's typography — and half the labels in this console are set in
+        // uppercase, which would render the lowercase "i" as an "I". The panel
+        // escapes this through a portal and resets the same properties for
+        // itself; this reset is for the glyph.
         style={{ textTransform: 'none', letterSpacing: 'normal' }}
       >
         <InfoTooltip text={t(helpKey(id))} />
