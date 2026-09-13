@@ -106,6 +106,18 @@ export default {
       tourNote: 'Nove minutos, tudo na cadeia a sério.',
       tourStop: 'Parar a visita guiada',
     },
+    note: {
+      transactions:
+        'Tudo o que acontece na cadeia, do mais recente para o mais antigo. As entradas não confirmadas esperam pelo próximo bloco — forja um e vê-as assentar.',
+      blocks:
+        'Todos os blocos alguma vez forjados. A maioria está vazia, porque um bloco nasce quer alguém tenha enviado algo quer não.',
+      accounts:
+        'As contas cujas frases-passe este navegador guarda, e os contactos a que deste nome. Uma conta só aparece na cadeia depois de receber algo.',
+      watch:
+        'Uma conta debaixo de olho: o que tem, como se chama na cadeia, e o que entrou e saiu.',
+      send: 'Todos os tipos de transação que o Signum consegue transportar. Escolhe um e a linha por baixo diz o que faz.',
+      chain: 'Desfaz o que fizeste. Rebobinar remove blocos; esvaziar a cadeia não consegue — só reiniciar o nó o faz.',
+    },
     tx: {
       unconfirmed: 'não confirmada',
       block: 'Bloco {{height}}',

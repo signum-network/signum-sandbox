@@ -23,6 +23,7 @@ import { ChainDrawer } from './drawers/ChainDrawer'
 import { HelpDrawer } from './drawers/HelpDrawer'
 import { BeginnerMode } from './BeginnerMode'
 import { FirstVisit } from './FirstVisit'
+import { ViewNote } from './ViewNote'
 
 export type ConsoleTab = 'transactions' | 'blocks' | 'accounts' | 'watch'
 export type DrawerName = 'send' | 'chain' | 'help' | null
@@ -123,58 +124,70 @@ export function ConsoleShell() {
           >
             {!beginner.answered && <FirstVisit onAnswer={beginner.setBeginner} />}
             {beginner.answered && tab === 'transactions' && (
-              <TransactionsView
-                items={feed.items}
-                accounts={accounts.accounts}
-                contacts={contacts.contacts}
-                onAddContact={contacts.add}
-                query={resolved}
-                page={txPage}
-                onPage={setTxPage}
-              />
+              <>
+                <ViewNote id="transactions" />
+                <TransactionsView
+                  items={feed.items}
+                  accounts={accounts.accounts}
+                  contacts={contacts.contacts}
+                  onAddContact={contacts.add}
+                  query={resolved}
+                  page={txPage}
+                  onPage={setTxPage}
+                />
+              </>
             )}
             {beginner.answered && tab === 'blocks' && (
-              <BlocksView
-                blocks={blocks.data ?? []}
-                accounts={accounts.accounts}
-                contacts={contacts.contacts}
-                query={resolved}
-                page={blockPage}
-                onPage={setBlockPage}
-                chainLength={state.height ?? 0}
-                hideEmpty={hideEmptyBlocks}
-                onHideEmpty={setHideEmptyBlocks}
-                // The block row itself only expands in place; leaving this tab
-                // is the consequence of clicking one of the transactions inside
-                // it, not of clicking the block.
-                onSelectTransaction={showTransaction}
-              />
+              <>
+                <ViewNote id="blocks" />
+                <BlocksView
+                  blocks={blocks.data ?? []}
+                  accounts={accounts.accounts}
+                  contacts={contacts.contacts}
+                  query={resolved}
+                  page={blockPage}
+                  onPage={setBlockPage}
+                  chainLength={state.height ?? 0}
+                  hideEmpty={hideEmptyBlocks}
+                  onHideEmpty={setHideEmptyBlocks}
+                  // The block row itself only expands in place; leaving this tab
+                  // is the consequence of clicking one of the transactions inside
+                  // it, not of clicking the block.
+                  onSelectTransaction={showTransaction}
+                />
+              </>
             )}
             {beginner.answered && tab === 'watch' && watched.watchedId && (
-              <div className="themed-scroll console-scroll min-h-0 flex-1 overflow-y-auto pr-2">
-                <WatchView
-                accountId={watched.watchedId}
-                accounts={accounts.accounts}
-                contacts={contacts.contacts}
-                onUnwatch={() => {
-                  watched.unwatch()
-                  setTab('accounts')
-                }}
-                  onSelectTransaction={showTransaction}
-                />
-              </div>
+              <>
+                <ViewNote id="watch" />
+                <div className="themed-scroll console-scroll min-h-0 flex-1 overflow-y-auto pr-2">
+                  <WatchView
+                  accountId={watched.watchedId}
+                  accounts={accounts.accounts}
+                  contacts={contacts.contacts}
+                  onUnwatch={() => {
+                    watched.unwatch()
+                    setTab('accounts')
+                  }}
+                    onSelectTransaction={showTransaction}
+                  />
+                </div>
+              </>
             )}
             {beginner.answered && tab === 'accounts' && (
-              <div className="themed-scroll console-scroll min-h-0 flex-1 overflow-y-auto pr-2">
-                <AccountsView
-                store={accounts}
-                contacts={contacts}
-                query={query}
-                  watchedId={watched.watchedId}
-                  onWatch={watched.watch}
-                  onSelectTransaction={showTransaction}
-                />
-              </div>
+              <>
+                <ViewNote id="accounts" />
+                <div className="themed-scroll console-scroll min-h-0 flex-1 overflow-y-auto pr-2">
+                  <AccountsView
+                  store={accounts}
+                  contacts={contacts}
+                  query={query}
+                    watchedId={watched.watchedId}
+                    onWatch={watched.watch}
+                    onSelectTransaction={showTransaction}
+                  />
+                </div>
+              </>
             )}
           </div>
           {drawer && (
@@ -193,8 +206,18 @@ export function ConsoleShell() {
                   ✕
                 </RowButton>
               </div>
-              {drawer === 'send' && <SendDrawer store={accounts} contacts={contacts.contacts} />}
-              {drawer === 'chain' && <ChainDrawer height={state.height} />}
+              {drawer === 'send' && (
+                <>
+                  <ViewNote id="send" />
+                  <SendDrawer store={accounts} contacts={contacts.contacts} />
+                </>
+              )}
+              {drawer === 'chain' && (
+                <>
+                  <ViewNote id="chain" />
+                  <ChainDrawer height={state.height} />
+                </>
+              )}
               {drawer === 'help' && (
               <HelpDrawer
                 beginner={beginner.beginner}

@@ -106,6 +106,18 @@ export default {
       tourNote: 'Nueve minutos, todo sobre la cadena real.',
       tourStop: 'Detener el recorrido',
     },
+    note: {
+      transactions:
+        'Todo lo que ocurre en la cadena, lo más reciente primero. Las entradas sin confirmar esperan al próximo bloque — forja uno y míralas asentarse.',
+      blocks:
+        'Todos los bloques forjados hasta ahora. La mayoría están vacíos, porque un bloque se crea haya enviado alguien algo o no.',
+      accounts:
+        'Las cuentas cuyas frases de contraseña guarda este navegador, y los contactos a los que has puesto nombre. Una cuenta aparece en la cadena solo cuando ha recibido algo.',
+      watch:
+        'Una cuenta a la vista: lo que tiene, cómo se llama en la cadena y lo que ha entrado y salido.',
+      send: 'Todos los tipos de transacción que Signum puede llevar. Elige uno y la línea de debajo dice lo que hace.',
+      chain: 'Deshaz lo que has hecho. Rebobinar quita bloques; vaciar la cadena no puede — eso solo lo consigue reiniciar el nodo.',
+    },
     tx: {
       unconfirmed: 'sin confirmar',
       block: 'Bloque {{height}}',

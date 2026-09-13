@@ -117,6 +117,18 @@ export default {
       tourNote: 'Nine minutes, all of it on the real chain.',
       tourStop: 'Stop the tour',
     },
+    note: {
+      transactions:
+        'Everything happening on the chain, newest first. Unconfirmed entries are waiting for the next block — forge one and watch them settle.',
+      blocks:
+        'Every block ever forged. Most are empty, because a block is made whether or not anyone sent anything.',
+      accounts:
+        'The accounts this browser holds the passphrases for, and the contacts you have named. An account appears on the chain only once it has received something.',
+      watch:
+        'One account kept in view: what it holds, what it is called on chain, and what has gone in and out.',
+      send: 'Every kind of transaction Signum can carry. Pick one and the line beneath says what it does.',
+      chain: 'Undo what you did. Winding back removes blocks; it cannot empty the chain — only restarting the node can.',
+    },
     tx: {
       unconfirmed: 'unconfirmed',
       block: 'Block {{height}}',

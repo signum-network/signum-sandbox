@@ -106,6 +106,18 @@ export default {
       tourNote: 'Neun Minuten, alles auf der echten Chain.',
       tourStop: 'Tour beenden',
     },
+    note: {
+      transactions:
+        'Alles, was auf der Chain passiert, das Neueste zuerst. Unbestätigte Einträge warten auf den nächsten Block — forge einen und sieh zu, wie sie sich setzen.',
+      blocks:
+        'Jeder je geforgte Block. Die meisten sind leer, denn ein Block entsteht, ob jemand etwas gesendet hat oder nicht.',
+      accounts:
+        'Die Konten, deren Passphrasen dieser Browser hält, und die Kontakte, die du benannt hast. Ein Konto erscheint erst auf der Chain, wenn es etwas empfangen hat.',
+      watch:
+        'Ein Konto im Blick: was es hält, wie es auf der Chain heißt, und was ein- und ausgegangen ist.',
+      send: 'Jede Transaktionsart, die Signum kennt. Wähle eine, die Zeile darunter sagt, was sie tut.',
+      chain: 'Mach rückgängig, was du getan hast. Zurückspulen entfernt Blöcke; leeren kann es die Chain nicht — das kann nur ein Neustart des Nodes.',
+    },
     tx: {
       unconfirmed: 'unbestätigt',
       block: 'Block {{height}}',
