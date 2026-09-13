@@ -1,7 +1,10 @@
-import { useId, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { sfx, useAudio } from '@/audio'
 import type { SandboxAccount } from '@/lib/accounts'
 import type { Contacts } from '@/lib/contacts'
 import { ConsoleButton } from '@/components/console/ConsoleButton'
+import { Identicon } from '@/components/console/Identicon'
 import { Select } from '@/components/console/Select'
 
 const border = { borderColor: 'var(--border2)' }
@@ -71,6 +74,16 @@ export function TextInput({
  * toggling between two widgets, no "other…" option) and more discoverable
  * than a bare text input with a separate dropdown of matches.
  */
+/**
+ * A "To" field that can be typed or picked, without ever changing shape.
+ *
+ * It stays a real text input at heart, because a sandbox exists to try
+ * addresses the book has never seen. Suggestions are drawn by us rather than
+ * by a native datalist: the browser renders that in its own chrome, which is
+ * the one thing that still looked borrowed from another program. Matching is
+ * a plain case-insensitive contains over the name and the address, since the
+ * list is a handful of entries and anything cleverer would be guessing.
+ */
 export function RecipientPicker({
   accounts,
   contacts,
@@ -84,25 +97,91 @@ export function RecipientPicker({
   onChange: (v: string) => void
   placeholder?: string
 }) {
-  const listId = useId()
-  const parties = knownRecipients(accounts, contacts)
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+  const { play } = useAudio()
+
+  const needle = value.trim().toLowerCase()
+  const matches = knownRecipients(accounts, contacts).filter(
+    (p) =>
+      needle === '' ||
+      p.name.toLowerCase().includes(needle) ||
+      p.address.toLowerCase().includes(needle),
+  )
+
+  useEffect(() => {
+    if (!open) return
+    const onMouseDown = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false)
+    }
+    document.addEventListener('mousedown', onMouseDown)
+    document.addEventListener('keydown', onKeyDown)
+    return () => {
+      document.removeEventListener('mousedown', onMouseDown)
+      document.removeEventListener('keydown', onKeyDown)
+    }
+  }, [open])
+
+  const choose = (address: string) => {
+    play(sfx.click)
+    onChange(address)
+    setOpen(false)
+  }
 
   return (
-    <>
+    <div ref={ref} className="relative">
       <input
         className="w-full border bg-transparent px-2 py-1 text-[11px] text-[var(--fg)]"
         style={border}
-        list={listId}
         value={value}
         placeholder={placeholder ?? 'TS-…'}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => {
+          onChange(e.target.value)
+          setOpen(true)
+        }}
+        onFocus={() => setOpen(true)}
       />
-      <datalist id={listId}>
-        {parties.map((p) => (
-          <option key={p.id} value={p.address}>{p.name}</option>
-        ))}
-      </datalist>
-    </>
+
+      <AnimatePresence>
+        {open && matches.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: -6, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -6, scale: 0.97 }}
+            transition={{ type: 'spring', stiffness: 420, damping: 28 }}
+            className="themed-scroll absolute left-0 top-full z-50 mt-1 max-h-56 w-full overflow-y-auto"
+            style={{
+              background: 'var(--bg2)',
+              border: '1px solid var(--border2)',
+              boxShadow: '0 16px 48px rgba(0,0,0,.4)',
+            }}
+          >
+            {matches.map((p) => (
+              <motion.button
+                key={p.id}
+                type="button"
+                className="flex w-full items-center gap-2 px-2 py-1.5 text-left text-[11px]"
+                style={{ color: 'var(--fg)' }}
+                whileHover={{ backgroundColor: 'rgba(255,255,255,.07)', color: 'var(--blue2)' }}
+                onHoverStart={() => play(sfx.tick)}
+                onClick={() => choose(p.address)}
+              >
+                <Identicon value={p.address} size={14} />
+                <span className="flex min-w-0 flex-col items-start">
+                  <span className="truncate">{p.name}</span>
+                  <span className="truncate text-[9px]" style={{ color: 'var(--muted)' }}>
+                    {p.address}
+                  </span>
+                </span>
+              </motion.button>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   )
 }
 
@@ -135,7 +214,12 @@ export function AccountSelect({
       placeholder="—"
       emptyLabel={emptyAccountsLabel}
       onChange={onChange}
-      options={accounts.map((a) => ({ value: a.id, label: a.name, sublabel: a.address }))}
+      options={accounts.map((a) => ({
+        value: a.id,
+        label: a.name,
+        sublabel: a.address,
+        icon: <Identicon value={a.address} size={14} />,
+      }))}
     />
   )
 }

@@ -122,6 +122,13 @@ export default {
       resetManual: 'Ни один из вызовов сброса не сработал. Выполните {{command}}',
       height: 'Высота',
     },
+    watch: {
+      watch: 'Наблюдать',
+      stop: 'Перестать наблюдать',
+      incoming: 'Входящие',
+      outgoing: 'Исходящие',
+      nothing: 'Ничего',
+    },
     guard: {
       title: 'Это не сеть песочницы',
       description:

@@ -122,6 +122,13 @@ export default {
       resetManual: 'どちらのリセット呼び出しも失敗しました。{{command}} を実行してください',
       height: '高さ',
     },
+    watch: {
+      watch: '監視',
+      stop: '監視をやめる',
+      incoming: '受信',
+      outgoing: '送信',
+      nothing: 'なし',
+    },
     guard: {
       title: 'これはサンドボックスネットワークではありません',
       description:

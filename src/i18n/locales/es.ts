@@ -122,6 +122,13 @@ export default {
       resetManual: 'Ninguna de las dos llamadas de reinicio funcionó. Ejecuta {{command}}',
       height: 'Altura',
     },
+    watch: {
+      watch: 'Observar',
+      stop: 'Dejar de observar',
+      incoming: 'Entrantes',
+      outgoing: 'Salientes',
+      nothing: 'Nada',
+    },
     guard: {
       title: 'Esta no es la red del sandbox',
       description:

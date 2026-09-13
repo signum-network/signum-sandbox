@@ -27,12 +27,16 @@ export function ContactList({
   query,
   onAdd,
   onRemove,
+  onWatch,
+  watchedId,
 }: {
   contacts: Contacts
   addressPrefix: string
   query: Query
   onAdd: (accountIdOrAddress: string, name: string) => void
   onRemove: (accountIdOrAddress: string) => void
+  onWatch: (accountIdOrAddress: string) => void
+  watchedId: string | null
 }) {
   const { t } = useTranslation()
   const [address, setAddress] = useState('')
@@ -92,7 +96,10 @@ export function ContactList({
             <Identicon value={c.address} />
             <span className="font-bold text-[var(--fg)]">{c.name}</span>
             <span className="text-[var(--muted)]">{c.address}</span>
-            <span className="ml-auto">
+            <span className="ml-auto flex items-center gap-2">
+              <ConsoleButton active={watchedId === c.id} onClick={() => onWatch(c.id)}>
+                {t('console.watch.watch')}
+              </ConsoleButton>
               <ConsoleButton onClick={() => onRemove(c.id)}>
                 {t('console.accounts.remove')}
               </ConsoleButton>

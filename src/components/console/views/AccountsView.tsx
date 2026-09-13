@@ -11,11 +11,15 @@ export function AccountsView({
   store,
   contacts,
   query,
+  watchedId,
+  onWatch,
   onSelectTransaction,
 }: {
   store: AccountStore
   contacts: ContactStore
   query: Query
+  watchedId: string | null
+  onWatch: (accountIdOrAddress: string) => void
   onSelectTransaction: (transactionId: string) => void
 }) {
   const { t } = useTranslation()
@@ -124,6 +128,8 @@ export function AccountsView({
             contacts={contacts.contacts}
             onSelectTransaction={onSelectTransaction}
             isForger={store.forgerId === account.id}
+            isWatched={watchedId === account.id}
+            onWatch={() => onWatch(account.id)}
             onSetForger={() => store.setForger(account.id)}
             onRemove={() => store.remove(account.id)}
           />
@@ -136,6 +142,8 @@ export function AccountsView({
         query={query}
         onAdd={contacts.add}
         onRemove={contacts.remove}
+        onWatch={onWatch}
+        watchedId={watchedId}
       />
     </div>
   )

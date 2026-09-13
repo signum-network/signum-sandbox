@@ -3,22 +3,25 @@ import { useTranslation } from 'react-i18next'
 import { useNodeState } from '@/hooks/useNodeState'
 import { useAccounts } from '@/hooks/useAccounts'
 import { useContacts } from '@/hooks/useContacts'
+import { useWatched } from '@/hooks/useWatched'
 import { useChainFeed } from '@/hooks/useChainFeed'
 import { Unreachable } from '@/components/startpage'
 import { AppHeader } from '@/components/AppHeader'
 import { ConsoleButton, RowButton } from './ConsoleButton'
 import { interpret, resolveQuery } from '@/lib/search'
+import { displayName } from '@/lib/contacts'
 import { useNameLookup } from '@/hooks/useNameLookup'
 import { Header } from './Header'
 import { AccountsView } from './views/AccountsView'
 import { TransactionsView } from './views/TransactionsView'
 import { BlocksView } from './views/BlocksView'
+import { WatchView } from './views/WatchView'
 import { SearchField } from './views/SearchField'
 import { SendDrawer } from './drawers/SendDrawer'
 import { ChainDrawer } from './drawers/ChainDrawer'
 import { HelpDrawer } from './drawers/HelpDrawer'
 
-export type ConsoleTab = 'transactions' | 'blocks' | 'accounts'
+export type ConsoleTab = 'transactions' | 'blocks' | 'accounts' | 'watch'
 export type DrawerName = 'send' | 'chain' | 'help' | null
 
 const TABS: ConsoleTab[] = ['transactions', 'blocks', 'accounts']
@@ -30,6 +33,7 @@ export function ConsoleShell() {
   const { state, nodeAddress, connected } = useNodeState()
   const accounts = useAccounts()
   const contacts = useContacts()
+  const watched = useWatched()
   const feed = useChainFeed(state.kind === 'ready' ? state.height : null, connected)
   const [search, setSearch] = useState('')
   const query = interpret(search)
@@ -68,7 +72,7 @@ export function ConsoleShell() {
 
       <div className="mb-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          {TABS.map((name) => (
+          {[...TABS, ...(watched.watchedId ? (['watch'] as const) : [])].map((name) => (
             <ConsoleButton
               key={name}
               active={tab === name}
@@ -78,7 +82,9 @@ export function ConsoleShell() {
                 color: tab === name ? 'var(--blue3)' : 'var(--muted)',
               }}
             >
-              {t(`console.tab.${name}`)}
+              {name === 'watch'
+                ? displayName(watched.watchedId ?? '', accounts.accounts, contacts.contacts)
+                : t(`console.tab.${name}`)}
             </ConsoleButton>
           ))}
         </div>
@@ -108,11 +114,25 @@ export function ConsoleShell() {
               onSelectTransaction={showTransaction}
             />
           )}
+          {tab === 'watch' && watched.watchedId && (
+            <WatchView
+              accountId={watched.watchedId}
+              accounts={accounts.accounts}
+              contacts={contacts.contacts}
+              onUnwatch={() => {
+                watched.unwatch()
+                setTab('accounts')
+              }}
+              onSelectTransaction={showTransaction}
+            />
+          )}
           {tab === 'accounts' && (
             <AccountsView
               store={accounts}
               contacts={contacts}
               query={query}
+              watchedId={watched.watchedId}
+              onWatch={watched.watch}
               onSelectTransaction={showTransaction}
             />
           )}

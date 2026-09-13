@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { sfx, useAudio } from '@/audio'
 
@@ -7,6 +7,8 @@ export interface SelectOption {
   label: string
   /** A dimmer second line under the label — e.g. an account's address. */
   sublabel?: string
+  /** Shown before the label, in the trigger as well as in the list. */
+  icon?: ReactNode
 }
 
 /**
@@ -82,13 +84,16 @@ export function Select({
           })
         }}
       >
-        <span className="truncate">
+        <span className="flex min-w-0 items-center gap-2 truncate">
           {current ? (
             <>
-              {current.label}
-              {current.sublabel && (
-                <span style={{ color: 'var(--muted)' }}> · {current.sublabel}</span>
-              )}
+              {current.icon}
+              <span className="truncate">
+                {current.label}
+                {current.sublabel && (
+                  <span style={{ color: 'var(--muted)' }}> · {current.sublabel}</span>
+                )}
+              </span>
             </>
           ) : (
             placeholder
@@ -124,7 +129,7 @@ export function Select({
                 type="button"
                 role="option"
                 aria-selected={o.value === value}
-                className="flex w-full flex-col items-start px-2 py-1.5 text-left text-[11px]"
+                className="flex w-full items-center gap-2 px-2 py-1.5 text-left text-[11px]"
                 style={{
                   background: o.value === value ? 'rgba(255,255,255,.05)' : 'transparent',
                   color: 'var(--fg)',
@@ -137,12 +142,15 @@ export function Select({
                   setOpen(false)
                 }}
               >
-                <span>{o.label}</span>
-                {o.sublabel && (
-                  <span className="text-[9px]" style={{ color: 'var(--muted)' }}>
-                    {o.sublabel}
-                  </span>
-                )}
+                {o.icon}
+                <span className="flex min-w-0 flex-col items-start">
+                  <span className="truncate">{o.label}</span>
+                  {o.sublabel && (
+                    <span className="truncate text-[9px]" style={{ color: 'var(--muted)' }}>
+                      {o.sublabel}
+                    </span>
+                  )}
+                </span>
               </motion.button>
             ))}
           </motion.div>

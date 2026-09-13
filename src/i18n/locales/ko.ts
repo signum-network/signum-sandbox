@@ -122,6 +122,13 @@ export default {
       resetManual: '두 초기화 호출 모두 실패했습니다. {{command}} 를 실행하세요',
       height: '높이',
     },
+    watch: {
+      watch: '관찰',
+      stop: '관찰 중지',
+      incoming: '수신',
+      outgoing: '송신',
+      nothing: '없음',
+    },
     guard: {
       title: '샌드박스 네트워크가 아닙니다',
       description:

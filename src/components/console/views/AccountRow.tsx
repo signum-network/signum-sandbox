@@ -17,7 +17,9 @@ export function AccountRow({
   accounts,
   contacts,
   isForger,
+  isWatched,
   onSetForger,
+  onWatch,
   onRemove,
   onSelectTransaction,
 }: {
@@ -25,7 +27,9 @@ export function AccountRow({
   accounts: SandboxAccount[]
   contacts: Contacts
   isForger: boolean
+  isWatched: boolean
   onSetForger: () => void
+  onWatch: () => void
   onRemove: () => void
   onSelectTransaction: (transactionId: string) => void
 }) {
@@ -47,6 +51,9 @@ export function AccountRow({
         <span className="flex items-center gap-2">
           <ConsoleButton active={isForger} onClick={onSetForger}>
             {isForger ? `★ ${t('console.accounts.forger')}` : t('console.accounts.forger')}
+          </ConsoleButton>
+          <ConsoleButton active={isWatched} onClick={onWatch}>
+            {t('console.watch.watch')}
           </ConsoleButton>
           <ConsoleButton onClick={onRemove}>{t('console.accounts.remove')}</ConsoleButton>
         </span>

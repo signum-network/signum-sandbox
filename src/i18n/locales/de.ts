@@ -122,6 +122,13 @@ export default {
       resetManual: 'Keiner der beiden Reset-Aufrufe hat funktioniert. Führe {{command}} aus',
       height: 'Höhe',
     },
+    watch: {
+      watch: 'Beobachten',
+      stop: 'Nicht mehr beobachten',
+      incoming: 'Eingehend',
+      outgoing: 'Ausgehend',
+      nothing: 'Nichts',
+    },
     guard: {
       title: 'Das ist nicht das Sandbox-Netz',
       description:

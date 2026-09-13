@@ -122,6 +122,13 @@ export default {
       resetManual: 'Nenhuma das chamadas de reinício funcionou. Execute {{command}}',
       height: 'Altura',
     },
+    watch: {
+      watch: 'Observar',
+      stop: 'Parar de observar',
+      incoming: 'Entradas',
+      outgoing: 'Saídas',
+      nothing: 'Nada',
+    },
     guard: {
       title: 'Esta não é a rede do sandbox',
       description:

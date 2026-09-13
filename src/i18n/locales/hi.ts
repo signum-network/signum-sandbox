@@ -122,6 +122,13 @@ export default {
       resetManual: 'दोनों में से कोई भी रीसेट कॉल काम नहीं आया। {{command}} चलाएँ',
       height: 'ऊँचाई',
     },
+    watch: {
+      watch: 'निगरानी',
+      stop: 'निगरानी बंद करें',
+      incoming: 'आवक',
+      outgoing: 'जावक',
+      nothing: 'कुछ नहीं',
+    },
     guard: {
       title: 'यह सैंडबॉक्स नेटवर्क नहीं है',
       description:

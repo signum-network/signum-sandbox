@@ -133,6 +133,13 @@ export default {
       resetManual: 'Neither reset call worked. Run {{command}}',
       height: 'Height',
     },
+    watch: {
+      watch: 'Watch',
+      stop: 'Stop watching',
+      incoming: 'Incoming',
+      outgoing: 'Outgoing',
+      nothing: 'Nothing',
+    },
     guard: {
       title: 'This is not the sandbox network',
       description:

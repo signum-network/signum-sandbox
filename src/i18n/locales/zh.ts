@@ -121,6 +121,13 @@ export default {
       resetManual: '两个重置调用都没有成功。请运行 {{command}}',
       height: '高度',
     },
+    watch: {
+      watch: '关注',
+      stop: '取消关注',
+      incoming: '转入',
+      outgoing: '转出',
+      nothing: '无',
+    },
     guard: {
       title: '这不是沙盒网络',
       description: '节点报告为 {{network}}。沙盒以明文保存密语，且仅在自己的模拟链上这样做，因此账户和发送功能已关闭。',

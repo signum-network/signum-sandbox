@@ -122,6 +122,13 @@ export default {
       resetManual: 'Жоден із викликів скидання не спрацював. Виконайте {{command}}',
       height: 'Висота',
     },
+    watch: {
+      watch: 'Спостерігати',
+      stop: 'Припинити спостереження',
+      incoming: 'Вхідні',
+      outgoing: 'Вихідні',
+      nothing: 'Нічого',
+    },
     guard: {
       title: 'Це не мережа пісочниці',
       description:
