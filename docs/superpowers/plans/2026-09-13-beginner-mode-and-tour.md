@@ -460,7 +460,7 @@ Insert a top-level `glossary` key in `src/i18n/locales/en.ts`, as a sibling of `
 
 - [ ] **Step 3: Translate the same key set into the remaining eight**
 
-`es`, `pt`, `uk`, `ru`, `zh`, `ja`, `ko`, `hi` each get a `glossary` block with exactly these sixteen terms and both keys each. Translate the meaning, not the words — these are explanations, and an explanation that reads like machine output teaches nothing. Keep `SRC44`, `Multi-Out`, `Signum` and `SIGNA` untranslated; they are proper nouns on the chain. `locales.test.ts` is the gate: it compares every locale's flattened key set against English and fails on any difference.
+`es`, `pt`, `uk`, `ru`, `zh`, `ja`, `ko`, `hi` each get a `glossary` block with exactly these sixteen terms and both keys each. Translate the meaning, not the words — these are explanations, and an explanation that reads like machine output teaches nothing. Keep `SRC44`, `Signum` and `SIGNA` untranslated; they are proper nouns on the chain. Everything else takes the word that locale file already uses — `glossary.multiOut.term` must read exactly like `console.kind.multiOut` does, or the tooltip will label a row with a word the row does not use. `locales.test.ts` is the gate: it compares every locale's flattened key set against English and fails on any difference.
 
 - [ ] **Step 4: Run the tests**
 

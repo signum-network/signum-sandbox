@@ -67,7 +67,7 @@ export default {
       help: 'Un pago que se repite solo. Lo configuras una vez y la cadena lo ejecuta hasta que se cancele.',
     },
     multiOut: {
-      term: 'Multi-Out',
+      term: 'Multi-salida',
       help: 'Una transacción que paga a muchas cuentas: hasta 64 con importes distintos, o 128 recibiendo todas lo mismo. Una comisión en vez de cien.',
     },
     contact: {
