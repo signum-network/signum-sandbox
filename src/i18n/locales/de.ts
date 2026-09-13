@@ -286,4 +286,15 @@ export default {
         'Der Node meldet {{network}}. Die Sandbox hält Passphrases im Klartext und tut das nur auf ihrer eigenen Mock-Chain — Accounts und Senden sind deshalb abgeschaltet.',
     },
   },
+  tour: {
+    position: 'Schritt {{position}} von {{total}}',
+    next: 'Verstanden',
+    finish: 'Und jetzt bau etwas',
+    finaleFooter:
+      'All das steckt in der Senden-Schublade, jeweils mit einer Zeile dazu, was es tut. Einsteiger-Modus und diese Tour liegen hinter Hilfe, und die vollständige JSON-API ist einen Klick weiter.',
+    stop: 'Tour beenden',
+    waiting: 'Wir warten auf dich…',
+    step: {},
+    useCase: {},
+  },
 } as const

@@ -297,4 +297,15 @@ export default {
         'The node reports {{network}}. The sandbox keeps passphrases in plain text and only does that on its own mock chain, so accounts and sending are switched off.',
     },
   },
+  tour: {
+    position: 'Step {{position}} of {{total}}',
+    next: 'Got it',
+    finish: 'Go and build something',
+    finaleFooter:
+      'All of it is in the Send drawer, each with a line saying what it does. Beginner mode and this tour live behind Help, and the full JSON API is one click further.',
+    stop: 'End the tour',
+    waiting: 'Waiting for you…',
+    step: {},
+    useCase: {},
+  },
 } as const

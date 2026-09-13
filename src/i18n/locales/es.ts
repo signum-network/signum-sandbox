@@ -286,4 +286,15 @@ export default {
         'El nodo informa {{network}}. El sandbox guarda las frases de contraseña en texto plano y solo lo hace en su propia cadena simulada, así que las cuentas y el envío están desactivados.',
     },
   },
+  tour: {
+    position: 'Paso {{position}} de {{total}}',
+    next: 'Entendido',
+    finish: 'Ve y construye algo',
+    finaleFooter:
+      'Todo está en el panel Enviar, cada cosa con una línea que dice para qué sirve. El modo principiante y este recorrido viven detrás de Ayuda, y la API JSON completa está a un clic más.',
+    stop: 'Terminar el recorrido',
+    waiting: 'Te esperamos…',
+    step: {},
+    useCase: {},
+  },
 } as const

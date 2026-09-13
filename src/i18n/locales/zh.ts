@@ -284,4 +284,15 @@ export default {
       description: '节点报告为 {{network}}。沙盒以明文保存密语，且仅在自己的模拟链上这样做，因此账户和发送功能已关闭。',
     },
   },
+  tour: {
+    position: '第 {{position}} 步，共 {{total}} 步',
+    next: '明白了',
+    finish: '去动手做点什么',
+    finaleFooter:
+      '这些都在发送面板里，每一项都有一行说明它做什么。新手模式和本导览藏在帮助后面，完整的 JSON API 再点一下就到。',
+    stop: '结束导览',
+    waiting: '等你操作…',
+    step: {},
+    useCase: {},
+  },
 } as const

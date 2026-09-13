@@ -286,4 +286,15 @@ export default {
         'O nó reporta {{network}}. O sandbox guarda as frases-passe em texto simples e só o faz na sua própria cadeia simulada, por isso as contas e o envio estão desativados.',
     },
   },
+  tour: {
+    position: 'Passo {{position}} de {{total}}',
+    next: 'Percebi',
+    finish: 'Vai construir alguma coisa',
+    finaleFooter:
+      'Está tudo no painel Enviar, cada um com uma linha a dizer o que faz. O modo iniciante e esta visita guiada vivem por trás de Ajuda, e a API JSON completa está a mais um clique de distância.',
+    stop: 'Terminar a visita guiada',
+    waiting: 'Estamos à tua espera…',
+    step: {},
+    useCase: {},
+  },
 } as const
