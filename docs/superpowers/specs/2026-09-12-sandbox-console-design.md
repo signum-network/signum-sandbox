@@ -29,16 +29,18 @@ Checked against the pinned `signum-node.jar` (v3.9.11) API description and the i
 | A block reward is credited straight to the forger's balance without emitting a transaction. | The stream will never show a "block reward" row, and the mock-up in this document is wrong about that. The `reward` kind stays in the code for a transaction that genuinely has no sender. |
 | Read-only endpoints for the three views all exist: `getUnconfirmedTransactions`, `getAccountTransactions`, `getBlocks`, `getBlock`, `getTransaction`, `getAccount`, `getAliases`, `getAsset`, `getAccountAssets`, `getAccountSubscriptions`. | The inspector needs no node change. |
 
-Both reset calls have since been run against the live mock node, and they do not behave alike:
+Both reset calls have since been run against the live mock node, and only one of them does anything:
 
 | Call | What actually happens on v3.9.11 |
 |---|---|
-| `popOff` with `height=1` | Works. Returns the list of popped blocks; `numberOfBlocks` drops to 2 — genesis plus block 1. |
-| `fullReset` | **Silent no-op.** Answers `{"done":true}` and leaves the database byte-identical. The node log shows `Unable to execute clean as it has been disabled with the 'flyway.cleanDisabled' property`, and that failure is never propagated into the API response. |
+| `popOff` | Works, but **cannot reach an empty chain**. `height=0` is refused outright (`invalid numBlocks or height`), so the floor is height 1: block 1 survives, along with the 10,000 SIGNA its forger was paid for it. Its reach is a further limit — 1440 blocks — but the floor is the binding one. |
+| `fullReset` | **Silent no-op.** Answers `{"done":true}` and leaves the database byte-identical, because Flyway's clean is disabled inside the node. Passing `-Dflyway.cleanDisabled=false` to the JVM does not lift it either: the node sets the flag in code. |
 
-Reset therefore has three stages, and the first one that **demonstrably** worked wins. `popOff` down to height 1 is the real path: a sandbox chain is almost always shorter than the 1440-block limit, so rewinding to the start *is* a full reset, and it needs neither a restart nor a second mechanism. `fullReset` stays in the sequence because attempting it costs nothing and a later node build may repair it, but it is not counted on. And the reset script — stop the node, remove `db/`, start it again — is the last resort the console names when neither API call moved the chain. It ships in both flavours, `reset.sh` and `reset.cmd`, and the console names whichever matches the platform the browser reports, because the deliverable is a local download and the instruction has to be one the reader can actually run.
+So the console cannot empty the chain, and no amount of API can make it. Emptying means deleting the database, the node holds that file open while it runs, and there is no shutdown endpoint — nor should a web page have one.
 
-Because `fullReset` reports success while doing nothing, **`resetChain` measures instead of trusting**: after each stage it reads the height back and only reports that stage as successful if the chain actually returned to the start. Telling someone their chain was wiped when it was not is the worst outcome available after a destructive action they confirmed.
+The two are therefore presented as the two different things they are. **Winding back** is what the console does: `popOff` to block 1, verified by reading the height afterwards rather than trusting the answer, with the drawer saying plainly what survives. **An empty chain** is `start.sh --reset` (`start.cmd --reset`), which asks for confirmation and deletes `db/` before launching. The drawer names that command, spelled for the platform the browser reports.
+
+The prompt is on the flag rather than on every start: a question asked at each launch would be answered "keep it" almost every time, and a question always answered the same way stops being read. `fullReset` was removed rather than kept as a fallback — a stage that always lies is worse than no stage.
 
 ## Decisions
 
@@ -54,7 +56,7 @@ Because `fullReset` reports success while doing nothing, **`resetChain` measures
 10. **The tour drives real actions and waits for real chain state**, rather than narrating over the UI.
 11. **The passphrase safety rail:** passphrases live in plain `localStorage` because they are worthless on a mock chain — and the account store refuses to operate when the connected node is not the mock network.
 12. **Scenario accounts use obviously fake passphrases** (`sandbox-alice`, `sandbox-miner`); accounts created in the console get real generated mnemonics.
-13. **Reset walks three stages** — `popOff` to height 1, then `fullReset`, then a documented script — and verifies the height after each rather than trusting the response.
+13. **Winding back and emptying are separate.** The console winds back with `popOff` and verifies the height; emptying the chain is `start.sh --reset`, because it needs the node stopped. `fullReset` is not used at all.
 14. **A local address book.** Contacts are accounts the user does not own, given a name, kept as `accountId → name`. One resolution rule names an account everywhere: owned account, then contact, then on-chain name, then a shortened address.
 15. **Reset names the right script per platform.** The deliverable carries `start`/`reset` in both `.sh` and `.cmd` form, and the console names whichever matches the browser's platform.
 16. **Delivery in two layers:** the developer core first, the newcomer layer on top.
@@ -105,7 +107,7 @@ The expanded detail decodes the payload rather than restating the JSON: a plain 
 
 **Auto-forge** produces a block on a fixed interval, **off by default**. It is what a developer switches on so their application's transactions confirm without switching windows; leaving it off by default preserves the newcomer's cause-and-effect between pressing a button and seeing a block.
 
-**Reset** sits behind a confirmation and walks the three stages above — `popOff` to height 1, then `fullReset`, then the script it tells you to run — checking the height after each rather than believing the answer. Afterwards the console is back in its empty state, offering the scenarios again.
+**Winding back** sits behind a confirmation, calls `popOff` to block 1 and checks the height afterwards. It says what it cannot do — block 1 and its reward remain — and names the command that can.
 
 **Advanced tools** are hidden behind a switch in the Chain drawer. It currently holds `popOff` with −1, −10 and −100 blocks. The same switch is the place for any later tool that would confuse more than it helps.
 
@@ -272,4 +274,4 @@ Smart contracts, reward recipient, marketplace, asset trading, the faucet, distr
 
 ## Open risks
 
-`fullReset` turned out to be a silent no-op, so on a chain longer than `popOff`'s 1440-block reach the only working reset is the script. That is a narrow case — a sandbox chain rarely gets that long — but it is the one place where a button becomes an instruction. The scenario vocabulary will feel too narrow the first time someone wants a step it does not have — that is the accepted price of a declarative format, and widening it later is additive. And the tour's coupling to the components is the part most likely to be underestimated: if it is not built in with the components, it will be built twice.
+The console cannot empty the chain by itself and never will: `popOff` refuses to go below block 1 and `fullReset` does nothing. That is a limit of the node, now stated in the drawer rather than worked around.

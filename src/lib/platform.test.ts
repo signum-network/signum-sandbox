@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { detectPlatform, resetScriptCommand } from './platform'
+import { detectPlatform, resetCommand } from './platform'
 
 const WINDOWS_UA =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36'
@@ -28,14 +28,14 @@ describe('detectPlatform', () => {
   })
 })
 
-describe('resetScriptCommand', () => {
+describe('resetCommand', () => {
   it('names the Windows script on Windows', () => {
-    expect(resetScriptCommand(WINDOWS_UA)).toBe('.\\scripts\\reset.cmd')
+    expect(resetCommand(WINDOWS_UA)).toBe('.\\scripts\\start.cmd --reset')
   })
 
   it('names the POSIX script everywhere else, including the unrecognised case', () => {
-    expect(resetScriptCommand(MAC_UA)).toBe('./scripts/reset.sh')
-    expect(resetScriptCommand(LINUX_UA)).toBe('./scripts/reset.sh')
-    expect(resetScriptCommand(undefined)).toBe('./scripts/reset.sh')
+    expect(resetCommand(MAC_UA)).toBe('./scripts/start.sh --reset')
+    expect(resetCommand(LINUX_UA)).toBe('./scripts/start.sh --reset')
+    expect(resetCommand(undefined)).toBe('./scripts/start.sh --reset')
   })
 })

@@ -18,6 +18,6 @@ export function detectPlatform(userAgent: string | undefined): Platform {
 }
 
 /** The reset script to name, spelled exactly as a user on that platform would type it. */
-export function resetScriptCommand(userAgent: string | undefined): string {
-  return detectPlatform(userAgent) === 'windows' ? '.\\scripts\\reset.cmd' : './scripts/reset.sh'
+export function resetCommand(userAgent: string | undefined): string {
+  return detectPlatform(userAgent) === 'windows' ? '.\\scripts\\start.cmd --reset' : './scripts/start.sh --reset'
 }

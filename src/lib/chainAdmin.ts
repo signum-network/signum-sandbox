@@ -1,5 +1,5 @@
 import { ledger } from './ledger'
-import { resetPlan, START_HEIGHT, type ResetStage } from './resetPlan'
+import { START_HEIGHT, rewindProblem, type RewindProblem } from './rewind'
 
 /** Matches API.adminKeyList in conf/node.properties. */
 const ADMIN_KEY = 'sandbox'
@@ -22,44 +22,34 @@ export const forge = (secretPhrase: string) =>
 
 export const popOffTo = (height: number) => admin('popOff', { height: String(height) })
 
-export const fullReset = () => admin('fullReset')
-
 export const clearUnconfirmed = () => admin('clearUnconfirmedTransactions')
 
 /**
- * `alreadyAtStart` is not a failure: resetPlan already found nothing to do, so
- * there was nothing for either call to get wrong. Only an empty plan that was
- * actually attempted and still didn't land the chain at START_HEIGHT is
- * `failed` — that's the case with no explanation left but scripts/reset.sh.
+ * What a rewind did, or why it did nothing.
+ *
+ * `fullReset` used to sit behind this as a second stage and has been removed
+ * rather than kept for luck: verified against v3.9.11 it answers
+ * `{"done":true}` and leaves the database untouched, because Flyway's clean is
+ * disabled inside the node — a JVM `-Dflyway.cleanDisabled=false` does not
+ * lift it either, since the node sets the flag in code. A stage that always
+ * lies is worse than no stage.
  */
-export type ResetOutcome =
-  | { kind: 'succeeded'; stage: ResetStage }
-  | { kind: 'alreadyAtStart' }
-  | { kind: 'failed' }
+export type RewindOutcome = { kind: 'succeeded' } | { kind: RewindProblem } | { kind: 'failed' }
 
-const currentHeight = async () =>
-  (await ledger.network.getBlockchainStatus()).numberOfBlocks
+const currentHeight = async () => (await ledger.network.getBlockchainStatus()).numberOfBlocks
 
 /**
- * Attempts each stage and reads the chain back rather than trusting the answer.
- * Verified against v3.9.11: `fullReset` responds {"done":true} and leaves the
- * database untouched, because Flyway's clean is disabled in the node build. A
- * stage that lies is exactly why success is measured, not reported.
- *
- * A `failed` result means the caller has to tell the user to run scripts/reset.sh.
+ * Winds the chain back to block 1 and reads the height afterwards rather than
+ * trusting the answer — the console's one habit worth keeping from when its
+ * predecessor could report a success it had not achieved.
  */
-export async function resetChain(height: number): Promise<ResetOutcome> {
-  const stages = resetPlan(height)
-  if (stages.length === 0) return { kind: 'alreadyAtStart' }
-
-  for (const stage of stages) {
-    try {
-      if (stage === 'popOff') await popOffTo(1)
-      else await fullReset()
-      if ((await currentHeight()) <= START_HEIGHT) return { kind: 'succeeded', stage }
-    } catch {
-      // Fall through to the next stage.
-    }
+export async function rewindChain(height: number): Promise<RewindOutcome> {
+  const problem = rewindProblem(height)
+  if (problem !== 'none') return { kind: problem }
+  try {
+    await popOffTo(1)
+    return (await currentHeight()) <= START_HEIGHT ? { kind: 'succeeded' } : { kind: 'failed' }
+  } catch {
+    return { kind: 'failed' }
   }
-  return { kind: 'failed' }
 }
