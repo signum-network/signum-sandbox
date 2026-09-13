@@ -46,8 +46,8 @@ export function BlocksView({
   const first = page * PAGE_SIZE
 
   return (
-    <>
-      <ul>
+    <div className="flex min-h-0 flex-1 flex-col">
+      <ul className="themed-scroll min-h-0 flex-1 overflow-y-auto">
         {shown.map((block) => (
         <BlockRow
           key={block.block}
@@ -66,6 +66,6 @@ export function BlocksView({
         total={chainLength}
         onPage={onPage}
       />
-    </>
+    </div>
   )
 }

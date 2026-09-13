@@ -73,7 +73,7 @@ export function ConsoleShell() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl p-6">
+    <div className="mx-auto flex h-screen max-w-6xl flex-col p-6">
       <AppHeader
         networkName={state.networkName}
         version={state.version}
@@ -84,7 +84,7 @@ export function ConsoleShell() {
 
       <Header state={state} accounts={accounts} onOpenDrawer={setDrawer} />
 
-      <div className="mb-3 flex items-center justify-between">
+      <div className="mb-3 flex shrink-0 items-center justify-between">
         <div className="flex items-center gap-2">
           {[...TABS, ...(watched.watchedId ? (['watch'] as const) : [])].map((name) => (
             <ConsoleButton
@@ -105,8 +105,16 @@ export function ConsoleShell() {
         <SearchField value={search} onChange={changeSearch} />
       </div>
 
-      <div className="flex gap-3">
-        <div className="min-h-[320px] flex-1 border p-3" style={{ borderColor: 'var(--border2)' }}>
+      {/*
+        min-h-0 is what lets a flex child shrink below its content and hand the
+        overflow to the scroll container inside it; without it the list would
+        push the page taller again and nothing would scroll in place.
+      */}
+      <div className="flex min-h-0 flex-1 gap-3">
+        <div
+          className="flex min-h-[200px] min-w-0 flex-1 flex-col border p-3"
+          style={{ borderColor: 'var(--border2)' }}
+        >
           {tab === 'transactions' && (
             <TransactionsView
               items={feed.items}
@@ -134,7 +142,8 @@ export function ConsoleShell() {
             />
           )}
           {tab === 'watch' && watched.watchedId && (
-            <WatchView
+            <div className="themed-scroll min-h-0 flex-1 overflow-y-auto">
+              <WatchView
               accountId={watched.watchedId}
               accounts={accounts.accounts}
               contacts={contacts.contacts}
@@ -142,22 +151,28 @@ export function ConsoleShell() {
                 watched.unwatch()
                 setTab('accounts')
               }}
-              onSelectTransaction={showTransaction}
-            />
+                onSelectTransaction={showTransaction}
+              />
+            </div>
           )}
           {tab === 'accounts' && (
-            <AccountsView
+            <div className="themed-scroll min-h-0 flex-1 overflow-y-auto">
+              <AccountsView
               store={accounts}
               contacts={contacts}
               query={query}
-              watchedId={watched.watchedId}
-              onWatch={watched.watch}
-              onSelectTransaction={showTransaction}
-            />
+                watchedId={watched.watchedId}
+                onWatch={watched.watch}
+                onSelectTransaction={showTransaction}
+              />
+            </div>
           )}
         </div>
         {drawer && (
-          <div className="w-[34%] border p-3" style={{ borderColor: 'var(--blue2)' }}>
+          <div
+            className="themed-scroll w-[34%] overflow-y-auto border p-3"
+            style={{ borderColor: 'var(--blue2)' }}
+          >
             <div className="flex items-center justify-between">
               <span className="text-[10px] uppercase tracking-[1px] text-[var(--blue3)]">
                 {t(`console.drawer.${drawer}`)}

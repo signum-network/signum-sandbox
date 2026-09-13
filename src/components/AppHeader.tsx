@@ -44,7 +44,7 @@ export function AppHeader({
   )
 
   return (
-    <header className="mb-6 flex flex-wrap items-baseline justify-between gap-3">
+    <header className="mb-6 flex shrink-0 flex-wrap items-baseline justify-between gap-3">
       <div>
         {homeLink ? (
           <Link to="/" title={t('console.back')}>
