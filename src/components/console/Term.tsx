@@ -19,6 +19,11 @@ import { useBeginnerMode } from './BeginnerMode'
  * expands, a toggle — so the `i` stops the click going any further. Pressing
  * a help icon must never be pressing what it is explaining, and a newcomer
  * asking what forging is should not thereby forge.
+ *
+ * A word that appears once per row does not belong here. Fifty rows would
+ * carry fifty identical icons explaining the same thing, which is not help
+ * but wallpaper — those terms go in the view's note instead, where they are
+ * said once above the list.
  */
 export function Term({ id, children }: { id: GlossaryTerm; children?: ReactNode }) {
   const { t } = useTranslation()
@@ -36,6 +41,13 @@ export function Term({ id, children }: { id: GlossaryTerm; children?: ReactNode 
           event.preventDefault()
         }}
         className="inline-flex"
+        // The panel is a child of the word it explains, so it inherits the
+        // word's typography. Half the labels in this console are set in
+        // uppercase with wide tracking -- a button, a toggle, a form field --
+        // and a paragraph of explanation rendered that way is unreadable, and
+        // looks like a different component from the one beside it. The word
+        // keeps its host's styling; the sentence about it does not.
+        style={{ textTransform: 'none', letterSpacing: 'normal' }}
       >
         <InfoTooltip text={t(helpKey(id))} />
       </span>

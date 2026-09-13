@@ -5,7 +5,6 @@ import { useQuery } from '@tanstack/react-query'
 import { decodePayload, decryptFor } from '@/lib/payload'
 import type { SandboxAccount } from '@/lib/accounts'
 import { ConsoleButton, RowButton } from '../ConsoleButton'
-import { Term } from '../Term'
 import { displayName, type Contacts } from '@/lib/contacts'
 import { toComparableId } from '@/lib/recipient'
 import { summarize } from '@/lib/txSummary'
@@ -105,12 +104,8 @@ export function TransactionRow({
         </span>
         <span className={item.confirmed ? 'text-[var(--muted)]' : 'text-[var(--blue3)]'}>
           {item.confirmed
-            ? (
-                <Term id="block">
-                  {t('console.tx.block', { height: item.tx.height ?? '—' })}
-                </Term>
-              )
-            : <Term id="unconfirmed">{t('console.tx.unconfirmed')}</Term>}
+            ? t('console.tx.block', { height: item.tx.height ?? '—' })
+            : t('console.tx.unconfirmed')}
         </span>
       </RowButton>
 

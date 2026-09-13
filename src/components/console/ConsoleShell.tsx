@@ -179,7 +179,7 @@ export function ConsoleShell() {
             )}
             {beginner.answered && tab === 'transactions' && (
               <>
-                <ViewNote id="transactions" />
+                <ViewNote id="transactions" terms={['block', 'unconfirmed']} />
                 <TransactionsView
                   items={feed.items}
                   accounts={accounts.accounts}
@@ -193,7 +193,7 @@ export function ConsoleShell() {
             )}
             {beginner.answered && tab === 'blocks' && (
               <>
-                <ViewNote id="blocks" />
+                <ViewNote id="blocks" terms={['block', 'forger']} />
                 <BlocksView
                   blocks={blocks.data ?? []}
                   accounts={accounts.accounts}
