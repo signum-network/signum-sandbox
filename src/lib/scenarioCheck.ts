@@ -71,7 +71,10 @@ export function checkScenario(steps: ScenarioStep[]): Problem[] {
     }
   }
 
-  if (miner === null) {
+  // Not on a file that did not parse. An empty step list means the parser
+  // already has something to say, and "no miner line" on top of a syntax
+  // error is a second complaint about the same missing text.
+  if (miner === null && steps.length > 0) {
     problems.unshift({
       line: steps[0]?.line ?? 1,
       message: 'this scenario has no "miner" line, so nothing can forge',

@@ -109,6 +109,14 @@ const isAmount = (token: string | undefined) =>
   token !== undefined && /^\d+(\.\d+)?$/.test(token)
 
 /**
+ * Amounts divide; counts do not. Blocks, decimal places and seconds are all
+ * whole things, and `forge 1.5` accepted as a block count is the language
+ * telling an author their line is fine and then handing the runner something
+ * it cannot do.
+ */
+const isWhole = (token: string | undefined) => token !== undefined && /^\d+$/.test(token)
+
+/**
  * Source in, steps and problems out. Never throws: a scenario is edited in a
  * text box, so half of what this sees will be half-written, and the useful
  * answer is always a list of lines to look at.
@@ -142,15 +150,38 @@ export function parseScenario(source: string): ParseResult {
 
     /** `A -> B` at the head of the arguments, which most instructions take. */
     const parties = (): { from: string; to: string; tail: string[] } | null => {
-      if (rest[1] !== '->') {
+      // Presence first, position second. Judging position alone made a missing
+      // sender ("pay -> Bob 10") report that the arrow was absent, which the
+      // author can see on the line is untrue.
+      const arrow = rest.indexOf('->')
+      if (arrow === -1) {
         fail(`${verb} needs "->" between the two accounts`)
         return null
       }
-      if (rest[0] === undefined || rest[2] === undefined) {
-        fail(`${verb} needs two accounts`)
+      if (arrow !== 1 || rest[2] === undefined) {
+        fail(`${verb} needs an account on each side of "->"`)
         return null
       }
       return { from: rest[0], to: rest[2], tail: rest.slice(3) }
+    }
+
+    /**
+     * Anything left over after an instruction has taken what it understands.
+     *
+     * Without this, `account Alice mysecretwords` parsed clean and quietly
+     * derived sandbox-alice instead: the scenario ran, succeeded, and produced
+     * an address the author never asked for. A surplus argument is always a
+     * mistake, and the commonest one is a text that forgot its quotes.
+     */
+    const noExtra = (consumed: number, quotable = false): boolean => {
+      const extra = rest[consumed]
+      if (extra === undefined) return true
+      if (quotable && !isQuoted(extra)) {
+        fail(`${verb}: put "${extra}" in quotes to use it as text`)
+        return false
+      }
+      fail(`${verb} does not take "${extra}"`)
+      return false
     }
 
     switch (verb) {
@@ -158,8 +189,12 @@ export function parseScenario(source: string): ParseResult {
       case 'account': {
         const name = rest[0]
         if (name === undefined) return fail(`${verb} needs a name`)
-        if (verb === 'miner') return void steps.push({ line, kind: 'miner', name })
+        if (verb === 'miner') {
+          if (!noExtra(1)) return
+          return void steps.push({ line, kind: 'miner', name })
+        }
         const passphrase = isQuoted(rest[1]) ? unquote(rest[1]) : undefined
+        if (!noExtra(passphrase === undefined ? 1 : 2, true)) return
         return void steps.push({ line, kind: 'account', name, ...(passphrase && { passphrase }) })
       }
 
@@ -168,6 +203,7 @@ export function parseScenario(source: string): ParseResult {
         if (account === undefined) return fail('fund needs a name')
         if (rest[1] === undefined) return fail('fund needs an amount')
         if (!isAmount(rest[1])) return fail(`"${rest[1]}" is not an amount`)
+        if (!noExtra(2)) return
         return void steps.push({ line, kind: 'fund', account, signa: rest[1] })
       }
 
@@ -177,6 +213,7 @@ export function parseScenario(source: string): ParseResult {
         const [signa, message] = p.tail
         if (signa === undefined) return fail('pay needs an amount')
         if (!isAmount(signa)) return fail(`"${signa}" is not an amount`)
+        if (!noExtra(isQuoted(message) ? 5 : 4, true)) return
         return void steps.push({
           line,
           kind: 'pay',
@@ -192,6 +229,7 @@ export function parseScenario(source: string): ParseResult {
         const p = parties()
         if (!p) return
         if (!isQuoted(p.tail[0])) return fail(`${verb} needs a quoted text`)
+        if (!noExtra(4)) return
         return void steps.push({
           line,
           kind: 'msg',
@@ -226,6 +264,7 @@ export function parseScenario(source: string): ParseResult {
         const account = rest[0]
         if (account === undefined) return fail('info needs a name')
         if (!isQuoted(rest[1])) return fail('info needs a quoted display name')
+        if (!noExtra(isQuoted(rest[2]) ? 3 : 2, true)) return
         return void steps.push({
           line,
           kind: 'info',
@@ -240,8 +279,10 @@ export function parseScenario(source: string): ParseResult {
         if (issuer === undefined || token === undefined) {
           return fail('token needs an issuer and a symbol')
         }
+        if (isAmount(token)) return fail('token needs a symbol before the quantity')
         if (!isAmount(quantity)) return fail('token needs a quantity')
-        if (!isAmount(decimals)) return fail('token needs a number of decimals')
+        if (!isWhole(decimals)) return fail('token needs a whole number of decimals')
+        if (!noExtra(isQuoted(description) ? 5 : 4, true)) return
         return void steps.push({
           line,
           kind: 'token',
@@ -258,7 +299,9 @@ export function parseScenario(source: string): ParseResult {
         if (!p) return
         const [token, quantity] = p.tail
         if (token === undefined) return fail('transfer needs a token')
+        if (isAmount(token)) return fail('transfer needs the token symbol before the quantity')
         if (!isAmount(quantity)) return fail('transfer needs a quantity')
+        if (!noExtra(5)) return
         return void steps.push({ line, kind: 'transfer', from: p.from, to: p.to, token, quantity })
       }
 
@@ -268,6 +311,7 @@ export function parseScenario(source: string): ParseResult {
           return fail('alias needs an owner and a name')
         }
         if (!isQuoted(content)) return fail('alias needs quoted content')
+        if (!noExtra(3)) return
         return void steps.push({
           line,
           kind: 'alias',
@@ -282,9 +326,10 @@ export function parseScenario(source: string): ParseResult {
         if (!p) return
         const [signa, every, seconds] = p.tail
         if (!isAmount(signa)) return fail('subscribe needs an amount')
-        if (every !== 'every' || !isAmount(seconds)) {
-          return fail('subscribe needs "every <seconds>"')
+        if (every !== 'every' || !isWhole(seconds)) {
+          return fail('subscribe needs "every <seconds>", a whole number of seconds')
         }
+        if (!noExtra(6)) return
         return void steps.push({
           line,
           kind: 'subscribe',
@@ -296,7 +341,10 @@ export function parseScenario(source: string): ParseResult {
       }
 
       case 'forge': {
-        if (rest[0] !== undefined && !isAmount(rest[0])) return fail(`"${rest[0]}" is not a count`)
+        if (rest[0] !== undefined && !isWhole(rest[0])) {
+          return fail(`"${rest[0]}" is not a whole number of blocks`)
+        }
+        if (!noExtra(1)) return
         return void steps.push({ line, kind: 'forge', count: Number(rest[0] ?? 1) })
       }
 

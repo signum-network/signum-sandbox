@@ -139,3 +139,60 @@ describe('parseScenario', () => {
     expect(parse('forge').steps[0]).toEqual({ line: 1, kind: 'forge', count: 1 })
   })
 })
+
+describe('parseScenario, arguments it must not swallow', () => {
+  // The worst failure this language could have: a line that runs, succeeds,
+  // and produces a chain the author did not describe. An unquoted passphrase
+  // was silently dropped and the account derived from its name instead.
+  it('refuses an unquoted passphrase rather than ignoring it', () => {
+    expect(parse('account Alice mysecretwords').problems).toEqual([
+      { line: 1, message: 'account: put "mysecretwords" in quotes to use it as text' },
+    ])
+  })
+
+  it('refuses an unquoted message rather than dropping it', () => {
+    expect(parse('pay A -> B 10 thanks').problems).toEqual([
+      { line: 1, message: 'pay: put "thanks" in quotes to use it as text' },
+    ])
+  })
+
+  it('refuses a surplus argument it has no use for', () => {
+    expect(parse('fund Alice 10 20').problems).toEqual([
+      { line: 1, message: 'fund does not take "20"' },
+    ])
+  })
+
+  // Blocks, decimals and seconds are whole things. Accepting a fraction here
+  // told the author the line was fine and handed the runner half a block.
+  it('refuses a fractional count where only whole ones exist', () => {
+    expect(parse('forge 1.5').problems).toEqual([
+      { line: 1, message: '"1.5" is not a whole number of blocks' },
+    ])
+    expect(parse('subscribe A -> B 1 every 0.5').problems).toEqual([
+      { line: 1, message: 'subscribe needs "every <seconds>", a whole number of seconds' },
+    ])
+    expect(parse('token M SLICE 10 0.5').problems).toEqual([
+      { line: 1, message: 'token needs a whole number of decimals' },
+    ])
+  })
+
+  // Blaming the decimals for a missing symbol sends the author to the wrong
+  // end of the line.
+  it('says the symbol is missing rather than blaming the argument after it', () => {
+    expect(parse('token Alice 1000 0').problems).toEqual([
+      { line: 1, message: 'token needs a symbol before the quantity' },
+    ])
+    expect(parse('transfer A -> B 10 SLICE').problems).toEqual([
+      { line: 1, message: 'transfer needs the token symbol before the quantity' },
+    ])
+  })
+
+  it('tells a missing sender from a missing arrow', () => {
+    expect(parse('pay -> Bob 10').problems).toEqual([
+      { line: 1, message: 'pay needs an account on each side of "->"' },
+    ])
+    expect(parse('pay Alice Bob 10').problems).toEqual([
+      { line: 1, message: 'pay needs "->" between the two accounts' },
+    ])
+  })
+})

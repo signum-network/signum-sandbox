@@ -58,6 +58,25 @@ describe('checkScenario', () => {
     ])
   })
 
+  it('stays quiet on a file the parser could not read', () => {
+    expect(check('garbage line')).toEqual([])
+  })
+
+  // Two rules the plan implemented and never exercised. Both are the kind a
+  // later refactor can drop without a single test going red.
+  it('rejects a second miner, which would leave the forger ambiguous', () => {
+    expect(check('miner One\nminer Two')).toContainEqual({
+      line: 2,
+      message: 'this scenario names a miner twice',
+    })
+  })
+
+  it('rejects a token issued twice under the same symbol', () => {
+    expect(check('miner M\ntoken M SLICE 10 0\ntoken M SLICE 20 0')).toEqual([
+      { line: 3, message: 'token "SLICE" is already issued' },
+    ])
+  })
+
   it('reports every problem, not only the first', () => {
     expect(check('miner M\npay A -> B 1\ntransfer M -> M X 1')).toHaveLength(3)
   })
