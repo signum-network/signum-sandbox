@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNodeState } from '@/hooks/useNodeState'
 import { useAccounts } from '@/hooks/useAccounts'
@@ -24,6 +24,9 @@ import { HelpDrawer } from './drawers/HelpDrawer'
 import { BeginnerMode } from './BeginnerMode'
 import { FirstVisit } from './FirstVisit'
 import { ViewNote } from './ViewNote'
+import { TourOverlay } from './tour/TourOverlay'
+import { useTour } from '@/hooks/useTour'
+import { observeFeed, type Observation } from '@/lib/tour'
 
 import type { ConsoleTab, DrawerName } from '@/lib/consoleNav'
 
@@ -70,6 +73,36 @@ export function ConsoleShell() {
   // The Blocks tab walks the whole chain, so it fetches its own page rather
   // than sharing the stream's fixed window at the tip.
   const blocks = useBlockPage(blockPage, connected, state.kind === 'ready')
+
+  // Everything the tour is allowed to know, assembled from what the shell
+  // already holds. No extra query: a tour that polls the node to decide
+  // whether you did the thing would be a second source of truth about a chain
+  // that already has one.
+  const ownedIds = new Set(accounts.accounts.map((a) => a.id))
+  const observation: Observation = {
+    // Assembled above the unreachable guard, like every other hook here, so
+    // the height has to be read the same defensive way the feed reads it.
+    height: state.kind === 'ready' ? (state.height ?? 0) : 0,
+    accountCount: accounts.accounts.length,
+    forgerChosen: accounts.forgerId !== null,
+    ...observeFeed(feed.items, ownedIds),
+    tab,
+    drawer,
+  }
+  const tour = useTour(observation)
+
+  // A step that points at the Send drawer opens it. Only when the step
+  // changes: reopening it on every render would make the close button useless.
+  const stepId = tour.step?.id
+  useEffect(() => {
+    const opens = tour.step?.opens
+    if (!opens) return
+    if (opens.tab !== undefined) setTab(opens.tab)
+    if (opens.drawer !== undefined) setDrawer(opens.drawer)
+    // Keyed on the step id, not the step object, which is a fresh array entry
+    // on every render and would re-fire this on nothing but identity.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stepId])
 
   if (state.kind === 'unreachable') {
     return (
@@ -134,7 +167,16 @@ export function ConsoleShell() {
             className="flex min-h-[200px] min-w-0 flex-1 flex-col border p-3"
             style={{ borderColor: 'var(--border2)' }}
           >
-            {!beginner.answered && <FirstVisit onAnswer={beginner.setBeginner} />}
+            {!beginner.answered && (
+              <FirstVisit
+                onAnswer={(isBeginner) => {
+                  beginner.setBeginner(isBeginner)
+                  // Saying "I am new" is the one moment the tour is certainly
+                  // wanted, so it starts rather than waiting to be found.
+                  if (isBeginner) tour.start()
+                }}
+              />
+            )}
             {beginner.answered && tab === 'transactions' && (
               <>
                 <ViewNote id="transactions" />
@@ -221,7 +263,11 @@ export function ConsoleShell() {
               {drawer === 'send' && (
                 <>
                   <ViewNote id="send" />
-                  <SendDrawer store={accounts} contacts={contacts.contacts} />
+                  <SendDrawer
+                    store={accounts}
+                    contacts={contacts.contacts}
+                    prefill={tour.step?.prefill}
+                  />
                 </>
               )}
               {drawer === 'chain' && (
@@ -234,17 +280,18 @@ export function ConsoleShell() {
               <HelpDrawer
                 beginner={beginner.beginner}
                 onBeginner={beginner.setBeginner}
-                // The tour arrives with its own hook; until then the drawer's
-                // second control is present but inert rather than absent, so
-                // wiring it later is one line and not a re-layout.
-                tourActive={false}
-                onStartTour={() => {}}
-                onStopTour={() => {}}
+                tourActive={tour.active}
+                onStartTour={tour.start}
+                onStopTour={tour.stop}
               />
             )}
             </div>
           )}
         </div>
+
+        {/* Last inside the provider, so the ring and the callout paint over
+            everything the step might be pointing at. */}
+        <TourOverlay tour={tour} />
       </div>
     </BeginnerMode>
   )
