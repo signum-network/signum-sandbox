@@ -17,7 +17,7 @@ export default {
       action: '生成',
       requested: 'ブロックをリクエスト済み',
       failed: '生成に失敗しました — {{message}}',
-      auto: '自動', chooseForger: 'フォージャーを選択',
+      auto: '自動', chooseForger: 'フォージャーを選択', mainnetRate: 'Signum メインネット平均', nextIn: '次まで',
     },
     empty: {
       title: 'まだ何も起きていません',

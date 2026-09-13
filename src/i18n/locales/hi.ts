@@ -17,7 +17,7 @@ export default {
       action: 'फ़ोर्ज करें',
       requested: 'ब्लॉक का अनुरोध किया गया',
       failed: 'फ़ोर्ज विफल — {{message}}',
-      auto: 'ऑटो', chooseForger: 'फ़ोर्जर चुनें',
+      auto: 'ऑटो', chooseForger: 'फ़ोर्जर चुनें', mainnetRate: 'Signum मेननेट औसत', nextIn: 'अगला',
     },
     empty: {
       title: 'अभी तक कुछ नहीं हुआ है',

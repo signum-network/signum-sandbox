@@ -12,6 +12,8 @@ export function useForge(forger: SandboxAccount | undefined) {
   const [intervalS, setIntervalSeconds] = useState(() =>
     parseAutoInterval(window.localStorage.getItem(INTERVAL_KEY)),
   )
+  /** When the next automatic forge is due, for the countdown. Null when off. */
+  const [nextForgeAt, setNextForgeAt] = useState<number | null>(null)
 
   const setAutoInterval = useCallback((seconds: number) => {
     setIntervalSeconds(seconds)
@@ -48,14 +50,17 @@ export function useForge(forger: SandboxAccount | undefined) {
     let timer: ReturnType<typeof setTimeout> | undefined
 
     const loop = async () => {
+      setNextForgeAt(null)
       await forgeOnce()
       if (stopped) return
+      setNextForgeAt(Date.now() + intervalS * 1000)
       timer = setTimeout(() => void loop(), intervalS * 1000)
     }
     void loop()
 
     return () => {
       stopped = true
+      setNextForgeAt(null)
       if (timer) clearTimeout(timer)
     }
   }, [auto, forger, forgeOnce, intervalS])
@@ -74,6 +79,7 @@ export function useForge(forger: SandboxAccount | undefined) {
     setAuto,
     intervalS,
     setAutoInterval,
+    nextForgeAt,
     canForge: forger !== undefined,
     error,
   }

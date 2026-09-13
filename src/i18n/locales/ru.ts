@@ -17,7 +17,7 @@ export default {
       action: 'Ковать',
       requested: 'Блок запрошен',
       failed: 'Ошибка ковки — {{message}}',
-      auto: 'авто', chooseForger: 'Выбрать кузнеца',
+      auto: 'авто', chooseForger: 'Выбрать кузнеца', mainnetRate: 'в среднем в сети Signum', nextIn: 'следующий через',
     },
     empty: {
       title: 'Пока ничего не произошло',

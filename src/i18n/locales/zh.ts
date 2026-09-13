@@ -17,7 +17,7 @@ export default {
       action: '铸造',
       requested: '已请求铸造区块',
       failed: '铸造失败 — {{message}}',
-      auto: '自动', chooseForger: '选择铸块者',
+      auto: '自动', chooseForger: '选择铸块者', mainnetRate: 'Signum 主网平均值', nextIn: '下一个',
     },
     empty: {
       title: '还什么都没发生',

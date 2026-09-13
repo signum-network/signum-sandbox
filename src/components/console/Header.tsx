@@ -4,7 +4,8 @@ import type { NodeState } from '@/lib/nodeState'
 import type { AccountStore } from '@/hooks/useAccounts'
 import { useForge } from '@/hooks/useForge'
 import { Select } from '@/components/console/Select'
-import { AUTO_INTERVALS_S } from '@/lib/autoForge'
+import { AUTO_INTERVALS_S, MAINNET_INTERVAL_S, formatInterval } from '@/lib/autoForge'
+import { Countdown } from '@/components/console/Countdown'
 import { Toggle } from '@/components/console/Toggle'
 
 export function Header({
@@ -17,8 +18,17 @@ export function Header({
   onOpenDrawer: (drawer: 'send' | 'chain' | 'help') => void
 }) {
   const { t } = useTranslation()
-  const { forgeOnce, busy, auto, setAuto, intervalS, setAutoInterval, canForge, error } =
-    useForge(accounts.forger)
+  const {
+    forgeOnce,
+    busy,
+    auto,
+    setAuto,
+    intervalS,
+    setAutoInterval,
+    nextForgeAt,
+    canForge,
+    error,
+  } = useForge(accounts.forger)
   const [requested, setRequested] = useState(false)
 
   // submitNonce reports success even when several calls collapse into a single
@@ -86,14 +96,26 @@ export function Header({
           off. Five seconds is the floor the node imposes, not a preference.
         */}
         {auto && (
-          <div className="w-[90px]">
-            <Select
-              value={String(intervalS)}
-              placeholder={`${intervalS} s`}
-              onChange={(v) => setAutoInterval(Number(v))}
-              options={AUTO_INTERVALS_S.map((s) => ({ value: String(s), label: `${s} s` }))}
-            />
-          </div>
+          <>
+            <div className="w-[104px]">
+              <Select
+                value={String(intervalS)}
+                placeholder={formatInterval(intervalS)}
+                onChange={(v) => setAutoInterval(Number(v))}
+                options={AUTO_INTERVALS_S.map((seconds) => ({
+                  value: String(seconds),
+                  label: formatInterval(seconds),
+                  sublabel:
+                    seconds === MAINNET_INTERVAL_S ? t('console.forge.mainnetRate') : undefined,
+                }))}
+              />
+            </div>
+            {nextForgeAt !== null && (
+              <span className="text-[10px] text-[var(--muted)]">
+                {t('console.forge.nextIn')} <Countdown at={nextForgeAt} />
+              </span>
+            )}
+          </>
         )}
 
         {(['send', 'chain', 'help'] as const).map((name) => (

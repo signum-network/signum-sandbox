@@ -17,7 +17,7 @@ export default {
       action: '생성',
       requested: '블록 생성 요청됨',
       failed: '생성 실패 — {{message}}',
-      auto: '자동', chooseForger: '포저 선택',
+      auto: '자동', chooseForger: '포저 선택', mainnetRate: 'Signum 메인넷 평균', nextIn: '다음까지',
     },
     empty: {
       title: '아직 아무 일도 없습니다',

@@ -17,7 +17,7 @@ export default {
       action: 'Forjar',
       requested: 'Bloco solicitado',
       failed: 'Falha ao forjar — {{message}}',
-      auto: 'auto', chooseForger: 'Escolher um forjador',
+      auto: 'auto', chooseForger: 'Escolher um forjador', mainnetRate: 'média da mainnet Signum', nextIn: 'próximo em',
     },
     empty: {
       title: 'Ainda não aconteceu nada',

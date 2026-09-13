@@ -17,7 +17,7 @@ export default {
       action: 'Forgen',
       requested: 'Block angefordert',
       failed: 'Forgen fehlgeschlagen — {{message}}',
-      auto: 'auto', chooseForger: 'Forger wählen',
+      auto: 'auto', chooseForger: 'Forger wählen', mainnetRate: 'Signum-Mainnet im Mittel', nextIn: 'nächster in',
     },
     empty: {
       title: 'Noch ist nichts passiert',

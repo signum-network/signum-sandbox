@@ -17,7 +17,7 @@ export default {
       action: 'Кувати',
       requested: 'Блок запитано',
       failed: 'Помилка кування — {{message}}',
-      auto: 'авто', chooseForger: 'Обрати форджера',
+      auto: 'авто', chooseForger: 'Обрати форджера', mainnetRate: 'середнє в мережі Signum', nextIn: 'наступний за',
     },
     empty: {
       title: 'Поки що нічого не сталося',

@@ -28,7 +28,7 @@ export default {
       action: 'Forge',
       requested: 'Block requested',
       failed: 'Forge failed — {{message}}',
-      auto: 'auto', chooseForger: 'Choose a forger',
+      auto: 'auto', chooseForger: 'Choose a forger', mainnetRate: 'Signum mainnet average', nextIn: 'next in',
     },
     empty: {
       title: 'Nothing has happened yet',
