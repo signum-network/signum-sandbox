@@ -76,21 +76,26 @@ export function Header({
           the container's right edge, and a flex row lays its children out
           left-to-right, so any child's on-screen position depends only on
           the total width of itself and whatever follows it — never on what
-          precedes it. Putting the auto toggle, rate and countdown first
-          means the Forge button, forger picker and drawer buttons all sit
-          after them, so flipping auto on or off only grows or shrinks the
-          empty space to the left of everything else — nothing already on
-          screen shifts.
-        */}
-        <Toggle checked={auto} disabled={!canForge} onChange={setAuto} label={t('console.forge.auto')} />
+          precedes it. Putting the cluster first means the Forge button,
+          forger picker and drawer buttons all sit after it, so flipping auto
+          on or off only grows or shrinks the empty space to its left.
 
-        {/*
-          The rate only exists while auto-forging does, so it appears with the
-          switch rather than sitting there as a setting for something that is
-          off. Five seconds is the floor the node imposes, not a preference.
+          Within the cluster the order reads outward from the switch:
+          countdown, rate, then the switch itself, so what appears when auto
+          goes on unfolds away from the control that turned it on rather than
+          pushing it aside.
+
+          The rate and the countdown exist only while auto-forging does — a
+          rate for something that is off is furniture. Five seconds is the
+          floor the node imposes, not a preference.
         */}
         {auto && (
           <>
+            {nextForgeAt !== null && (
+              <span className="text-[10px] text-[var(--muted)]">
+                {t('console.forge.nextIn')} <Countdown at={nextForgeAt} />
+              </span>
+            )}
             <div className="w-[104px]">
               <Select
                 value={String(intervalS)}
@@ -104,13 +109,15 @@ export function Header({
                 }))}
               />
             </div>
-            {nextForgeAt !== null && (
-              <span className="text-[10px] text-[var(--muted)]">
-                {t('console.forge.nextIn')} <Countdown at={nextForgeAt} />
-              </span>
-            )}
           </>
         )}
+
+        <Toggle
+          checked={auto}
+          disabled={!canForge}
+          onChange={setAuto}
+          label={t('console.forge.auto')}
+        />
 
         <ConsoleButton disabled={!canForge || busy} onClick={() => void forgeClicked()}>
           ⛏ {t('console.forge.action')}
