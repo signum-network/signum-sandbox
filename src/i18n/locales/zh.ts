@@ -122,7 +122,6 @@ export default {
       unconfirmed: '未确认',
       block: '区块 {{height}}',
       raw: '原始响应',
-      fee: '手续费',
       undecryptable: '已加密 — 沙盒不持有任何一把密钥',
       none: '还没有交易',
       saveContact: '另存为联系人',

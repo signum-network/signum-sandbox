@@ -122,7 +122,6 @@ export default {
       unconfirmed: '未確認',
       block: 'ブロック {{height}}',
       raw: '生のレスポンス',
-      fee: '手数料',
       undecryptable: '暗号化済み — サンドボックスはどちらの鍵も持っていません',
       none: 'まだ取引がありません',
       saveContact: '連絡先として保存',

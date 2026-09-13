@@ -122,7 +122,6 @@ export default {
       unconfirmed: 'sin confirmar',
       block: 'Bloque {{height}}',
       raw: 'respuesta sin procesar',
-      fee: 'Comisión',
       undecryptable: 'Cifrado — el sandbox no tiene ninguna de las dos claves',
       none: 'Aún no hay transacciones',
       saveContact: 'Guardar como contacto',

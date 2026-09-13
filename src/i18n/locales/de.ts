@@ -122,7 +122,6 @@ export default {
       unconfirmed: 'unbestätigt',
       block: 'Block {{height}}',
       raw: 'Rohantwort',
-      fee: 'Gebühr',
       undecryptable: 'Verschlüsselt — die Sandbox hat keinen der beiden Schlüssel',
       none: 'Noch keine Transaktionen',
       saveContact: 'Als Kontakt speichern',

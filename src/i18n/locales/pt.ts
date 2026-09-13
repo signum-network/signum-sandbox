@@ -122,7 +122,6 @@ export default {
       unconfirmed: 'não confirmada',
       block: 'Bloco {{height}}',
       raw: 'resposta bruta',
-      fee: 'Taxa',
       undecryptable: 'Encriptada — o sandbox não tem nenhuma das chaves',
       none: 'Ainda não há transações',
       saveContact: 'Guardar como contacto',

@@ -133,7 +133,6 @@ export default {
       unconfirmed: 'unconfirmed',
       block: 'Block {{height}}',
       raw: 'raw response',
-      fee: 'Fee',
       undecryptable: 'Encrypted — the sandbox holds neither key',
       none: 'No transactions yet',
       saveContact: 'Save as contact',

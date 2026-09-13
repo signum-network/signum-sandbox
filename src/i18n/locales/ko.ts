@@ -122,7 +122,6 @@ export default {
       unconfirmed: '미확인',
       block: '블록 {{height}}',
       raw: '원시 응답',
-      fee: '수수료',
       undecryptable: '암호화됨 — 샌드박스는 두 키 중 어느 것도 갖고 있지 않습니다',
       none: '아직 트랜잭션이 없습니다',
       saveContact: '연락처로 저장',
