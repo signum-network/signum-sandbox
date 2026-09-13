@@ -2,7 +2,8 @@ import { useTranslation } from 'react-i18next'
 import type { Block } from '@signumjs/core'
 import type { SandboxAccount } from '@/lib/accounts'
 import type { Contacts } from '@/lib/contacts'
-import { matchesBlock, type ResolvedQuery } from '@/lib/search'
+import { isEmptyBlock, matchesBlock, type ResolvedQuery } from '@/lib/search'
+import { Toggle } from '../Toggle'
 import { PAGE_SIZE, pageCount } from '@/lib/paginate'
 import { Pager } from '../Pager'
 import { BlockRow } from './BlockRow'
@@ -15,6 +16,8 @@ export function BlocksView({
   page,
   onPage,
   chainLength,
+  hideEmpty,
+  onHideEmpty,
   onSelectTransaction,
 }: {
   blocks: Block[]
@@ -25,29 +28,42 @@ export function BlocksView({
   onPage: (page: number) => void
   /** numberOfBlocks, so the pager can say how much chain there is. */
   chainLength: number
+  hideEmpty: boolean
+  onHideEmpty: (hide: boolean) => void
   onSelectTransaction: (transactionId: string) => void
 }) {
   const { t } = useTranslation()
 
-  const shown = blocks.filter((block) => matchesBlock(block, query))
-
-  // A filter that matched nothing is not an empty chain, and saying so would be
-  // the same small lie the transaction stream is careful to avoid.
-  if (shown.length === 0) {
-    return (
-      <div className="p-4">
-        <p className="text-[11px] text-[var(--muted)]">
-          {blocks.length === 0 ? t('console.blocks.none') : t('console.blocks.noMatch')}
-        </p>
-      </div>
-    )
-  }
+  const matching = blocks.filter((block) => matchesBlock(block, query))
+  const shown = hideEmpty ? matching.filter((b) => !isEmptyBlock(b)) : matching
+  const hidden = matching.length - shown.length
 
   const first = page * PAGE_SIZE
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
+      <div className="mb-2 flex shrink-0 items-center gap-3">
+        <Toggle checked={hideEmpty} onChange={onHideEmpty} label={t('console.blocks.hideEmpty')} />
+        {hidden > 0 && (
+          <span className="text-[10px] text-[var(--muted)]">
+            {t('console.blocks.hidden', { count: hidden })}
+          </span>
+        )}
+      </div>
+      {/*
+        The empty message lives inside the list rather than replacing the whole
+        view: hiding empty blocks can empty a page, and a view that swallowed
+        its own switch would leave no way back.
+
+        A filter that matched nothing is also not an empty chain, and saying so
+        would be the same small lie the transaction stream avoids.
+      */}
       <ul className="themed-scroll console-scroll min-h-0 flex-1 overflow-y-auto pr-2">
+        {shown.length === 0 && (
+          <li className="p-4 text-[11px] text-[var(--muted)]">
+            {blocks.length === 0 ? t('console.blocks.none') : t('console.blocks.noMatch')}
+          </li>
+        )}
         {shown.map((block) => (
         <BlockRow
           key={block.block}

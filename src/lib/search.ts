@@ -136,6 +136,15 @@ const attachmentMentions = (tx: Transaction, needle: string) =>
     .includes(needle)
 
 /**
+ * A block nobody put anything in.
+ *
+ * Worth its own name because the Blocks tab can hide these: auto-forging a
+ * sandbox produces mostly empty blocks, and a list of them buries the two
+ * that matter.
+ */
+export const isEmptyBlock = (block: Block) => block.numberOfTransactions === 0
+
+/**
  * A block is a container with one account attached to it — its forger — so an
  * address or a name filters the list to the blocks that account produced. An
  * id means the block's own id here rather than a transaction's: on this tab

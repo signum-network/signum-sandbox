@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from '@tanstack/react-query'
 import { sfx, useAudio } from '@/audio'
-import { ConsoleButton } from '@/components/console/ConsoleButton'
+import { Select } from '@/components/console/Select'
+import { AliasTransferForm } from './forms/AliasTransferForm'
 import type { AccountStore } from '@/hooks/useAccounts'
 import type { Contacts } from '@/lib/contacts'
 import { PaymentForm } from './forms/PaymentForm'
@@ -25,12 +26,28 @@ export type SendKind =
   | 'tokenTransfer'
   | 'mintAsset'
   | 'alias'
+  | 'aliasTransfer'
   | 'subscription'
   | 'cancelSubscription'
 
+/**
+ * Ordered so related actions sit together — money, words, names, tokens,
+ * standing orders. The list outgrew a row of pills at a dozen entries, and a
+ * dropdown that keeps its neighbours adjacent is the cheapest grouping there
+ * is without teaching Select about groups it would use exactly once.
+ */
 const KINDS: SendKind[] = [
-  'payment', 'multiOut', 'message', 'accountInfo',
-  'tokenIssue', 'tokenTransfer', 'mintAsset', 'alias', 'subscription', 'cancelSubscription',
+  'payment',
+  'multiOut',
+  'message',
+  'accountInfo',
+  'alias',
+  'aliasTransfer',
+  'tokenIssue',
+  'tokenTransfer',
+  'mintAsset',
+  'subscription',
+  'cancelSubscription',
 ]
 
 export function SendDrawer({ store, contacts }: { store: AccountStore; contacts: Contacts }) {
@@ -62,20 +79,16 @@ export function SendDrawer({ store, contacts }: { store: AccountStore; contacts:
 
   return (
     <div className="mt-2">
-      <div className="mb-3 flex flex-wrap gap-1">
-        {KINDS.map((name) => (
-            <ConsoleButton
-            key={name}
-            active={kind === name}
-            onClick={() => {
-              setKind(name)
-              setNotice(null)
-            }}
-            style={{ color: kind === name ? 'var(--blue3)' : 'var(--muted)' }}
-          >
-            {t(`console.kind.${name}`)}
-          </ConsoleButton>
-        ))}
+      <div className="mb-3">
+        <Select
+          value={kind}
+          placeholder="—"
+          onChange={(v) => {
+            setKind(v as SendKind)
+            setNotice(null)
+          }}
+          options={KINDS.map((name) => ({ value: name, label: t(`console.kind.${name}`) }))}
+        />
       </div>
 
       {kind === 'payment' && (
@@ -133,6 +146,15 @@ export function SendDrawer({ store, contacts }: { store: AccountStore; contacts:
       {kind === 'mintAsset' && (
         <MintForm
           accounts={store.accounts}
+          forgerId={store.forgerId}
+          onSent={onSent}
+          onError={onError}
+        />
+      )}
+      {kind === 'aliasTransfer' && (
+        <AliasTransferForm
+          accounts={store.accounts}
+          contacts={contacts}
           forgerId={store.forgerId}
           onSent={onSent}
           onError={onError}

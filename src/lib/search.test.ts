@@ -4,6 +4,7 @@ import {
   interpret,
   localNameMatches,
   matchesAccountQuery,
+  isEmptyBlock,
   matchesBlock,
   matchesTransaction,
   resolveQuery,
@@ -164,6 +165,13 @@ describe('matchesBlock', () => {
     expect(matchesBlock(block({}), withQuery(aliceAddress))).toBe(true)
     expect(matchesBlock(block({}), withQuery('alice'))).toBe(true)
     expect(matchesBlock(block({ generator: BOB_ID }), withQuery('alice'))).toBe(false)
+  })
+})
+
+describe('isEmptyBlock', () => {
+  it('is true only when the block holds no transactions', () => {
+    expect(isEmptyBlock(block({ numberOfTransactions: 0 }))).toBe(true)
+    expect(isEmptyBlock(block({ numberOfTransactions: 3 }))).toBe(false)
   })
 })
 

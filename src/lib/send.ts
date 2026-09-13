@@ -230,6 +230,31 @@ export async function setAlias(account: SandboxAccount, aliasName: string, conte
   )
 }
 
+/**
+ * Handing an alias to someone else.
+ *
+ * Signum has no transfer of its own: an alias moves by being sold to a named
+ * recipient, and a sale at zero is what a gift looks like on this chain. The
+ * price is fixed at zero here rather than exposed, because selling aliases is
+ * a marketplace feature and the sandbox is not a marketplace.
+ */
+export async function transferAlias(
+  from: SandboxAccount,
+  aliasName: string,
+  to: string,
+  recipientPublicKey: string | undefined,
+) {
+  return asId(
+    await signingLedger.alias.sellAlias({
+      ...base(from, 'alias'),
+      aliasName,
+      amountPlanck: '0',
+      recipientId: toNumericId(to),
+      recipientPublicKey,
+    }),
+  )
+}
+
 export async function createSubscription(
   from: SandboxAccount,
   to: string,

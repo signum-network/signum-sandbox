@@ -38,6 +38,7 @@ export function ConsoleShell() {
   const [search, setSearch] = useState('')
   const [txPage, setTxPage] = useState(0)
   const [blockPage, setBlockPage] = useState(0)
+  const [hideEmptyBlocks, setHideEmptyBlocks] = useState(false)
   // A page index belongs to the list it indexed. Narrowing the filter makes
   // the old position meaningless, so it goes back to the top rather than
   // leaving someone on an empty page wondering where the rows went.
@@ -135,6 +136,8 @@ export function ConsoleShell() {
               page={blockPage}
               onPage={setBlockPage}
               chainLength={state.height ?? 0}
+              hideEmpty={hideEmptyBlocks}
+              onHideEmpty={setHideEmptyBlocks}
               // The block row itself only expands in place; leaving this tab
               // is the consequence of clicking one of the transactions inside
               // it, not of clicking the block.
