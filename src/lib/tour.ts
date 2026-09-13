@@ -133,7 +133,17 @@ export function isStepComplete(
     case 'sentSomething':
       return now.ownedUnconfirmed > baseline.ownedUnconfirmed
     case 'somethingSettled':
-      return now.ownedConfirmed > baseline.ownedConfirmed
+      // One more of yours has landed than had landed when the step began --
+      // or nothing of yours is waiting at all, neither now nor when the step
+      // began. Auto-forging can settle the payment while the step before this
+      // one is still being read, which leaves the confirmed count already
+      // raised and nothing left to wait for; without the second clause the
+      // step would wait for an event that has happened, and the tour would
+      // dead-end on the one setting a newcomer is most likely to have left on.
+      return (
+        now.ownedConfirmed > baseline.ownedConfirmed ||
+        (baseline.ownedUnconfirmed === 0 && now.ownedUnconfirmed === 0)
+      )
     case 'tabActive':
       return now.tab === step.completion.tab
     case 'drawerOpen':

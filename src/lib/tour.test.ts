@@ -83,6 +83,20 @@ describe('isStepComplete', () => {
     expect(isStepComplete(settling, { ...used, ownedConfirmed: 8 }, used, false)).toBe(true)
   })
 
+  // The tour can be left running while auto-forge is on, and then the payment
+  // settles while the step before this one is still on screen. The step's goal
+  // is "nothing of yours is still waiting", so it is already met -- a rule that
+  // only watched the confirmed count would wait for an event already past.
+  it('does not wait for something that has already settled', () => {
+    const settling = step({ completion: { kind: 'somethingSettled' } })
+    const nothingPending = { ...base, ownedUnconfirmed: 0, ownedConfirmed: 5 }
+    expect(isStepComplete(settling, nothingPending, nothingPending, false)).toBe(true)
+    // But something visibly waiting is still worth waiting for.
+    expect(
+      isStepComplete(settling, { ...nothingPending, ownedUnconfirmed: 1 }, nothingPending, false),
+    ).toBe(false)
+  })
+
   it('completes when the named tab or drawer is showing', () => {
     const onAccounts = step({ completion: { kind: 'tabActive', tab: 'accounts' } })
     const sendOpen = step({ completion: { kind: 'drawerOpen', drawer: 'send' } })
