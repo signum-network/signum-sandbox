@@ -25,8 +25,9 @@ import { BeginnerMode } from './BeginnerMode'
 import { FirstVisit } from './FirstVisit'
 import { ViewNote } from './ViewNote'
 
-export type ConsoleTab = 'transactions' | 'blocks' | 'accounts' | 'watch'
-export type DrawerName = 'send' | 'chain' | 'help' | null
+import type { ConsoleTab, DrawerName } from '@/lib/consoleNav'
+
+export type { ConsoleTab, DrawerName }
 
 const TABS: ConsoleTab[] = ['transactions', 'blocks', 'accounts']
 
