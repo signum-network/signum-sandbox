@@ -89,6 +89,15 @@ export function SendDrawer({ store, contacts }: { store: AccountStore; contacts:
           }}
           options={KINDS.map((name) => ({ value: name, label: t(`console.kind.${name}`) }))}
         />
+        {/*
+          One plain sentence about the chosen action, right under the choice.
+          Signum can do things most chains cannot — native tokens, a name
+          registry, standing orders — and a dropdown of eleven verbs explains
+          none of that to someone meeting it for the first time.
+        */}
+        <p className="mt-1 text-[10px] leading-relaxed text-[var(--muted)]">
+          {t(`console.kindHelp.${kind}`)}
+        </p>
       </div>
 
       {kind === 'payment' && (
