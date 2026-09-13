@@ -9,23 +9,22 @@ import { Amount } from '@signumjs/util'
 import { src44 } from '@signumjs/standards'
 import { ledger, signingLedger } from './ledger'
 import { knownPublicKey } from './recipient'
+import { feeFor, type SendAction } from './fees'
 import type { SandboxAccount } from './accounts'
 
 const { DescriptorDataBuilder } = src44
 
-/**
- * The mock chain has no fee market. One tenth of a SIGNA clears everything the
- * console sends and keeps the forms free of a field nobody wants to think about.
- */
-export const DEFAULT_FEE = Amount.fromSigna(0.1)
-
 const keysOf = (account: SandboxAccount) => generateSignKeys(account.passphrase)
 
-/** Every send shares these three fields. */
-const base = (account: SandboxAccount) => {
+/**
+ * Every send shares these three fields. The fee is looked up per action
+ * rather than fixed, since Signum's minimum fee is set per transaction
+ * type — see feeFor's comment in ./fees for how each number was measured.
+ */
+const base = (account: SandboxAccount, action: SendAction) => {
   const keys = keysOf(account)
   return {
-    feePlanck: DEFAULT_FEE.getPlanck(),
+    feePlanck: feeFor(action).getPlanck(),
     senderPublicKey: keys.publicKey,
     senderPrivateKey: keys.signPrivateKey,
   }
@@ -79,7 +78,7 @@ export async function sendPayment(
 ) {
   return asId(
     await signingLedger.transaction.sendAmountToSingleRecipient({
-      ...base(from),
+      ...base(from, 'payment'),
       amountPlanck: Amount.fromSigna(signa).getPlanck(),
       recipientId: toNumericId(to),
       recipientPublicKey,
@@ -100,7 +99,7 @@ export async function sendMultiOut(
 ) {
   return asId(
     await signingLedger.transaction.sendAmountToMultipleRecipients({
-      ...base(from),
+      ...base(from, 'multiOut'),
       recipientAmounts: recipients.map((r) => ({
         recipient: toNumericId(r.address),
         amountNQT: Amount.fromSigna(r.signa).getPlanck(),
@@ -117,7 +116,7 @@ export async function sendPlainMessage(
 ) {
   return asId(
     await signingLedger.message.sendMessage({
-      ...base(from),
+      ...base(from, 'message'),
       message,
       messageIsText: true,
       recipientId: toNumericId(to),
@@ -140,7 +139,7 @@ export async function sendEncryptedMessage(
 ) {
   return asId(
     await signingLedger.message.sendEncryptedMessage({
-      ...base(from),
+      ...base(from, 'message'),
       message,
       messageIsText: true,
       recipientId: toNumericId(to),
@@ -160,7 +159,7 @@ export async function setAccountInfo(
   const descriptor = DescriptorDataBuilder.create(name).setDescription(description).build()
   return asId(
     await signingLedger.account.setAccountInfo({
-      ...base(account),
+      ...base(account, 'accountInfo'),
       name,
       description: descriptor.stringify(),
     }),
@@ -173,15 +172,16 @@ export async function issueToken(
   quantity: string,
   decimals: number,
   description: string,
+  mintable: boolean,
 ) {
   return asId(
     await signingLedger.asset.issueAsset({
-      ...base(issuer),
+      ...base(issuer, 'issueAsset'),
       name,
       quantity,
       decimals,
       description,
-      mintable: false,
+      mintable,
     }),
   )
 }
@@ -195,7 +195,7 @@ export async function transferToken(
 ) {
   return asId(
     await signingLedger.asset.transferAsset({
-      ...base(from),
+      ...base(from, 'transferAsset'),
       assetId,
       quantity,
       recipientId: toNumericId(to),
@@ -204,9 +204,29 @@ export async function transferToken(
   )
 }
 
+/**
+ * Only works on a token issued with `mintable: true` — the node answers
+ * `"this asset is not mintable"` otherwise. The form is expected to have
+ * already filtered its asset list down to mintable ones; this function
+ * trusts that and lets the node be the final word regardless.
+ */
+export async function mintAsset(issuer: SandboxAccount, assetId: string, quantity: string) {
+  return asId(
+    await signingLedger.asset.mintAsset({
+      ...base(issuer, 'mintAsset'),
+      assetId,
+      quantity,
+    }),
+  )
+}
+
 export async function setAlias(account: SandboxAccount, aliasName: string, content: string) {
   return asId(
-    await signingLedger.alias.setAlias({ ...base(account), aliasName, aliasURI: content }),
+    await signingLedger.alias.setAlias({
+      ...base(account, 'alias'),
+      aliasName,
+      aliasURI: content,
+    }),
   )
 }
 
@@ -219,11 +239,30 @@ export async function createSubscription(
 ) {
   return asId(
     await signingLedger.transaction.createSubscription({
-      ...base(from),
+      ...base(from, 'subscription'),
       amountPlanck: Amount.fromSigna(signa).getPlanck(),
       recipientId: toNumericId(to),
       recipientPublicKey,
       frequency,
+    }),
+  )
+}
+
+/**
+ * Cancels a subscription this account pays on — not one that pays it.
+ * `getAccountSubscriptions(accountId)` is documented as listing subscriptions
+ * where the account is the sender, but checked live against this node it
+ * actually returns a subscription for either party, and the node accepted a
+ * cancellation signed by the recipient rather than the sender just as
+ * readily. So the "only what this account pays" guarantee has to come from
+ * the caller filtering by `sender`, not from the query or the node — see
+ * SubscriptionCancelForm, which does that filtering before ever calling this.
+ */
+export async function cancelSubscription(account: SandboxAccount, subscriptionId: string) {
+  return asId(
+    await signingLedger.transaction.cancelSubscription({
+      ...base(account, 'cancelSubscription'),
+      subscriptionId,
     }),
   )
 }

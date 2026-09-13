@@ -62,34 +62,19 @@ export function Header({
       </span>
 
       <span className="flex flex-wrap items-center gap-2">
-        <button
-          className={button}
-          style={{ ...border, color: canForge ? 'var(--blue3)' : 'var(--muted)' }}
-          disabled={!canForge || busy}
-          onClick={() => void forgeClicked()}
-        >
-          ⛏ {t('console.forge.action')}
-        </button>
-
-        {requested && (
-          <span className="text-[10px] text-[var(--muted)]">{t('console.forge.requested')}</span>
-        )}
-        {!requested && error && (
-          <span className="text-[10px] text-[var(--mag)]">
-            {t('console.forge.failed', { message: error })}
-          </span>
-        )}
-
-        <div className="w-36">
-          <Select
-            value={accounts.forgerId ?? ''}
-            placeholder={t('console.forge.chooseForger')}
-            emptyLabel={t('console.accounts.none')}
-            onChange={accounts.setForger}
-            options={accounts.accounts.map((a) => ({ value: a.id, label: a.name }))}
-          />
-        </div>
-
+        {/*
+          The auto cluster sits at the start of this row, not beside the
+          things it affects, because of how this span is positioned: the
+          outer container's justify-between pins this span's right edge to
+          the container's right edge, and a flex row lays its children out
+          left-to-right, so any child's on-screen position depends only on
+          the total width of itself and whatever follows it — never on what
+          precedes it. Putting the auto toggle, rate and countdown first
+          means the Forge button, forger picker and drawer buttons all sit
+          after them, so flipping auto on or off only grows or shrinks the
+          empty space to the left of everything else — nothing already on
+          screen shifts.
+        */}
         <Toggle checked={auto} disabled={!canForge} onChange={setAuto} label={t('console.forge.auto')} />
 
         {/*
@@ -119,6 +104,34 @@ export function Header({
             )}
           </>
         )}
+
+        <button
+          className={button}
+          style={{ ...border, color: canForge ? 'var(--blue3)' : 'var(--muted)' }}
+          disabled={!canForge || busy}
+          onClick={() => void forgeClicked()}
+        >
+          ⛏ {t('console.forge.action')}
+        </button>
+
+        {requested && (
+          <span className="text-[10px] text-[var(--muted)]">{t('console.forge.requested')}</span>
+        )}
+        {!requested && error && (
+          <span className="text-[10px] text-[var(--mag)]">
+            {t('console.forge.failed', { message: error })}
+          </span>
+        )}
+
+        <div className="w-36">
+          <Select
+            value={accounts.forgerId ?? ''}
+            placeholder={t('console.forge.chooseForger')}
+            emptyLabel={t('console.accounts.none')}
+            onChange={accounts.setForger}
+            options={accounts.accounts.map((a) => ({ value: a.id, label: a.name }))}
+          />
+        </div>
 
         {(['send', 'chain', 'help'] as const).map((name) => (
           <button

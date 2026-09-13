@@ -9,8 +9,10 @@ import { MessageForm } from './forms/MessageForm'
 import { AccountInfoForm } from './forms/AccountInfoForm'
 import { TokenIssueForm } from './forms/TokenIssueForm'
 import { TokenTransferForm } from './forms/TokenTransferForm'
+import { MintForm } from './forms/MintForm'
 import { AliasForm } from './forms/AliasForm'
 import { SubscriptionForm } from './forms/SubscriptionForm'
+import { SubscriptionCancelForm } from './forms/SubscriptionCancelForm'
 
 export type SendKind =
   | 'payment'
@@ -19,12 +21,14 @@ export type SendKind =
   | 'accountInfo'
   | 'tokenIssue'
   | 'tokenTransfer'
+  | 'mintAsset'
   | 'alias'
   | 'subscription'
+  | 'cancelSubscription'
 
 const KINDS: SendKind[] = [
   'payment', 'multiOut', 'message', 'accountInfo',
-  'tokenIssue', 'tokenTransfer', 'alias', 'subscription',
+  'tokenIssue', 'tokenTransfer', 'mintAsset', 'alias', 'subscription', 'cancelSubscription',
 ]
 
 export function SendDrawer({ store, contacts }: { store: AccountStore; contacts: Contacts }) {
@@ -114,6 +118,14 @@ export function SendDrawer({ store, contacts }: { store: AccountStore; contacts:
           onError={setNotice}
         />
       )}
+      {kind === 'mintAsset' && (
+        <MintForm
+          accounts={store.accounts}
+          forgerId={store.forgerId}
+          onSent={onSent}
+          onError={setNotice}
+        />
+      )}
       {kind === 'alias' && (
         <AliasForm accounts={store.accounts} forgerId={store.forgerId} onSent={onSent} onError={setNotice} />
       )}
@@ -122,6 +134,14 @@ export function SendDrawer({ store, contacts }: { store: AccountStore; contacts:
           accounts={store.accounts}
           forgerId={store.forgerId}
           contacts={contacts}
+          onSent={onSent}
+          onError={setNotice}
+        />
+      )}
+      {kind === 'cancelSubscription' && (
+        <SubscriptionCancelForm
+          accounts={store.accounts}
+          forgerId={store.forgerId}
           onSent={onSent}
           onError={setNotice}
         />
