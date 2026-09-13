@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from '@tanstack/react-query'
-import { rewindChain } from '@/lib/chainAdmin'
+import { rewindBy, rewindChain } from '@/lib/chainAdmin'
+import { REWIND_STEPS, canRewindBy, rewindProblem } from '@/lib/rewind'
 import { resetCommand } from '@/lib/platform'
 import { ConsoleButton } from '@/components/console/ConsoleButton'
 
@@ -23,22 +24,56 @@ export function ChainDrawer({ height }: { height: number | null }) {
   const [notice, setNotice] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
 
-  const rewind = async () => {
-    if (!window.confirm(t('console.chain.rewindConfirm'))) return
+  const run = async (action: () => Promise<{ kind: string }>) => {
     setBusy(true)
-    const outcome = await rewindChain(height ?? 0)
+    const outcome = await action()
     setBusy(false)
     setNotice(t(`console.chain.rewind_${outcome.kind}`))
     void client.invalidateQueries()
   }
 
+  const rewind = async () => {
+    if (!window.confirm(t('console.chain.rewindConfirm'))) return
+    await run(() => rewindChain(height ?? 0))
+  }
+
   return (
     <div className="mt-2 flex flex-col gap-3">
       <div>
-        <ConsoleButton disabled={busy} onClick={() => void rewind()}>
-          {t('console.chain.rewind')}
-        </ConsoleButton>
-        <p className="mt-1 text-[10px] text-[var(--muted)]">{t('console.chain.rewindNote')}</p>
+        {/*
+          Steps first: undoing the last block or the last ten is the everyday
+          use, and winding all the way back is the rare one. A step the node
+          would refuse is disabled rather than attempted — it answers a count
+          larger than the chain with a flat rejection and changes nothing.
+        */}
+        <div className="mb-2 flex flex-wrap items-center gap-2">
+          {REWIND_STEPS.map((blocks) => (
+            <ConsoleButton
+              key={blocks}
+              disabled={busy || !canRewindBy(height ?? 0, blocks)}
+              onClick={() => void run(() => rewindBy(blocks))}
+            >
+              −{blocks}
+            </ConsoleButton>
+          ))}
+          <ConsoleButton disabled={busy} onClick={() => void rewind()}>
+            {t('console.chain.rewind')}
+          </ConsoleButton>
+        </div>
+
+        <p className="text-[10px] text-[var(--muted)]">{t('console.chain.rewindNote')}</p>
+
+        {/*
+          Said before the attempt rather than after it: on a long chain the
+          full wind-back is simply not on offer, and finding that out by
+          pressing the button is finding it out too late.
+        */}
+        {rewindProblem(height ?? 0) === 'outOfReach' && (
+          <p className="mt-1 text-[10px]" style={{ color: 'var(--amber)' }}>
+            {t('console.chain.rewind_outOfReach')}
+          </p>
+        )}
+
         {notice && <p className="mt-1 text-[10px] text-[var(--blue3)]">{notice}</p>}
       </div>
 

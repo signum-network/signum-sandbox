@@ -25,3 +25,21 @@ export function rewindProblem(height: number): RewindProblem {
   if (height <= START_HEIGHT) return 'alreadyAtStart'
   return height - 1 <= POP_OFF_REACH ? 'none' : 'outOfReach'
 }
+
+/**
+ * The steps a partial rewind offers. Small enough to undo a mistake, large
+ * enough to clear an afternoon of auto-forging.
+ */
+export const REWIND_STEPS = [1, 10, 100] as const
+
+/**
+ * Whether that many blocks can come off.
+ *
+ * The node refuses `numBlocks` larger than the chain with a flat `Incorrect
+ * request` and changes nothing, so a step that would go below block 1 is
+ * disabled rather than attempted — the button that cannot work says so by
+ * being unavailable, not by failing.
+ */
+export function canRewindBy(height: number, blocks: number): boolean {
+  return height - blocks >= START_HEIGHT
+}

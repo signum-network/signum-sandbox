@@ -1,5 +1,5 @@
 import { ledger } from './ledger'
-import { START_HEIGHT, rewindProblem, type RewindProblem } from './rewind'
+import { START_HEIGHT, canRewindBy, rewindProblem, type RewindProblem } from './rewind'
 
 /** Matches API.adminKeyList in conf/node.properties. */
 const ADMIN_KEY = 'sandbox'
@@ -21,6 +21,8 @@ export const forge = (secretPhrase: string) =>
   ledger.service.send('submitNonce', { secretPhrase, nonce: '0' })
 
 export const popOffTo = (height: number) => admin('popOff', { height: String(height) })
+
+export const popOffBy = (numBlocks: number) => admin('popOff', { numBlocks: String(numBlocks) })
 
 export const clearUnconfirmed = () => admin('clearUnconfirmedTransactions')
 
@@ -49,6 +51,25 @@ export async function rewindChain(height: number): Promise<RewindOutcome> {
   try {
     await popOffTo(1)
     return (await currentHeight()) <= START_HEIGHT ? { kind: 'succeeded' } : { kind: 'failed' }
+  } catch {
+    return { kind: 'failed' }
+  }
+}
+
+/**
+ * Takes a fixed number of blocks off the top.
+ *
+ * Measured rather than assumed: `numBlocks` removes exactly that many, and a
+ * count larger than the chain is refused with a flat `Incorrect request` that
+ * changes nothing — which is why the caller checks `canRewindBy` first and
+ * this one still reads the height back.
+ */
+export async function rewindBy(blocks: number): Promise<RewindOutcome> {
+  const before = await currentHeight()
+  if (!canRewindBy(before, blocks)) return { kind: 'alreadyAtStart' }
+  try {
+    await popOffBy(blocks)
+    return (await currentHeight()) < before ? { kind: 'succeeded' } : { kind: 'failed' }
   } catch {
     return { kind: 'failed' }
   }
