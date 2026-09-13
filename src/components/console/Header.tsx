@@ -51,12 +51,14 @@ export function Header({
       className="mb-3 flex flex-wrap items-center justify-between gap-2 border p-3"
       style={border}
     >
+      {/*
+        Only the chain lives here. Who the app is, whether the node answers,
+        and the personal settings are in AppHeader above, so this bar changes
+        exactly when the chain does.
+      */}
       <span className="text-[11px]">
-        <span className="font-bold text-[var(--blue3)]">{state.networkName ?? '—'}</span>
-        <span className="text-[var(--muted)]">
-          {' '}· {state.version ?? '—'} · {t(`status.${state.connection}`)} ·{' '}
-          {t('console.chain.height')} {state.height ?? '—'}
-        </span>
+        <span className="text-[var(--muted)]">{t('console.chain.height')} </span>
+        <span className="font-bold text-[var(--blue3)]">{state.height ?? '—'}</span>
       </span>
 
       <span className="flex flex-wrap items-center gap-2">

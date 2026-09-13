@@ -44,13 +44,16 @@ export function Toggle({
       <span
         className="relative inline-block h-[14px] w-[26px] shrink-0"
         style={{
-          border: '1px solid var(--border2)',
-          background: checked ? 'var(--blue)' : 'transparent',
+          // No solid fill: the console is drawn in hairlines, and --blue as a
+          // filled track was the one saturated block of colour in it. On reads
+          // as the accent border and knob the rest of the app already uses.
+          border: `1px solid ${checked ? 'var(--blue2)' : 'var(--border2)'}`,
+          background: 'transparent',
         }}
       >
         <motion.span
           className="absolute top-[1px] h-[10px] w-[10px]"
-          style={{ background: checked ? 'var(--bg)' : 'var(--muted)' }}
+          style={{ background: checked ? 'var(--blue2)' : 'var(--muted)' }}
           animate={{ left: checked ? '13px' : '1px' }}
           transition={{ type: 'spring', stiffness: 500, damping: 32 }}
         />

@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link } from '@tanstack/react-router'
 import { useNodeState } from '@/hooks/useNodeState'
 import { useAccounts } from '@/hooks/useAccounts'
 import { useContacts } from '@/hooks/useContacts'
 import { useChainFeed } from '@/hooks/useChainFeed'
 import { Unreachable } from '@/components/startpage'
+import { AppHeader } from '@/components/AppHeader'
 import { interpret, resolveQuery } from '@/lib/search'
 import { useNameLookup } from '@/hooks/useNameLookup'
 import { Header } from './Header'
@@ -55,11 +55,13 @@ export function ConsoleShell() {
 
   return (
     <div className="mx-auto max-w-6xl p-6">
-      <div className="mb-3">
-        <Link to="/" className="text-[10px] tracking-[2px] text-[var(--muted)] hover:text-[var(--blue3)]">
-          ← {t('console.back')}
-        </Link>
-      </div>
+      <AppHeader
+        networkName={state.networkName}
+        version={state.version}
+        connection={state.connection}
+        scanning={state.scanning}
+        homeLink
+      />
 
       <Header state={state} accounts={accounts} onOpenDrawer={setDrawer} />
 
