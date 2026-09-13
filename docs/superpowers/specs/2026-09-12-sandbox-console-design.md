@@ -175,7 +175,9 @@ Two scenarios ship:
 
 Both use a fixed miner account and the deliberately fake passphrases described above, published in the documentation, so addresses survive a reset and can be written into an application's configuration and test fixtures.
 
-Avatars: SRC44's avatar field references IPFS, which an offline sandbox cannot rely on. Scenarios leave it empty and the UI renders a `hashicon` identicon from the address. Exactly one account carries a real pinned CID to demonstrate the field, and falls back to the identicon if it cannot be fetched.
+Avatars: SRC44's avatar field references IPFS, which an offline sandbox cannot rely on. Scenarios leave it empty everywhere and the UI renders a `hashicon` identicon from the address. An earlier draft had one account carry a real pinned CID to demonstrate the field; that is dropped, because a single account behaving differently from the rest buys one demonstrated field at the cost of a fetch path, a timeout and a fallback.
+
+**Scenarios load cumulatively.** They add to whatever chain is already there rather than requiring an empty one — the console cannot empty a chain anyway, and winding back is a decision the user makes deliberately in the Chain drawer. Running the same scenario twice is therefore not an error: the accounts are derived from fixed passphrases, so they are the same accounts, and the second run simply adds more transactions between them.
 
 ## Beginner mode and the tour
 
