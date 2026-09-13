@@ -294,7 +294,113 @@ export default {
       'All das steckt in der Senden-Schublade, jeweils mit einer Zeile dazu, was es tut. Einsteiger-Modus und diese Tour liegen hinter Hilfe, und die vollständige JSON-API ist einen Klick weiter.',
     stop: 'Tour beenden',
     waiting: 'Wir warten auf dich…',
-    step: {},
-    useCase: {},
+    step: {
+      welcome: {
+        title: 'Diese Chain gehört dir',
+        body: 'Sie läuft auf deinem Rechner, sie ist nichts wert, und du kannst sie nicht so kaputt machen, dass ein Neustart es nicht richtet. Wir legen ein Konto an, forgen einen Block und senden eine Zahlung — alles echt, nichts simuliert.',
+      },
+      openAccounts: {
+        title: 'Öffne den Reiter Konten',
+        body: 'Alles fängt mit einem Konto an. Hier wohnen sie.',
+      },
+      createAccount: {
+        title: 'Lege ein Konto an',
+        body: 'Gib ihm eine Bezeichnung — der Name ist für dich und bleibt in diesem Browser. Die Chain sieht ihn nicht.',
+      },
+      passphraseIsTheAccount: {
+        title: 'Diese Passphrase ist das Konto',
+        body: 'Sie ist kein Passwort, das ein Konto schützt. Die Adresse, die du siehst, wurde aus diesen Wörtern berechnet. Tippe sie irgendwo auf der Welt erneut ein und du hast dasselbe Konto wieder.',
+      },
+      passphraseIsForever: {
+        title: 'Niemand kann sie dir zurückgeben',
+        body: 'Es gibt keinen Zurücksetzen-Link und keinen Support. Ist die Passphrase weg, ist das Konto weg — mit allem, was darin lag. Das ist kein Fehler, das ist der Preis dafür, dass niemand dazwischensteht.',
+      },
+      passphraseInPlainText: {
+        title: 'Die Sandbox speichert sie im Klartext',
+        body: 'Sie liegt als lesbarer Text im Speicher dieses Browsers. Hier ist das in Ordnung, weil sie nichts bewacht. Eine echte Wallet darf das niemals tun — und die Sandbox lädt diese Konten gar nicht erst, wenn der Node sich als etwas anderes als die Mock-Chain herausstellt.',
+      },
+      notOnChainYet: {
+        title: 'Auf der Chain steht es noch nicht',
+        body: 'Die Chain hat von diesem Konto nie gehört, denn es hat noch nie etwas bekommen. Sieh zu, was passiert, sobald es etwas verdient.',
+      },
+      pickForger: {
+        title: 'Wähle es als Forger',
+        body: 'Der Forger ist das Konto, dem deine Blöcke gutgeschrieben werden. Nimm das, das du gerade angelegt hast.',
+      },
+      forge: {
+        title: 'Jetzt forge einen Block',
+        body: 'Im echten Signum-Netz braucht das eine Festplatte und etwa vier Minuten. Hier braucht es einen Knopf.',
+      },
+      heightRose: {
+        title: 'Die Höhe ist gestiegen',
+        body: 'Diese Zahl sagt, wie viele Blöcke es gibt. Sie zählt nur aufwärts und ist damit die Uhr der Chain — und der Block, den du gerade gemacht hast, hat deinem Konto seine Belohnung ausgezahlt.',
+      },
+      nowOnChain: {
+        title: 'Und da ist es',
+        body: 'Das Konto hat jetzt ein Guthaben, also weiß die Chain, dass es existiert. Angemeldet werden musste es nicht — etwas zu empfangen hat es dorthin gebracht.',
+      },
+      secondAccount: {
+        title: 'Noch ein Konto',
+        body: 'Du brauchst ein Ziel für dein Geld. Leg ein zweites an — genau wie eben.',
+      },
+      openSend: {
+        title: 'Öffne den Senden-Dialog',
+        body: 'Jede Transaktionsart, die Signum kennt, beginnt hier.',
+      },
+      sendPayment: {
+        title: 'Bezahle dein zweites Konto',
+        body: 'Vom gedeckten Konto auf das neue. Der Betrag ist vorgetragen, ändere ihn ruhig. Die Gebühr darunter ist das, was der Forger des nächsten Blocks dafür verdient, sie mitzunehmen.',
+      },
+      unconfirmed: {
+        title: 'Da steht unbestätigt',
+        body: 'Der Node hat deine Transaktion, aber kein Block enthält sie — also ist sie nicht wirklich passiert. Endgültig ist nichts, bevor es in einem Block steht.',
+      },
+      forgeAgain: {
+        title: 'Forge nochmal und sieh zu',
+        body: 'Ein Block mehr. Deine Transaktion kommt hinein, und die Gebühr, die du gezahlt hast, kommt zu dir zurück — du bist ja der Forger.',
+      },
+      settled: {
+        title: 'Das ist der ganze Kreislauf',
+        body: 'Signieren, senden, auf einen Block warten, fertig. So arbeitet jede Chain; die meisten lassen dich nur länger warten, bis du es siehst.',
+      },
+      finale: {
+        title: 'Du kannst jetzt auf einer Blockchain bauen',
+        body: 'Mehr war es nicht: ein Konto, ein Block, eine Transaktion, eine Bestätigung. Alles Weitere ist das, was du in den Payload legst — und Leute legen Erstaunliches hinein. Acht davon, alle mit genau dem baubar, was du gerade getan hast:',
+      },
+    },
+    useCase: {
+      tracing: {
+        title: 'Eine Lieferkette nachvollziehen',
+        body: 'Jede Übergabe ist eine Zahlung mit strukturiertem Payload. Niemandem gehört das Protokoll, niemand kann den letzten Monat still korrigieren, und ein Partner liest mit, ohne dich um Zugang zu bitten.',
+      },
+      notarising: {
+        title: 'Beweisen, dass etwas existiert hat',
+        body: 'Leg den Fingerabdruck eines Dokuments in einen Payload. Der Block, in dem er landet, ist ein Zeitstempel, den niemand verschieben kann — ein Notar für den Bruchteil eines SIGNA.',
+      },
+      credentials: {
+        title: 'Zertifikate ausstellen, die sich selbst prüfen',
+        body: 'Ein Zeugnis, eine Lizenz, eine Prüfplakette: als Token ausgeben, den der Inhaber hält. Die Prüfung ist eine Abfrage, und eine Fälschung ist nicht verboten, sondern unmöglich.',
+      },
+      tokenising: {
+        title: 'Ein Unternehmen tokenisieren',
+        body: 'Anteile, Erlöse, Mitgliedschaft. Den Token nativ ausgeben, alle Inhaber in einem einzigen Multi-Out auszahlen, und den wiederkehrenden Teil einer Subscription überlassen.',
+      },
+      games: {
+        title: 'Ein Spiel mit echtem Fortschritt bauen',
+        body: 'Gegenstände als Token, die dem Spieler wirklich gehören, Erfolge als Payload, den niemand zurückdreht, und ein Spielstand, der deine Server überlebt.',
+      },
+      registry: {
+        title: 'Ein Register ohne Registrar führen',
+        body: 'Aliasse sind ein Namenssystem im Protokoll selbst. Ein Name zeigt auf ein Konto, einen Link oder beliebigen Inhalt, und der Besitz wechselt mit einer Transaktion.',
+      },
+      machines: {
+        title: 'Maschinen einander bezahlen lassen',
+        body: 'Gebühren in Hundertstel-SIGNA machen Abrechnung pro Nutzung lohnend. Ein Zähler, eine Ladesäule oder ein Sensor rechnet in Sekunden ab, ganz ohne Rechnung dazwischen.',
+      },
+      channels: {
+        title: 'Nachrichten senden, die kein Server liest',
+        body: 'Ein verschlüsselter Payload gibt zwei Konten einen privaten Kanal — ohne Backend, ohne Anmeldung und ohne dass jemand die Erlaubnis erteilen muss.',
+      },
+    },
   },
 } as const

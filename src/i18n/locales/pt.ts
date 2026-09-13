@@ -294,7 +294,113 @@ export default {
       'Está tudo no painel Enviar, cada um com uma linha a dizer o que faz. O modo iniciante e esta visita guiada vivem por trás de Ajuda, e a API JSON completa está a mais um clique de distância.',
     stop: 'Terminar a visita guiada',
     waiting: 'Estamos à tua espera…',
-    step: {},
-    useCase: {},
+    step: {
+      welcome: {
+        title: 'Esta cadeia é tua',
+        body: 'Corre na tua máquina, não vale nada, e não a consegues partir de forma que um reinício não resolva. Vamos criar uma conta, forjar um bloco e enviar um pagamento — tudo real, nada simulado.',
+      },
+      openAccounts: {
+        title: 'Abre o separador Contas',
+        body: 'Tudo começa com uma conta. É aqui que elas vivem.',
+      },
+      createAccount: {
+        title: 'Cria uma conta',
+        body: 'Dá-lhe uma etiqueta — esse nome é para ti e fica neste navegador. A cadeia não o vê.',
+      },
+      passphraseIsTheAccount: {
+        title: 'Essa frase-passe é a conta',
+        body: 'Não é uma palavra-passe que protege uma conta. O endereço que vês foi calculado a partir dessas palavras. Escreve-as outra vez em qualquer parte do mundo e tens a mesma conta de volta.',
+      },
+      passphraseIsForever: {
+        title: 'Ninguém ta pode devolver',
+        body: 'Não há link de recuperação nem apoio ao cliente. Se perderes a frase-passe, a conta desaparece com o que lá estivesse. Isso não é um defeito: é o preço de não haver ninguém pelo meio.',
+      },
+      passphraseInPlainText: {
+        title: 'A sandbox guarda-a em claro',
+        body: 'Está no armazenamento deste navegador como texto legível. Aqui tudo bem, porque não guarda nada de valor. Uma carteira a sério nunca pode fazer isto, e a sandbox recusa-se até a carregar estas contas se o nó afinal não for a cadeia de testes.',
+      },
+      notOnChainYet: {
+        title: 'Ainda não está na cadeia',
+        body: 'A cadeia nunca ouviu falar desta conta, porque nunca lhe foi enviado nada. Repara no que acontece quando ela ganhar alguma coisa.',
+      },
+      pickForger: {
+        title: 'Escolhe-a como forjador',
+        body: 'O forjador é a conta a que são creditados os blocos que fazes. Escolhe a que acabaste de criar.',
+      },
+      forge: {
+        title: 'Agora forja um bloco',
+        body: 'Na rede real da Signum isto exige um disco rígido e cerca de quatro minutos. Aqui exige um botão.',
+      },
+      heightRose: {
+        title: 'A altura subiu',
+        body: 'Esse número diz quantos blocos existem. Só conta para cima, e é por isso que faz de relógio da cadeia — e o bloco que acabaste de fazer pagou a recompensa à tua conta.',
+      },
+      nowOnChain: {
+        title: 'E aqui está',
+        body: 'A conta já tem saldo, portanto a cadeia sabe que existe. Não foi preciso registá-la: receber alguma coisa foi o que a pôs lá.',
+      },
+      secondAccount: {
+        title: 'Mais uma conta',
+        body: 'Precisas de um destino para o teu dinheiro. Cria uma segunda — tal como antes.',
+      },
+      openSend: {
+        title: 'Abre o painel Enviar',
+        body: 'Aqui começa cada tipo de transação que a Signum sabe transportar.',
+      },
+      sendPayment: {
+        title: 'Paga à tua segunda conta',
+        body: 'Da conta com fundos para a nova. O montante já está preenchido; muda-o se quiseres. A taxa em baixo é o que o forjador do próximo bloco ganha por a levar.',
+      },
+      unconfirmed: {
+        title: 'Diz não confirmada',
+        body: 'O nó tem a tua transação mas nenhum bloco a contém ainda, por isso ela não aconteceu realmente. Nada é definitivo enquanto não estiver num bloco.',
+      },
+      forgeAgain: {
+        title: 'Forja outra vez e vê-a assentar',
+        body: 'Mais um bloco. A tua transação entra nele, e a taxa que pagaste volta para ti — o forjador és tu.',
+      },
+      settled: {
+        title: 'É este o ciclo todo',
+        body: 'Assinar, difundir, esperar por um bloco, feito. Toda a cadeia funciona assim; a maioria só te faz esperar mais para o veres.',
+      },
+      finale: {
+        title: 'Já podes construir numa blockchain',
+        body: 'Era só isto: uma conta, um bloco, uma transação, uma confirmação. Daí para a frente, tudo é o que decidires pôr no conteúdo — e as pessoas põem lá coisas notáveis. Oito delas, todas possíveis com exactamente o que acabaste de fazer:',
+      },
+    },
+    useCase: {
+      tracing: {
+        title: 'Seguir uma cadeia de abastecimento',
+        body: 'Cada entrega é um pagamento que leva conteúdo estruturado. O registo não é de ninguém, ninguém corrige o mês passado às escondidas, e um parceiro lê-o sem te pedir acesso.',
+      },
+      notarising: {
+        title: 'Provar que algo existiu',
+        body: 'Põe a impressão digital de um documento no conteúdo. O bloco onde ela cair é um carimbo temporal que ninguém consegue mexer — um notário por uma fracção de SIGNA.',
+      },
+      credentials: {
+        title: 'Emitir certificados que se verificam sozinhos',
+        body: 'Um diploma, uma licença, uma inspecção: emite-o como um token guardado por quem o detém. Verificá-lo é uma consulta, e falsificá-lo não é ilegal, é impossível.',
+      },
+      tokenising: {
+        title: 'Tokenizar um negócio',
+        body: 'Participações, receitas, adesões. Emite o token nativamente, paga a todos os detentores numa única multi-saída, e deixa uma subscrição tratar da parte que se repete.',
+      },
+      games: {
+        title: 'Fazer um jogo com progresso a sério',
+        body: 'Itens como tokens que o jogador possui mesmo, conquistas como conteúdo que ninguém reverte, e um jogo guardado que sobrevive aos teus servidores.',
+      },
+      registry: {
+        title: 'Manter um registo sem registador',
+        body: 'Os alias são um sistema de nomes dentro do protocolo. Um nome aponta para uma conta, um link ou o conteúdo que escolheres, e a posse muda com uma transação.',
+      },
+      machines: {
+        title: 'Deixar as máquinas pagarem umas às outras',
+        body: 'Taxas na casa dos centésimos de SIGNA tornam a cobrança por utilização viável. Um contador, um posto de carregamento ou um sensor liquidam em segundos, sem factura pelo meio.',
+      },
+      channels: {
+        title: 'Enviar mensagens que nenhum servidor lê',
+        body: 'Um conteúdo cifrado dá a duas contas um canal privado que não precisa de servidor, nem de registo, nem da autorização de ninguém para continuar a funcionar.',
+      },
+    },
   },
 } as const

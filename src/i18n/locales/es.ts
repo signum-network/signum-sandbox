@@ -294,7 +294,113 @@ export default {
       'Todo está en el panel Enviar, cada cosa con una línea que dice para qué sirve. El modo principiante y este recorrido viven detrás de Ayuda, y la API JSON completa está a un clic más.',
     stop: 'Terminar el recorrido',
     waiting: 'Te esperamos…',
-    step: {},
-    useCase: {},
+    step: {
+      welcome: {
+        title: 'Esta cadena es tuya',
+        body: 'Corre en tu máquina, no vale nada, y no puedes romperla de ninguna forma que un reinicio no arregle. Vamos a crear una cuenta, forjar un bloque y enviar un pago — todo real, nada simulado.',
+      },
+      openAccounts: {
+        title: 'Abre la pestaña Cuentas',
+        body: 'Todo empieza con una cuenta. Aquí es donde viven.',
+      },
+      createAccount: {
+        title: 'Crea una cuenta',
+        body: 'Dale una etiqueta — ese nombre es para ti y se queda en este navegador. La cadena no lo verá.',
+      },
+      passphraseIsTheAccount: {
+        title: 'Esa frase de contraseña es la cuenta',
+        body: 'No es una contraseña que proteja una cuenta. La dirección que ves se calculó a partir de esas palabras. Escríbelas de nuevo en cualquier parte del mundo y recuperas la misma cuenta.',
+      },
+      passphraseIsForever: {
+        title: 'Nadie puede devolvértela',
+        body: 'No hay enlace de recuperación ni servicio de atención. Si pierdes la frase de contraseña, la cuenta se pierde con todo lo que hubiera dentro. Eso no es un defecto: es lo que cuesta que no haya nadie en medio.',
+      },
+      passphraseInPlainText: {
+        title: 'La sandbox la guarda en claro',
+        body: 'Está en el almacenamiento de este navegador como texto legible. Aquí da igual, porque no protege nada. Una cartera de verdad jamás debe hacer esto, y la sandbox se niega incluso a cargar estas cuentas si el nodo resulta no ser la cadena de pruebas.',
+      },
+      notOnChainYet: {
+        title: 'Todavía no está en la cadena',
+        body: 'La cadena nunca ha oído hablar de esta cuenta, porque nunca se le ha enviado nada. Mira lo que pasa cuando gane algo.',
+      },
+      pickForger: {
+        title: 'Elígela como forjador',
+        body: 'El forjador es la cuenta a la que se acreditan los bloques que haces. Elige la que acabas de crear.',
+      },
+      forge: {
+        title: 'Ahora forja un bloque',
+        body: 'En la red real de Signum esto exige un disco duro y unos cuatro minutos. Aquí exige un botón.',
+      },
+      heightRose: {
+        title: 'La altura ha subido',
+        body: 'Ese número dice cuántos bloques existen. Solo cuenta hacia arriba, y por eso hace de reloj de la cadena — y el bloque que acabas de hacer le ha pagado su recompensa a tu cuenta.',
+      },
+      nowOnChain: {
+        title: 'Y ahí está',
+        body: 'La cuenta ya tiene saldo, así que la cadena sabe que existe. No hubo que registrarla: recibir algo es lo que la puso ahí.',
+      },
+      secondAccount: {
+        title: 'Una cuenta más',
+        body: 'Necesitas un destino para tu dinero. Crea una segunda — igual que antes.',
+      },
+      openSend: {
+        title: 'Abre el panel Enviar',
+        body: 'Aquí empieza cada tipo de transacción que Signum sabe llevar.',
+      },
+      sendPayment: {
+        title: 'Paga a tu segunda cuenta',
+        body: 'Desde la cuenta con fondos hacia la nueva. El importe ya está puesto; cámbialo si quieres. La comisión de abajo es lo que ganará el forjador del próximo bloque por llevarla.',
+      },
+      unconfirmed: {
+        title: 'Dice sin confirmar',
+        body: 'El nodo tiene tu transacción pero ningún bloque la contiene todavía, así que en realidad no ha ocurrido. Nada es definitivo hasta estar en un bloque.',
+      },
+      forgeAgain: {
+        title: 'Forja otra vez y míralo asentarse',
+        body: 'Un bloque más. Tu transacción entra en él, y la comisión que pagaste vuelve a ti — el forjador eres tú.',
+      },
+      settled: {
+        title: 'Ese es el ciclo entero',
+        body: 'Firmar, difundir, esperar un bloque, listo. Toda cadena funciona así; la mayoría solo te hace esperar más para verlo.',
+      },
+      finale: {
+        title: 'Ya puedes construir sobre una blockchain',
+        body: 'Eso era todo: una cuenta, un bloque, una transacción, una confirmación. A partir de ahí, todo es lo que decidas meter en el contenido — y la gente mete cosas notables ahí dentro. Ocho de ellas, todas construibles con exactamente lo que acabas de hacer:',
+      },
+    },
+    useCase: {
+      tracing: {
+        title: 'Rastrear una cadena de suministro',
+        body: 'Cada entrega es un pago que lleva contenido estructurado. El registro no es de nadie, nadie puede corregir el mes pasado en silencio, y un socio puede leerlo sin pedirte acceso.',
+      },
+      notarising: {
+        title: 'Demostrar que algo existió',
+        body: 'Mete la huella de un documento en el contenido. El bloque donde caiga es una marca de tiempo que nadie puede mover — un notario por una fracción de SIGNA.',
+      },
+      credentials: {
+        title: 'Emitir certificados que se verifican solos',
+        body: 'Un título, una licencia, una inspección: emítelo como un token que guarda su titular. Comprobarlo es una consulta, y falsificarlo no es ilegal sino imposible.',
+      },
+      tokenising: {
+        title: 'Tokenizar un negocio',
+        body: 'Participaciones, ingresos, membresías. Emite el token de forma nativa, paga a todos los titulares en una sola multi-salida, y deja que una suscripción se ocupe de lo que se repite.',
+      },
+      games: {
+        title: 'Hacer un juego con progreso de verdad',
+        body: 'Objetos como tokens que el jugador posee realmente, logros como contenido que nadie puede revertir, y una partida guardada que sobrevive a tus servidores.',
+      },
+      registry: {
+        title: 'Llevar un registro sin registrador',
+        body: 'Los alias son un sistema de nombres dentro del protocolo. Un nombre apunta a una cuenta, a un enlace o a lo que elijas, y la propiedad cambia con una transacción.',
+      },
+      machines: {
+        title: 'Que las máquinas se paguen entre sí',
+        body: 'Comisiones de centésimas de SIGNA hacen que cobrar por uso merezca la pena. Un contador, un punto de carga o un sensor liquidan en segundos, sin factura de por medio.',
+      },
+      channels: {
+        title: 'Enviar mensajes que ningún servidor lee',
+        body: 'Un contenido cifrado da a dos cuentas un canal privado que no necesita servidor, ni registro, ni el permiso de nadie para seguir funcionando.',
+      },
+    },
   },
 } as const

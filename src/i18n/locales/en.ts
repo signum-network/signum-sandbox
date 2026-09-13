@@ -305,7 +305,113 @@ export default {
       'All of it is in the Send drawer, each with a line saying what it does. Beginner mode and this tour live behind Help, and the full JSON API is one click further.',
     stop: 'End the tour',
     waiting: 'Waiting for you…',
-    step: {},
-    useCase: {},
+    step: {
+      welcome: {
+        title: 'This chain is yours',
+        body: 'It runs on your machine, it is worth nothing, and you cannot break it in a way a restart will not fix. We will make an account, forge a block and send a payment — all of it real, none of it simulated.',
+      },
+      openAccounts: {
+        title: 'Open the Accounts tab',
+        body: 'Everything starts with an account. This is where they live.',
+      },
+      createAccount: {
+        title: 'Create an account',
+        body: 'Give it a label — that name is for you, kept in this browser. The chain will not see it.',
+      },
+      passphraseIsTheAccount: {
+        title: 'That passphrase is the account',
+        body: 'It is not a password protecting an account. The address you see was calculated from those words. Type them again anywhere in the world and you get the same account back.',
+      },
+      passphraseIsForever: {
+        title: 'Nobody can give it back to you',
+        body: 'There is no reset link and no support desk. Lose the passphrase and the account is gone, with whatever was in it. That is not a flaw — it is what having no middleman costs.',
+      },
+      passphraseInPlainText: {
+        title: 'The sandbox keeps it in the clear',
+        body: 'It is sitting in this browser’s storage as readable text. That is fine here, because it guards nothing. A real wallet must never do this, and the sandbox refuses to even load these accounts if the node turns out not to be the mock chain.',
+      },
+      notOnChainYet: {
+        title: 'It is not on the chain yet',
+        body: 'The chain has never heard of this account, because nothing has ever been sent to it. Watch what happens when it earns something.',
+      },
+      pickForger: {
+        title: 'Choose it as the forger',
+        body: 'The forger is the account credited with the blocks you make. Pick the one you just created.',
+      },
+      forge: {
+        title: 'Now forge a block',
+        body: 'On the real Signum network this takes a hard drive and about four minutes. Here it takes a button.',
+      },
+      heightRose: {
+        title: 'The height went up',
+        body: 'That number is how many blocks exist. It only counts up, which makes it the chain’s clock — and the block you just made paid your account its reward.',
+      },
+      nowOnChain: {
+        title: 'And there it is',
+        body: 'The account has a balance now, so the chain knows it exists. It did not need registering; receiving something is what put it there.',
+      },
+      secondAccount: {
+        title: 'One more account',
+        body: 'You need somewhere to send money to. Make a second one — same as before.',
+      },
+      openSend: {
+        title: 'Open the Send drawer',
+        body: 'Every kind of transaction Signum can carry starts here.',
+      },
+      sendPayment: {
+        title: 'Pay your second account',
+        body: 'From the funded account, to the new one. The amount is filled in; change it if you like. The fee below is what the forger of the next block will earn for carrying it.',
+      },
+      unconfirmed: {
+        title: 'It says unconfirmed',
+        body: 'The node has your transaction but no block contains it yet, so it has not really happened. Nothing is final until it is in a block.',
+      },
+      forgeAgain: {
+        title: 'Forge again and watch it settle',
+        body: 'One more block. Your transaction goes into it, and the fee you paid comes back to you — you are the forger.',
+      },
+      settled: {
+        title: 'That is the whole loop',
+        body: 'Sign, broadcast, wait for a block, done. Every chain works this way; most just make you wait longer to see it.',
+      },
+      finale: {
+        title: 'You can build on a blockchain now',
+        body: 'That was all of it: an account, a block, a transaction, a confirmation. Everything past that is what you decide to put in the payload — and people put remarkable things in there. Eight of them, all buildable with exactly what you just did:',
+      },
+    },
+    useCase: {
+      tracing: {
+        title: 'Trace a supply chain',
+        body: 'Every handover is a payment carrying a structured payload. Nobody owns the record, nobody can quietly edit last month, and a partner can read it without asking you for access.',
+      },
+      notarising: {
+        title: 'Prove something existed',
+        body: 'Put a document’s fingerprint in a payload. The block it lands in is a timestamp nobody can move — a notary for a fraction of a SIGNA.',
+      },
+      credentials: {
+        title: 'Issue certificates that verify themselves',
+        body: 'A diploma, a licence, a safety inspection: issue it as a token held by its owner. Checking it is one query, and faking it is not illegal but impossible.',
+      },
+      tokenising: {
+        title: 'Tokenise a business',
+        body: 'Shares, revenue, membership. Issue the token natively, pay every holder in a single multi-out, and let a subscription handle the part that repeats.',
+      },
+      games: {
+        title: 'Build a game with progress that is real',
+        body: 'Items as tokens the player genuinely owns, achievements as payloads nobody can roll back, and a save file that outlives your servers.',
+      },
+      registry: {
+        title: 'Run a registry with no registrar',
+        body: 'Aliases are a name system inside the protocol. A name points at an account, a link or any content you choose, and ownership moves with one transaction.',
+      },
+      machines: {
+        title: 'Let machines pay each other',
+        body: 'Fees in hundredths of a SIGNA make per-use billing worth doing. A meter, a charging point or a sensor settles in seconds, with no invoice in between.',
+      },
+      channels: {
+        title: 'Send messages no server can read',
+        body: 'An encrypted payload gives two accounts a private channel that needs no backend, no sign-up and nobody’s permission to keep working.',
+      },
+    },
   },
 } as const

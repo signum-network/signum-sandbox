@@ -125,21 +125,26 @@ describe('observeFeed', () => {
   })
 })
 
-// Skipped until Task 14 writes the strings this checks. The block is left
-// here rather than deferred to that task so unskipping it is the only thing
-// Task 14 has to remember, and the optional chaining below is what keeps a
-// missing `tour` block from taking the whole file down with it at collection.
-describe.skip('TOUR_USE_CASES', () => {
+describe('TOUR_USE_CASES', () => {
   // Same guard as the glossary: an idea with no words is not an idea. The
   // other nine locales follow from locales.test.ts.
-  const useCase =
-    (en as unknown as { tour?: { useCase?: Record<string, { title?: string; body?: string }> } })
-      .tour?.useCase ?? {}
+  const useCase = (
+    en as unknown as { tour: { useCase: Record<string, { title?: string; body?: string }> } }
+  ).tour.useCase
 
   it('has a headline and a sentence for every idea', () => {
     for (const id of TOUR_USE_CASES) {
       expect(useCase[id]?.title, `${id}.title`).toBeTruthy()
       expect(useCase[id]?.body, `${id}.body`).toBeTruthy()
+    }
+  })
+
+  // The finale card lays them out in a grid of short headlines beside longer
+  // bodies. A headline that runs to a sentence breaks that shape, and it is
+  // the last thing a newcomer reads.
+  it('keeps the headlines short enough for a two-column card', () => {
+    for (const id of TOUR_USE_CASES) {
+      expect(useCase[id]?.title?.length, `${id}.title`).toBeLessThan(60)
     }
   })
 })
