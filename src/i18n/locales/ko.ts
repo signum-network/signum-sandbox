@@ -99,6 +99,13 @@ export default {
       oldHandNote: '바로 콘솔로',
     },
     drawer: { send: '보내기', chain: '체인', help: '도움말', close: '닫기' },
+    help: {
+      beginner: '초보자 모드',
+      beginnerNote: '전문 용어마다 옆에 설명을 붙이고, 각 화면 위에 한 줄짜리 안내를 표시합니다.',
+      tour: '둘러보기 시작',
+      tourNote: '9분이면 됩니다. 전부 실제 체인 위에서 진행됩니다.',
+      tourStop: '둘러보기 중단',
+    },
     tx: {
       unconfirmed: '미확인',
       block: '블록 {{height}}',

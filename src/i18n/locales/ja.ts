@@ -99,6 +99,13 @@ export default {
       oldHandNote: 'そのままコンソールへ',
     },
     drawer: { send: '送信', chain: 'チェーン', help: 'ヘルプ', close: '閉じる' },
+    help: {
+      beginner: '初心者モード',
+      beginnerNote: '専門用語のそれぞれに説明を添え、各ビューの上に一文の説明を表示します。',
+      tour: 'ツアーを始める',
+      tourNote: '9 分ほど、すべて本物のチェーン上で行います。',
+      tourStop: 'ツアーを終了',
+    },
     tx: {
       unconfirmed: '未確認',
       block: 'ブロック {{height}}',

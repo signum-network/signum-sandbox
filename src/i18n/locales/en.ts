@@ -110,6 +110,13 @@ export default {
       oldHandNote: 'Straight to the console',
     },
     drawer: { send: 'Send', chain: 'Chain', help: 'Help', close: 'Close' },
+    help: {
+      beginner: 'Beginner mode',
+      beginnerNote: 'Adds an explanation beside every domain word, and a sentence of context above every view.',
+      tour: 'Take the tour',
+      tourNote: 'Nine minutes, all of it on the real chain.',
+      tourStop: 'Stop the tour',
+    },
     tx: {
       unconfirmed: 'unconfirmed',
       block: 'Block {{height}}',

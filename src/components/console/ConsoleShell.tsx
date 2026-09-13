@@ -195,7 +195,18 @@ export function ConsoleShell() {
               </div>
               {drawer === 'send' && <SendDrawer store={accounts} contacts={contacts.contacts} />}
               {drawer === 'chain' && <ChainDrawer height={state.height} />}
-              {drawer === 'help' && <HelpDrawer />}
+              {drawer === 'help' && (
+              <HelpDrawer
+                beginner={beginner.beginner}
+                onBeginner={beginner.setBeginner}
+                // The tour arrives with its own hook; until then the drawer's
+                // second control is present but inert rather than absent, so
+                // wiring it later is one line and not a re-layout.
+                tourActive={false}
+                onStartTour={() => {}}
+                onStopTour={() => {}}
+              />
+            )}
             </div>
           )}
         </div>

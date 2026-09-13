@@ -99,6 +99,13 @@ export default {
       oldHandNote: 'Direto para a consola',
     },
     drawer: { send: 'Enviar', chain: 'Cadeia', help: 'Ajuda', close: 'Fechar' },
+    help: {
+      beginner: 'Modo iniciante',
+      beginnerNote: 'Coloca uma explicação ao lado de cada termo técnico e uma frase de contexto por cima de cada vista.',
+      tour: 'Fazer a visita guiada',
+      tourNote: 'Nove minutos, tudo na cadeia a sério.',
+      tourStop: 'Parar a visita guiada',
+    },
     tx: {
       unconfirmed: 'não confirmada',
       block: 'Bloco {{height}}',

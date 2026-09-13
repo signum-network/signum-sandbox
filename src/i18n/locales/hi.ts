@@ -99,6 +99,13 @@ export default {
       oldHandNote: 'सीधे कंसोल में',
     },
     drawer: { send: 'भेजें', chain: 'चेन', help: 'सहायता', close: 'बंद करें' },
+    help: {
+      beginner: 'शुरुआती मोड',
+      beginnerNote: 'हर तकनीकी शब्द के बगल में एक व्याख्या और हर दृश्य के ऊपर संदर्भ की एक पंक्ति जोड़ता है।',
+      tour: 'टूर शुरू करें',
+      tourNote: 'नौ मिनट, और यह सब असली चेन पर।',
+      tourStop: 'टूर रोकें',
+    },
     tx: {
       unconfirmed: 'अपुष्ट',
       block: 'ब्लॉक {{height}}',

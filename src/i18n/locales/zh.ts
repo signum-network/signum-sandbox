@@ -99,6 +99,13 @@ export default {
       oldHandNote: '直接进入控制台',
     },
     drawer: { send: '发送', chain: '链', help: '帮助', close: '关闭' },
+    help: {
+      beginner: '新手模式',
+      beginnerNote: '在每个专业术语旁加上解释，并在每个视图上方加一句说明。',
+      tour: '开始导览',
+      tourNote: '九分钟，全程都在真实的链上进行。',
+      tourStop: '结束导览',
+    },
     tx: {
       unconfirmed: '未确认',
       block: '区块 {{height}}',

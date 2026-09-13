@@ -99,6 +99,13 @@ export default {
       oldHandNote: 'Direkt in die Konsole',
     },
     drawer: { send: 'Senden', chain: 'Chain', help: 'Hilfe', close: 'Schließen' },
+    help: {
+      beginner: 'Einsteiger-Modus',
+      beginnerNote: 'Setzt neben jedes Fachwort eine Erklärung und über jede Ansicht einen Satz Kontext.',
+      tour: 'Tour starten',
+      tourNote: 'Neun Minuten, alles auf der echten Chain.',
+      tourStop: 'Tour beenden',
+    },
     tx: {
       unconfirmed: 'unbestätigt',
       block: 'Block {{height}}',
