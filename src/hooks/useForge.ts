@@ -1,23 +1,27 @@
 import { useCallback, useEffect, useState } from 'react'
 import { forge } from '@/lib/chainAdmin'
+import { parseAutoInterval } from '@/lib/autoForge'
 import type { SandboxAccount } from '@/lib/accounts'
 
-/**
- * Roughly five seconds apart, each submitNonce yields exactly one block; faster
- * calls all report success but collapse into one, since they compete for the
- * same height. The auto interval respects that.
- */
-const AUTO_INTERVAL_MS = 5000
+const INTERVAL_KEY = 'signum-sandbox.autoInterval.v1'
 
 export function useForge(forger: SandboxAccount | undefined) {
   const [auto, setAuto] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [intervalS, setIntervalSeconds] = useState(() =>
+    parseAutoInterval(window.localStorage.getItem(INTERVAL_KEY)),
+  )
+
+  const setAutoInterval = useCallback((seconds: number) => {
+    setIntervalSeconds(seconds)
+    window.localStorage.setItem(INTERVAL_KEY, String(seconds))
+  }, [])
 
   // Always resolves, never rejects: ChainService.send throws on any errorCode
-  // in the response (e.g. the node restarting mid-forge), and the interval
-  // below has nothing to catch a rejection with — an uncaught one there is an
-  // unhandled promise rejection every AUTO_INTERVAL_MS, forever.
+  // in the response (e.g. the node restarting mid-forge), and the loop below
+  // has nothing to catch a rejection with — an uncaught one there is an
+  // unhandled promise rejection once per interval, forever.
   const forgeOnce = useCallback(async () => {
     if (!forger) return
     setBusy(true)
@@ -33,11 +37,28 @@ export function useForge(forger: SandboxAccount | undefined) {
     }
   }, [forger])
 
+  // A self-scheduling timeout rather than an interval: the gap is measured
+  // from when a forge finished, not from when the last one started, so a slow
+  // node cannot stack overlapping calls that then collapse into one block.
+  // The first block comes immediately, because switching the thing on and
+  // waiting five seconds for any sign of life reads as broken.
   useEffect(() => {
     if (!auto || !forger) return
-    const id = setInterval(() => void forgeOnce(), AUTO_INTERVAL_MS)
-    return () => clearInterval(id)
-  }, [auto, forger, forgeOnce])
+    let stopped = false
+    let timer: ReturnType<typeof setTimeout> | undefined
+
+    const loop = async () => {
+      await forgeOnce()
+      if (stopped) return
+      timer = setTimeout(() => void loop(), intervalS * 1000)
+    }
+    void loop()
+
+    return () => {
+      stopped = true
+      if (timer) clearTimeout(timer)
+    }
+  }, [auto, forger, forgeOnce, intervalS])
 
   // A dangling forger id (the account was removed) or no forger at all leaves
   // auto-forge switched on with nothing to forge with — the effect above bails
@@ -46,5 +67,14 @@ export function useForge(forger: SandboxAccount | undefined) {
     if (!forger) setAuto(false)
   }, [forger])
 
-  return { forgeOnce, busy, auto, setAuto, canForge: forger !== undefined, error }
+  return {
+    forgeOnce,
+    busy,
+    auto,
+    setAuto,
+    intervalS,
+    setAutoInterval,
+    canForge: forger !== undefined,
+    error,
+  }
 }

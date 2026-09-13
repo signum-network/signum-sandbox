@@ -4,6 +4,7 @@ import type { NodeState } from '@/lib/nodeState'
 import type { AccountStore } from '@/hooks/useAccounts'
 import { useForge } from '@/hooks/useForge'
 import { Select } from '@/components/console/Select'
+import { AUTO_INTERVALS_S } from '@/lib/autoForge'
 import { Toggle } from '@/components/console/Toggle'
 
 export function Header({
@@ -16,7 +17,8 @@ export function Header({
   onOpenDrawer: (drawer: 'send' | 'chain' | 'help') => void
 }) {
   const { t } = useTranslation()
-  const { forgeOnce, busy, auto, setAuto, canForge, error } = useForge(accounts.forger)
+  const { forgeOnce, busy, auto, setAuto, intervalS, setAutoInterval, canForge, error } =
+    useForge(accounts.forger)
   const [requested, setRequested] = useState(false)
 
   // submitNonce reports success even when several calls collapse into a single
@@ -77,6 +79,22 @@ export function Header({
         </div>
 
         <Toggle checked={auto} disabled={!canForge} onChange={setAuto} label={t('console.forge.auto')} />
+
+        {/*
+          The rate only exists while auto-forging does, so it appears with the
+          switch rather than sitting there as a setting for something that is
+          off. Five seconds is the floor the node imposes, not a preference.
+        */}
+        {auto && (
+          <div className="w-[90px]">
+            <Select
+              value={String(intervalS)}
+              placeholder={`${intervalS} s`}
+              onChange={(v) => setAutoInterval(Number(v))}
+              options={AUTO_INTERVALS_S.map((s) => ({ value: String(s), label: `${s} s` }))}
+            />
+          </div>
+        )}
 
         {(['send', 'chain', 'help'] as const).map((name) => (
           <button
