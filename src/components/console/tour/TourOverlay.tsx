@@ -16,9 +16,19 @@ import type { TourStore } from '@/hooks/useTour'
  */
 const OVERLAY_Z = 30
 
-const CALLOUT_WIDTH = 300
+const CALLOUT_WIDTH = 340
 /** The last step is a list, not a sentence, and 300px is a column of words. */
-const FINALE_WIDTH = 460
+const FINALE_WIDTH = 520
+/**
+ * Roughly how tall a callout runs, used only to decide whether it still fits
+ * below its target. A guess rather than a measurement: measuring would mean a
+ * second layout pass every time the card changes, to move a card that in
+ * practice always has room -- every `data-tour` target sits in the top strip
+ * of the page. Set above the tallest card the longer locales produce, so the
+ * error is on the side of flipping too eagerly rather than running off screen.
+ */
+const CALLOUT_HEIGHT = 220
+
 const GAP = 10
 
 interface Box {
@@ -92,7 +102,8 @@ export function TourOverlay({ tour }: { tour: TourStore }) {
   // Below the target if there is room, above it otherwise; and never off the
   // right edge. The finale has no target and centres itself.
   const below = box ? box.top + box.height + GAP : 0
-  const calloutTop = box && below + 180 > window.innerHeight ? box.top - 180 : below
+  const calloutTop =
+    box && below + CALLOUT_HEIGHT > window.innerHeight ? box.top - CALLOUT_HEIGHT : below
   const calloutLeft = box
     ? Math.min(box.left, window.innerWidth - width - GAP)
     : window.innerWidth / 2 - width / 2
@@ -131,22 +142,22 @@ export function TourOverlay({ tour }: { tour: TourStore }) {
         }}
       >
         <div className="mb-2 flex items-center justify-between">
-          <span className="text-[9px] uppercase tracking-[1px] text-[var(--blue3)]">
+          <span className="text-[11px] uppercase tracking-[1px] text-[var(--blue3)]">
             {t('tour.position', { position: tour.position, total: tour.total })}
           </span>
-          <RowButton className="text-[11px] text-[var(--muted)]" onClick={tour.stop}>
+          <RowButton className="text-[13px] text-[var(--muted)]" onClick={tour.stop}>
             ✕
           </RowButton>
         </div>
 
         <p
           className={
-            finale ? 'mb-1 text-[13px] text-[var(--blue3)]' : 'mb-1 text-[11px] text-[var(--fg)]'
+            finale ? 'mb-1 text-[15px] text-[var(--blue3)]' : 'mb-1 text-[13px] text-[var(--fg)]'
           }
         >
           {t(`tour.step.${tour.step.id}.title`)}
         </p>
-        <p className="mb-3 text-[10px] leading-relaxed text-[var(--muted)]">
+        <p className="mb-3 text-[12px] leading-relaxed text-[var(--muted)]">
           {t(`tour.step.${tour.step.id}.body`)}
         </p>
 
@@ -159,8 +170,8 @@ export function TourOverlay({ tour }: { tour: TourStore }) {
           <ul className="mb-3 grid gap-2 sm:grid-cols-2">
             {TOUR_USE_CASES.map((id) => (
               <li key={id} className="border-l pl-2" style={{ borderColor: 'var(--blue2)' }}>
-                <p className="text-[10px] text-[var(--fg)]">{t(`tour.useCase.${id}.title`)}</p>
-                <p className="text-[10px] leading-relaxed text-[var(--muted)]">
+                <p className="text-[12px] text-[var(--fg)]">{t(`tour.useCase.${id}.title`)}</p>
+                <p className="text-[12px] leading-relaxed text-[var(--muted)]">
                   {t(`tour.useCase.${id}.body`)}
                 </p>
               </li>
@@ -169,7 +180,7 @@ export function TourOverlay({ tour }: { tour: TourStore }) {
         )}
 
         {finale && (
-          <p className="mb-3 text-[10px] leading-relaxed text-[var(--muted)]">
+          <p className="mb-3 text-[12px] leading-relaxed text-[var(--muted)]">
             {t('tour.finaleFooter')}
           </p>
         )}
@@ -179,7 +190,7 @@ export function TourOverlay({ tour }: { tour: TourStore }) {
             {t(finale ? 'tour.finish' : 'tour.next')}
           </ConsoleButton>
         ) : (
-          <span className="text-[10px] text-[var(--blue3)]">{t('tour.waiting')}</span>
+          <span className="text-[12px] text-[var(--blue3)]">{t('tour.waiting')}</span>
         )}
       </div>
     </>

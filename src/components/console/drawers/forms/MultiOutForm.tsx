@@ -134,7 +134,7 @@ export function MultiOutForm({
         </Field>
       )}
 
-      <span className="mb-1 block text-[9px] uppercase tracking-[1px] text-[var(--muted)]">
+      <span className="mb-1 block text-[11px] uppercase tracking-[1px] text-[var(--muted)]">
         <Term id="multiOut">{t('console.send.recipients')}</Term> · {filled.length}/{limit}
       </span>
 
@@ -158,7 +158,7 @@ export function MultiOutForm({
             </span>
           )}
           <RowButton
-            className="mt-1 text-[11px] leading-none text-[var(--muted)] hover:text-[var(--mag)]"
+            className="mt-1 text-[13px] leading-none text-[var(--muted)] hover:text-[var(--mag)]"
             onClick={() => setRows(rows.filter((_, i) => i !== index))}
           >
             ✕
@@ -177,7 +177,7 @@ export function MultiOutForm({
           {t('console.send.multiOut.paste')}
         </ConsoleButton>
         {problem === 'tooMany' && (
-          <span className="text-[10px]" style={{ color: 'var(--mag)' }}>
+          <span className="text-[12px]" style={{ color: 'var(--mag)' }}>
             {t('console.send.multiOut.tooMany', { limit })}
           </span>
         )}

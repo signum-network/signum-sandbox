@@ -35,7 +35,7 @@ function SaveContactField({
       <span className="min-w-[100px] text-[var(--muted)]">{label}</span>
       <span>{address}</span>
       <input
-        className="border bg-transparent px-2 py-[2px] text-[11px] text-[var(--fg)]"
+        className="border bg-transparent px-2 py-[2px] text-[13px] text-[var(--fg)]"
         style={{ borderColor: 'var(--border2)' }}
         value={name}
         placeholder={t('console.accounts.localLabel')}
@@ -90,7 +90,7 @@ export function TransactionRow({
   return (
     <li className="border-b" style={{ borderColor: 'var(--border2)' }}>
       <RowButton
-        className="flex w-full items-center justify-between py-2 text-left text-[11px]"
+        className="flex w-full items-center justify-between py-2 text-left text-[13px]"
         onClick={() => setOpen(!open)}
       >
         <span>
@@ -111,7 +111,7 @@ export function TransactionRow({
 
       {open && (
         <div
-          className="mb-2 border-l-2 py-2 pl-3 text-[11px]"
+          className="mb-2 border-l-2 py-2 pl-3 text-[13px]"
           style={{ borderColor: 'var(--blue2)', background: 'rgba(0,102,255,.06)' }}
         >
           {fields.map((field) => (

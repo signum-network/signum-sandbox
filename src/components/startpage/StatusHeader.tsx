@@ -22,7 +22,7 @@ export function StatusHeader({ networkName, version, connection, scanning }: Pro
       connection={connection}
       scanning={scanning}
       subtitle={
-        <p className="mt-1 text-[11px] tracking-[1px] text-[var(--muted)]">{t('tagline')}</p>
+        <p className="mt-1 text-[13px] tracking-[1px] text-[var(--muted)]">{t('tagline')}</p>
       }
     />
   )

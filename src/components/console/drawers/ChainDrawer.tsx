@@ -61,7 +61,7 @@ export function ChainDrawer({ height }: { height: number | null }) {
           </ConsoleButton>
         </div>
 
-        <p className="text-[10px] text-[var(--muted)]">{t('console.chain.rewindNote')}</p>
+        <p className="text-[12px] text-[var(--muted)]">{t('console.chain.rewindNote')}</p>
 
         {/*
           Said before the attempt rather than after it: on a long chain the
@@ -69,21 +69,21 @@ export function ChainDrawer({ height }: { height: number | null }) {
           pressing the button is finding it out too late.
         */}
         {rewindProblem(height ?? 0) === 'outOfReach' && (
-          <p className="mt-1 text-[10px]" style={{ color: 'var(--amber)' }}>
+          <p className="mt-1 text-[12px]" style={{ color: 'var(--amber)' }}>
             {t('console.chain.rewind_outOfReach')}
           </p>
         )}
 
-        {notice && <p className="mt-1 text-[10px] text-[var(--blue3)]">{notice}</p>}
+        {notice && <p className="mt-1 text-[12px] text-[var(--blue3)]">{notice}</p>}
       </div>
 
       <div className="border-t pt-3" style={{ borderColor: 'var(--border2)' }}>
-        <p className="text-[10px] uppercase tracking-[1px] text-[var(--blue3)]">
+        <p className="text-[12px] uppercase tracking-[1px] text-[var(--blue3)]">
           {t('console.chain.fresh')}
         </p>
-        <p className="mt-1 text-[10px] text-[var(--muted)]">{t('console.chain.freshNote')}</p>
+        <p className="mt-1 text-[12px] text-[var(--muted)]">{t('console.chain.freshNote')}</p>
         <code
-          className="mt-1 block border p-2 text-[10px] text-[var(--fg)]"
+          className="mt-1 block border p-2 text-[12px] text-[var(--fg)]"
           style={{ borderColor: 'var(--border2)' }}
         >
           {resetCommand(navigator.userAgent)}

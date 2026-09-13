@@ -56,7 +56,7 @@ export function AppHeader({
         {subtitle}
       </div>
       <div className="flex flex-wrap items-center gap-3">
-        <div className="flex items-center gap-2 text-[10px] tracking-[1px] text-[var(--muted)]">
+        <div className="flex items-center gap-2 text-[12px] tracking-[1px] text-[var(--muted)]">
           <span
             className="inline-block h-[6px] w-[6px] rounded-full"
             style={{ background: colour, boxShadow: `0 0 6px ${colour}` }}

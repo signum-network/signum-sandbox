@@ -28,7 +28,7 @@ export function HelpDrawer({
     <div className="mt-2 flex flex-col gap-4">
       <div>
         <Toggle checked={beginner} onChange={onBeginner} label={t('console.help.beginner')} />
-        <p className="mt-1 text-[10px] leading-relaxed text-[var(--muted)]">
+        <p className="mt-1 text-[12px] leading-relaxed text-[var(--muted)]">
           {t('console.help.beginnerNote')}
         </p>
       </div>
@@ -37,13 +37,13 @@ export function HelpDrawer({
         <ConsoleButton onClick={tourActive ? onStopTour : onStartTour}>
           {t(tourActive ? 'console.help.tourStop' : 'console.help.tour')}
         </ConsoleButton>
-        <p className="mt-1 text-[10px] leading-relaxed text-[var(--muted)]">
+        <p className="mt-1 text-[12px] leading-relaxed text-[var(--muted)]">
           {t('console.help.tourNote')}
         </p>
       </div>
 
       <a
-        className="text-[11px] text-[var(--blue3)] underline"
+        className="text-[13px] text-[var(--blue3)] underline"
         href="/api-doc/"
         target="_blank"
         rel="noreferrer"

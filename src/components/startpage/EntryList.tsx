@@ -17,10 +17,10 @@ function Entry({
 
   const body = (
     <>
-      <div className="text-[12px] font-bold tracking-[1px] text-[var(--blue3)]">
+      <div className="text-[14px] font-bold tracking-[1px] text-[var(--blue3)]">
         ▸ {title.toUpperCase()}
       </div>
-      <div className="mt-1 text-[10px] leading-relaxed text-[var(--muted)]">
+      <div className="mt-1 text-[12px] leading-relaxed text-[var(--muted)]">
         {description}
         {badge && <> · {badge}</>}
       </div>

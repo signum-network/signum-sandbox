@@ -38,7 +38,7 @@ export function knownRecipients(accounts: SandboxAccount[], contacts: Contacts):
 export function Field({ label, children }: { label: ReactNode; children: ReactNode }) {
   return (
     <label className="mb-2 block">
-      <span className="mb-1 block text-[9px] uppercase tracking-[1px] text-[var(--muted)]">
+      <span className="mb-1 block text-[11px] uppercase tracking-[1px] text-[var(--muted)]">
         {label}
       </span>
       {children}
@@ -57,7 +57,7 @@ export function TextInput({
 }) {
   return (
     <input
-      className="w-full border bg-transparent px-2 py-1 text-[11px] text-[var(--fg)]"
+      className="w-full border bg-transparent px-2 py-1 text-[13px] text-[var(--fg)]"
       style={border}
       value={value}
       placeholder={placeholder}
@@ -151,7 +151,7 @@ export function SuggestInput({
   return (
     <div ref={ref} className="relative">
       <input
-        className="w-full border bg-transparent px-2 py-1 text-[11px] text-[var(--fg)]"
+        className="w-full border bg-transparent px-2 py-1 text-[13px] text-[var(--fg)]"
         style={border}
         value={value}
         placeholder={placeholder}
@@ -180,7 +180,7 @@ export function SuggestInput({
               <motion.button
                 key={s.value}
                 type="button"
-                className="flex w-full items-center gap-2 px-2 py-1.5 text-left text-[11px]"
+                className="flex w-full items-center gap-2 px-2 py-1.5 text-left text-[13px]"
                 style={{ color: 'var(--fg)' }}
                 whileHover={{ backgroundColor: 'rgba(255,255,255,.07)', color: 'var(--blue2)' }}
                 onHoverStart={() => play(sfx.tick)}
@@ -194,7 +194,7 @@ export function SuggestInput({
                 <span className="flex min-w-0 flex-col items-start">
                   <span className="truncate">{s.label}</span>
                   {s.sublabel && (
-                    <span className="truncate text-[9px]" style={{ color: 'var(--muted)' }}>
+                    <span className="truncate text-[11px]" style={{ color: 'var(--muted)' }}>
                       {s.sublabel}
                     </span>
                   )}
@@ -244,7 +244,7 @@ export function RecipientPicker({
 export function TextArea({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   return (
     <textarea
-      className="w-full border bg-transparent px-2 py-1 text-[11px] text-[var(--fg)]"
+      className="w-full border bg-transparent px-2 py-1 text-[13px] text-[var(--fg)]"
       style={border}
       rows={3}
       value={value}

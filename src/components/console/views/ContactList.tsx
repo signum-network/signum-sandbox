@@ -43,7 +43,7 @@ export function ContactList({
   const [address, setAddress] = useState('')
   const [name, setName] = useState('')
 
-  const field = 'border bg-transparent px-2 py-1 text-[11px] text-[var(--fg)]'
+  const field = 'border bg-transparent px-2 py-1 text-[13px] text-[var(--fg)]'
   const border = { borderColor: 'var(--border2)' }
 
   const entries = Object.entries(contacts)
@@ -52,7 +52,7 @@ export function ContactList({
 
   return (
     <div className="mt-5 border-t pt-3" style={{ borderColor: 'var(--border2)' }}>
-      <div className="mb-2 text-[10px] font-bold uppercase tracking-[2px] text-[var(--muted)]">
+      <div className="mb-2 text-[12px] font-bold uppercase tracking-[2px] text-[var(--muted)]">
         <Term id="contact">{t('console.accounts.sectionContacts')}</Term>
       </div>
 
@@ -84,14 +84,14 @@ export function ContactList({
       </div>
 
       {entries.length === 0 && (
-        <p className="text-[11px] text-[var(--muted)]">{t('console.accounts.noContacts')}</p>
+        <p className="text-[13px] text-[var(--muted)]">{t('console.accounts.noContacts')}</p>
       )}
 
       <ul>
         {entries.map((c) => (
           <li
             key={c.id}
-            className="flex items-center gap-3 border-b py-2 text-[11px]"
+            className="flex items-center gap-3 border-b py-2 text-[13px]"
             style={{ borderColor: 'var(--border2)' }}
           >
             <Identicon value={c.address} />

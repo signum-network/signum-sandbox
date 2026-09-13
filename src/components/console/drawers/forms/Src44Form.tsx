@@ -132,14 +132,14 @@ export function Src44Form({
         </>
       )}
 
-      <div className="mb-2 text-[9px] uppercase tracking-[1px] text-[var(--muted)]">
+      <div className="mb-2 text-[11px] uppercase tracking-[1px] text-[var(--muted)]">
         {t('console.src44.preview')}{' '}
         <span style={{ color: size > SRC44_MAX_BYTES ? 'var(--mag)' : 'var(--muted)' }}>
           · {t('console.src44.bytes', { size, max: SRC44_MAX_BYTES })}
         </span>
       </div>
       <pre
-        className="themed-scroll console-scroll mb-2 max-h-32 overflow-auto border p-2 text-[10px]"
+        className="themed-scroll console-scroll mb-2 max-h-32 overflow-auto border p-2 text-[12px]"
         style={{
           borderColor: json ? 'var(--border2)' : 'var(--mag)',
           color: json ? 'var(--fg)' : 'var(--mag)',

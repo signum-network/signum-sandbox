@@ -28,7 +28,7 @@ export function Toggle({
       role="switch"
       aria-checked={checked}
       disabled={disabled}
-      className="flex items-center gap-2 text-[10px] uppercase tracking-[1px]"
+      className="flex items-center gap-2 text-[12px] uppercase tracking-[1px]"
       style={{
         color: checked ? 'var(--blue2)' : 'var(--muted)',
         opacity: disabled ? 0.45 : 1,
@@ -43,7 +43,7 @@ export function Toggle({
       }}
     >
       <span
-        className="relative inline-block h-[14px] w-[26px] shrink-0"
+        className="relative inline-block h-[16px] w-[30px] shrink-0"
         style={{
           // No solid fill: the console is drawn in hairlines, and --blue as a
           // filled track was the one saturated block of colour in it. On reads
@@ -53,9 +53,9 @@ export function Toggle({
         }}
       >
         <motion.span
-          className="absolute top-[1px] h-[10px] w-[10px]"
+          className="absolute top-[1px] h-[12px] w-[12px]"
           style={{ background: checked ? 'var(--blue2)' : 'var(--muted)' }}
-          animate={{ left: checked ? '13px' : '1px' }}
+          animate={{ left: checked ? '15px' : '1px' }}
           transition={{ type: 'spring', stiffness: 500, damping: 32 }}
         />
       </span>

@@ -25,7 +25,7 @@ export function CustomFields({
 
   return (
     <div className="mb-2">
-      <span className="mb-1 block text-[9px] uppercase tracking-[1px] text-[var(--muted)]">
+      <span className="mb-1 block text-[11px] uppercase tracking-[1px] text-[var(--muted)]">
         {t('console.src44.custom')}
       </span>
 
@@ -46,7 +46,7 @@ export function CustomFields({
             />
           </span>
           <RowButton
-            className="text-[11px] leading-none text-[var(--muted)] hover:text-[var(--mag)]"
+            className="text-[13px] leading-none text-[var(--muted)] hover:text-[var(--mag)]"
             onClick={() => onChange(fields.filter((_, i) => i !== index))}
           >
             ✕

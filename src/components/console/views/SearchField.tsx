@@ -22,14 +22,14 @@ export function SearchField({
       style={{ borderColor: 'var(--border2)', minWidth: 240 }}
     >
       <input
-        className="flex-1 bg-transparent text-[11px] text-[var(--fg)] outline-none"
+        className="flex-1 bg-transparent text-[13px] text-[var(--fg)] outline-none"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={t('console.search.placeholder')}
       />
       {value !== '' && (
         <RowButton
-          className="ml-2 text-[11px] leading-none text-[var(--muted)] hover:text-[var(--blue3)]"
+          className="ml-2 text-[13px] leading-none text-[var(--muted)] hover:text-[var(--blue3)]"
           onClick={() => onChange('')}
         >
           ✕

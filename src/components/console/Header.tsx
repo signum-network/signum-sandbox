@@ -64,7 +64,7 @@ export function Header({
         and the personal settings are in AppHeader above, so this bar changes
         exactly when the chain does.
       */}
-      <span className="text-[11px]" data-tour="height">
+      <span className="text-[13px]" data-tour="height">
         <span className="text-[var(--muted)]">
           <Term id="height">{t('console.chain.height')}</Term>{' '}
         </span>
@@ -95,11 +95,11 @@ export function Header({
         {auto && (
           <>
             {nextForgeAt !== null && (
-              <span className="text-[10px] text-[var(--muted)]">
+              <span className="text-[12px] text-[var(--muted)]">
                 {t('console.forge.nextIn')} <Countdown at={nextForgeAt} />
               </span>
             )}
-            <div className="w-[104px]">
+            <div className="w-[124px]">
               <Select
                 value={String(intervalS)}
                 placeholder={formatInterval(intervalS)}
@@ -129,15 +129,15 @@ export function Header({
         </span>
 
         {requested && (
-          <span className="text-[10px] text-[var(--muted)]">{t('console.forge.requested')}</span>
+          <span className="text-[12px] text-[var(--muted)]">{t('console.forge.requested')}</span>
         )}
         {!requested && error && (
-          <span className="text-[10px] text-[var(--mag)]">
+          <span className="text-[12px] text-[var(--mag)]">
             {t('console.forge.failed', { message: error })}
           </span>
         )}
 
-        <div className="w-36" data-tour="forger-select">
+        <div className="w-44" data-tour="forger-select">
           <Select
             value={accounts.forgerId ?? ''}
             placeholder={t('console.forge.chooseForger')}

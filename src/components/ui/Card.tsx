@@ -53,7 +53,7 @@ export function CardLabel({
   return (
     <p
       className={cn(
-        'mb-2.5 text-[9px] font-semibold uppercase tracking-[3px] text-[var(--blue2)]',
+        'mb-2.5 text-[11px] font-semibold uppercase tracking-[3px] text-[var(--blue2)]',
         className,
       )}
     >
@@ -79,7 +79,7 @@ export function CardSub({
   return (
     <p
       className={cn(
-        'mt-1.5 text-[10px] tracking-[1px] text-[var(--muted)]',
+        'mt-1.5 text-[12px] tracking-[1px] text-[var(--muted)]',
         className,
       )}
     >

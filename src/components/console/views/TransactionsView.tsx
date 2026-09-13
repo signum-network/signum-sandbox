@@ -29,8 +29,8 @@ export function TransactionsView({
   if (items.length === 0) {
     return (
       <div className="p-4">
-        <p className="text-[12px] font-bold text-[var(--blue3)]">{t('console.empty.title')}</p>
-        <p className="mt-2 text-[11px] text-[var(--muted)]">{t('console.empty.description')}</p>
+        <p className="text-[14px] font-bold text-[var(--blue3)]">{t('console.empty.title')}</p>
+        <p className="mt-2 text-[13px] text-[var(--muted)]">{t('console.empty.description')}</p>
       </div>
     )
   }
@@ -41,7 +41,7 @@ export function TransactionsView({
   if (matching.length === 0) {
     return (
       <div className="p-4">
-        <p className="text-[11px] text-[var(--muted)]">{t('console.tx.none')}</p>
+        <p className="text-[13px] text-[var(--muted)]">{t('console.tx.none')}</p>
       </div>
     )
   }

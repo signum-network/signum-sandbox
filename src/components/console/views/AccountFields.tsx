@@ -5,14 +5,14 @@ import { ConsoleButton } from '../ConsoleButton'
 import { Term } from '@/components/console/Term'
 
 export const actionButton =
-  'border px-2 py-[1px] text-[10px] uppercase tracking-[1px] text-[var(--blue3)]'
+  'border px-2 py-[1px] text-[12px] uppercase tracking-[1px] text-[var(--blue3)]'
 export const actionBorder = { borderColor: 'var(--border2)' }
 
 /** One labelled line of an account's detail, so every line lines up. */
 export function Row({ label, children }: { label: ReactNode; children: ReactNode }) {
   return (
     <div className="flex flex-wrap items-baseline gap-3 py-[2px]">
-      <span className="min-w-[110px] text-[var(--muted)]">{label}</span>
+      <span className="min-w-[132px] text-[var(--muted)]">{label}</span>
       <span>{children}</span>
     </div>
   )
@@ -54,7 +54,7 @@ export function PassphraseField({ passphrase }: { passphrase: string }) {
         {revealed ? t('console.accounts.passphraseHide') : t('console.accounts.passphraseReveal')}
       </ConsoleButton>{' '}
       <CopyButton value={passphrase} />{' '}
-      <span className="text-[10px] text-[var(--muted)]">{t('console.accounts.fake')}</span>
+      <span className="text-[12px] text-[var(--muted)]">{t('console.accounts.fake')}</span>
     </Row>
   )
 }

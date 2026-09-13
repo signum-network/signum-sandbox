@@ -73,7 +73,7 @@ export function SendDrawer({
   const [notice, setNotice] = useState<{ ok: boolean; text: string } | null>(null)
 
   if (!store.available) {
-    return <p className="mt-2 text-[11px] text-[var(--muted)]">{t('console.guard.title')}</p>
+    return <p className="mt-2 text-[13px] text-[var(--muted)]">{t('console.guard.title')}</p>
   }
 
   // A fresh transaction shows up as unconfirmed only after the feed refetches;
@@ -107,7 +107,7 @@ export function SendDrawer({
           registry, standing orders — and a dropdown of eleven verbs explains
           none of that to someone meeting it for the first time.
         */}
-        <p className="mt-1 text-[10px] leading-relaxed text-[var(--muted)]">
+        <p className="mt-1 text-[12px] leading-relaxed text-[var(--muted)]">
           {t(`console.kindHelp.${kind}`)}
         </p>
       </div>
@@ -205,7 +205,7 @@ export function SendDrawer({
 
       {notice && (
         <p
-          className="mt-2 text-[10px]"
+          className="mt-2 text-[12px]"
           style={{ color: notice.ok ? 'var(--green)' : 'var(--mag)' }}
         >
           {notice.ok ? '✓' : '✕'} {notice.text}

@@ -38,7 +38,7 @@ export function AccountRow({
 
   return (
     <li className="border-b" style={{ borderColor: 'var(--border2)' }}>
-      <div className="flex items-center gap-3 py-2 text-[11px]">
+      <div className="flex items-center gap-3 py-2 text-[13px]">
         <RowButton className="flex flex-1 items-center gap-3 text-left" onClick={() => setOpen(!open)}>
           <span className="text-[var(--muted)]">{open ? '▾' : '▸'}</span>
           <Identicon value={account.address} />

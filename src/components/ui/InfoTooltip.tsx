@@ -1,6 +1,6 @@
 import { useState, useRef, useLayoutEffect } from 'react'
 
-const TOOLTIP_WIDTH = 240
+const TOOLTIP_WIDTH = 280
 const VIEWPORT_MARGIN = 8
 
 interface InfoTooltipProps {
@@ -39,7 +39,7 @@ export function InfoTooltip({ text }: InfoTooltipProps) {
         tabIndex={0}
         role="button"
         aria-label="More information"
-        className="inline-flex h-[14px] w-[14px] cursor-default items-center justify-center rounded-full text-[8px] font-bold leading-none select-none"
+        className="inline-flex h-[16px] w-[16px] cursor-default items-center justify-center rounded-full text-[10px] font-bold leading-none select-none"
         style={{
           border: '1px solid var(--muted)',
           color: 'var(--muted)',
@@ -53,7 +53,7 @@ export function InfoTooltip({ text }: InfoTooltipProps) {
 
       {visible && (
         <span
-          className="pointer-events-none absolute z-50 w-[240px] p-3 text-[10px] leading-relaxed"
+          className="pointer-events-none absolute z-50 w-[280px] p-3 text-[12px] leading-relaxed"
           style={{
             background: 'var(--bg2)',
             border: '1px solid var(--border2)',

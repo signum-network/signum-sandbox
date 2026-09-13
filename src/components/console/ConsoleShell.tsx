@@ -250,11 +250,11 @@ export function ConsoleShell() {
               style={{ borderColor: 'var(--blue2)' }}
             >
               <div className="flex items-center justify-between">
-                <span className="text-[10px] uppercase tracking-[1px] text-[var(--blue3)]">
+                <span className="text-[12px] uppercase tracking-[1px] text-[var(--blue3)]">
                   {t(`console.drawer.${drawer}`)}
                 </span>
                 <RowButton
-                  className="text-[11px] text-[var(--muted)]"
+                  className="text-[13px] text-[var(--muted)]"
                   onClick={() => setDrawer(null)}
                 >
                   ✕

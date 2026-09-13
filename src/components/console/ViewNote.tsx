@@ -22,11 +22,13 @@ export function ViewNote({ id, terms = [] }: { id: string; terms?: GlossaryTerm[
 
   return (
     <div className="mb-2 shrink-0">
-      <p className="text-[10px] leading-relaxed text-[var(--muted)]">
+      <p className="text-[12px] leading-relaxed text-[var(--muted)]">
         {t(`console.note.${id}`)}
       </p>
       {terms.length > 0 && (
-        <p className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] text-[var(--muted)]">
+        <p
+          className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-[var(--muted)]"
+        >
           {terms.map((term) => (
             <Term key={term} id={term} />
           ))}

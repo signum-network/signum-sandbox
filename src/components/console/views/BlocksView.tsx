@@ -45,7 +45,7 @@ export function BlocksView({
       <div className="mb-2 flex shrink-0 items-center gap-3">
         <Toggle checked={hideEmpty} onChange={onHideEmpty} label={t('console.blocks.hideEmpty')} />
         {hidden > 0 && (
-          <span className="text-[10px] text-[var(--muted)]">
+          <span className="text-[12px] text-[var(--muted)]">
             {t('console.blocks.hidden', { count: hidden })}
           </span>
         )}
@@ -60,7 +60,7 @@ export function BlocksView({
       */}
       <ul className="themed-scroll console-scroll min-h-0 flex-1 overflow-y-auto pr-2">
         {shown.length === 0 && (
-          <li className="p-4 text-[11px] text-[var(--muted)]">
+          <li className="p-4 text-[13px] text-[var(--muted)]">
             {blocks.length === 0 ? t('console.blocks.none') : t('console.blocks.noMatch')}
           </li>
         )}

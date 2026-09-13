@@ -64,7 +64,7 @@ export function Select({
     <div ref={ref} className="relative">
       <motion.button
         type="button"
-        className="flex w-full items-center justify-between gap-2 border bg-transparent px-2 py-1 text-left text-[11px]"
+        className="flex w-full items-center justify-between gap-2 border bg-transparent px-2 py-1 text-left text-[13px]"
         style={{
           borderColor: 'var(--border)',
           color: current ? 'var(--fg)' : 'var(--muted)',
@@ -119,7 +119,7 @@ export function Select({
             role="listbox"
           >
             {options.length === 0 && (
-              <p className="px-2 py-1.5 text-[10px]" style={{ color: 'var(--muted)' }}>
+              <p className="px-2 py-1.5 text-[12px]" style={{ color: 'var(--muted)' }}>
                 {emptyLabel ?? '—'}
               </p>
             )}
@@ -129,7 +129,7 @@ export function Select({
                 type="button"
                 role="option"
                 aria-selected={o.value === value}
-                className="flex w-full items-center gap-2 px-2 py-1.5 text-left text-[11px]"
+                className="flex w-full items-center gap-2 px-2 py-1.5 text-left text-[13px]"
                 style={{
                   background: o.value === value ? 'rgba(255,255,255,.05)' : 'transparent',
                   color: 'var(--fg)',
@@ -146,7 +146,7 @@ export function Select({
                 <span className="flex min-w-0 flex-col items-start">
                   <span className="truncate">{o.label}</span>
                   {o.sublabel && (
-                    <span className="truncate text-[9px]" style={{ color: 'var(--muted)' }}>
+                    <span className="truncate text-[11px]" style={{ color: 'var(--muted)' }}>
                       {o.sublabel}
                     </span>
                   )}

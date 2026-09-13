@@ -6,7 +6,7 @@ export function Unreachable({ nodeAddress }: { nodeAddress: string }) {
   return (
     <Card>
       <CardLabel>{t('unreachable.title', { host: nodeAddress })}</CardLabel>
-      <p className="mt-2 text-[11px] text-[var(--muted)]">{t('unreachable.description')}</p>
+      <p className="mt-2 text-[13px] text-[var(--muted)]">{t('unreachable.description')}</p>
     </Card>
   )
 }

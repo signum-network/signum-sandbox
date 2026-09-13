@@ -71,7 +71,7 @@ export function BlockRow({
 
   return (
     <li className="border-b" style={{ borderColor: 'var(--border2)' }}>
-      <div className="flex items-center justify-between py-2 text-[11px]">
+      <div className="flex items-center justify-between py-2 text-[13px]">
         <RowButton
           className="flex-1 text-left"
           onClick={() => setOpen(!open)}
@@ -99,7 +99,7 @@ export function BlockRow({
 
       {open && transactions.length > 0 && (
         <ul
-          className="mb-2 border-l-2 pl-3 text-[11px]"
+          className="mb-2 border-l-2 pl-3 text-[13px]"
           style={{ borderColor: 'var(--blue2)', background: 'rgba(0,102,255,.06)' }}
         >
           {transactions.map((tx) => (

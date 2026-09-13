@@ -31,7 +31,7 @@ export function ConsoleButton({
       type="button"
       title={title}
       disabled={disabled}
-      className="border px-3 py-1 text-[10px] uppercase tracking-[1px]"
+      className="border px-3 py-1 text-[12px] uppercase tracking-[1px]"
       style={{
         borderColor: active ? 'var(--blue2)' : 'var(--border2)',
         color: disabled ? 'var(--muted)' : 'var(--blue3)',

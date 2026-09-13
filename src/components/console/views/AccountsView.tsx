@@ -34,15 +34,15 @@ export function AccountsView({
   if (!store.available) {
     return (
       <div className="p-4">
-        <p className="text-[12px] font-bold text-[var(--blue3)]">{t('console.guard.title')}</p>
-        <p className="mt-2 text-[11px] text-[var(--muted)]">
+        <p className="text-[14px] font-bold text-[var(--blue3)]">{t('console.guard.title')}</p>
+        <p className="mt-2 text-[13px] text-[var(--muted)]">
           {t('console.guard.description', { network: store.networkName ?? '—' })}
         </p>
       </div>
     )
   }
 
-  const field = 'border bg-transparent px-2 py-1 text-[11px] text-[var(--fg)]'
+  const field = 'border bg-transparent px-2 py-1 text-[13px] text-[var(--fg)]'
   const border = { borderColor: 'var(--border2)' }
 
   const shown = store.accounts.filter((account) =>
@@ -51,7 +51,7 @@ export function AccountsView({
 
   return (
     <div>
-      <div className="mb-2 text-[10px] font-bold uppercase tracking-[2px] text-[var(--blue3)]">
+      <div className="mb-2 text-[12px] font-bold uppercase tracking-[2px] text-[var(--blue3)]">
         {t('console.accounts.sectionOwned')}
       </div>
 
@@ -61,7 +61,7 @@ export function AccountsView({
         holds the passphrase for. Said once, plainly, rather than left for
         the reader to guess from an unlabelled input.
       */}
-      <p className="mb-2 text-[10px] text-[var(--muted)]">{t('console.accounts.nameHint')}</p>
+      <p className="mb-2 text-[12px] text-[var(--muted)]">{t('console.accounts.nameHint')}</p>
 
       {/*
         Two stacked, dividing-lined rows rather than one wrapping line: create
@@ -116,7 +116,7 @@ export function AccountsView({
       </div>
 
       {shown.length === 0 && (
-        <p className="text-[11px] text-[var(--muted)]">{t('console.accounts.none')}</p>
+        <p className="text-[13px] text-[var(--muted)]">{t('console.accounts.none')}</p>
       )}
 
       <ul>

@@ -28,7 +28,7 @@ export function Pager({
 
   return (
     <div
-      className="mt-2 flex items-center gap-3 border-t pt-2 text-[10px] text-[var(--muted)]"
+      className="mt-2 flex items-center gap-3 border-t pt-2 text-[12px] text-[var(--muted)]"
       style={{ borderColor: 'var(--border2)' }}
     >
       <span className="tabular-nums">{t('console.pager.range', { from, to, total })}</span>

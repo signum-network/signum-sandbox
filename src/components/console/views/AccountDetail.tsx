@@ -96,7 +96,7 @@ export function AccountDetail({
 
   return (
     <div
-      className="mb-2 border-l-2 py-2 pl-3 text-[11px]"
+      className="mb-2 border-l-2 py-2 pl-3 text-[13px]"
       style={{ borderColor: 'var(--blue2)', background: 'rgba(0,102,255,.06)' }}
     >
       <PassphraseField passphrase={account.passphrase} />

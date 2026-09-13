@@ -14,8 +14,8 @@ export function FirstVisit({ onAnswer }: { onAnswer: (beginner: boolean) => void
 
   return (
     <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-4 p-6 text-center">
-      <p className="text-[13px] text-[var(--blue3)]">{t('console.firstVisit.title')}</p>
-      <p className="max-w-[420px] text-[11px] leading-relaxed text-[var(--muted)]">
+      <p className="text-[15px] text-[var(--blue3)]">{t('console.firstVisit.title')}</p>
+      <p className="max-w-[420px] text-[13px] leading-relaxed text-[var(--muted)]">
         {t('console.firstVisit.description')}
       </p>
       <div className="flex flex-wrap items-start justify-center gap-3">
@@ -24,7 +24,7 @@ export function FirstVisit({ onAnswer }: { onAnswer: (beginner: boolean) => void
             <ConsoleButton onClick={() => onAnswer(beginner)}>
               {t(beginner ? 'console.firstVisit.newHere' : 'console.firstVisit.oldHand')}
             </ConsoleButton>
-            <span className="text-[10px] leading-relaxed text-[var(--muted)]">
+            <span className="text-[12px] leading-relaxed text-[var(--muted)]">
               {t(beginner ? 'console.firstVisit.newHereNote' : 'console.firstVisit.oldHandNote')}
             </span>
           </div>

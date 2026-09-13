@@ -33,7 +33,7 @@ function Direction({
 
   return (
     <div className="flex-1">
-      <div className="mb-1 text-[9px] uppercase tracking-[2px] text-[var(--blue3)]">{label}</div>
+      <div className="mb-1 text-[11px] uppercase tracking-[2px] text-[var(--blue3)]">{label}</div>
       {transactions?.length ? (
         <ul>
           {transactions.map((tx) => {
@@ -42,7 +42,7 @@ function Direction({
             return (
               <li key={tx.transaction} className="border-b" style={{ borderColor: 'var(--border2)' }}>
                 <RowButton
-                  className="w-full py-1 text-left text-[11px]"
+                  className="w-full py-1 text-left text-[13px]"
                   onClick={() => onSelectTransaction(tx.transaction)}
                 >
                   <span className="text-[var(--blue3)]">{t(`console.kind.${summary.kind}`)}</span>
@@ -57,7 +57,7 @@ function Direction({
           })}
         </ul>
       ) : (
-        <p className="text-[11px] text-[var(--muted)]">{t('console.watch.nothing')}</p>
+        <p className="text-[13px] text-[var(--muted)]">{t('console.watch.nothing')}</p>
       )}
     </div>
   )
@@ -126,17 +126,17 @@ export function WatchView({
     <div>
       <div className="mb-3 flex items-center gap-3">
         <Identicon value={address} size={24} />
-        <span className="text-[13px] font-bold text-[var(--blue3)]">
+        <span className="text-[15px] font-bold text-[var(--blue3)]">
           {displayName(accountId, accounts, contacts, chain?.name)}
         </span>
-        <span className="text-[11px] text-[var(--muted)]">{address}</span>
+        <span className="text-[13px] text-[var(--muted)]">{address}</span>
         <span className="ml-auto">
           <ConsoleButton onClick={onUnwatch}>{t('console.watch.stop')}</ConsoleButton>
         </span>
       </div>
 
       {notOnChain ? (
-        <p className="text-[11px] text-[var(--muted)]">{t('console.accounts.notOnChain')}</p>
+        <p className="text-[13px] text-[var(--muted)]">{t('console.accounts.notOnChain')}</p>
       ) : (
         <>
           <Row label={t('console.accounts.balance')}>
