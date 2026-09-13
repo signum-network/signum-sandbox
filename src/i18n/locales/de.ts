@@ -42,6 +42,10 @@ export default {
       term: 'Adresse',
       help: 'Die Account-Id in lesbarer Form: dieselbe Zahl, in Blöcke gruppiert hinter einem Netz-Präfix, mit einer Prüfsumme am Ende, damit ein Tippfehler auffällt, statt Geld ins Nichts zu schicken. Adresse und Id benennen dasselbe Konto.',
     },
+    did: {
+      term: 'DID',
+      help: 'Ein dezentraler Identifikator: ein Name für etwas, den keine Firma vergeben hat und keine Registrierstelle wieder einziehen kann. Signum-Konten, -Transaktionen und -Aliasse folgen dem W3C-Standard, lassen sich also als did:signum:… schreiben und zu einem Dokument auflösen, das ihren Public Key und ihr Profil nennt. Genau das erlaubt einer fremden Anwendung, eine Aussage über ein Konto zu prüfen, ohne jemandem dazwischen vertrauen zu müssen.',
+    },
     unconfirmed: {
       term: 'Unbestätigt',
       help: 'Abgeschickt, aber noch in keinem Block. Der Node hält sie fest. Forge einen Block und sieh zu, wie sie sich setzt.',

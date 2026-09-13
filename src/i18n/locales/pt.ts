@@ -42,6 +42,10 @@ export default {
       term: 'Endereço',
       help: 'O id da conta em forma legível: o mesmo número, reagrupado em blocos depois de um prefixo de rede e com uma soma de verificação no fim, para que um erro de escrita seja apanhado em vez de enviar dinheiro a ninguém. Endereço e id nomeiam a mesma conta.',
     },
+    did: {
+      term: 'DID',
+      help: 'Um identificador descentralizado: um nome que nenhuma empresa emitiu e que nenhum registo pode retirar. As contas, transações e alias da Signum seguem a norma do W3C, por isso cada um pode escrever-se como did:signum:… e resolver-se num documento que indica a sua chave pública e o seu perfil. É isso que permite a outra aplicação verificar uma afirmação sobre uma conta sem ter de confiar em ninguém pelo meio.',
+    },
     unconfirmed: {
       term: 'Não confirmada',
       help: 'Enviada, mas ainda não está num bloco. O nó está a segurá-la. Forja um bloco e vê-a assentar.',

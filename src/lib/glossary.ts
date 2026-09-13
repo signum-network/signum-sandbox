@@ -18,6 +18,9 @@ export const GLOSSARY_TERMS = [
   'publicKey',
   'accountId',
   'address',
+  // The identifier the four of them add up to, and the reason a chain is
+  // useful for verification at all.
+  'did',
   'unconfirmed',
   'fee',
   'payload',

@@ -42,6 +42,10 @@ export default {
       term: 'Dirección',
       help: 'El id de cuenta en forma legible: el mismo número, reagrupado en bloques tras un prefijo de red y con una suma de control al final, de modo que una errata se detecta en vez de enviar dinero a nadie. Dirección e id nombran la misma cuenta.',
     },
+    did: {
+      term: 'DID',
+      help: 'Un identificador descentralizado: un nombre que ninguna empresa emitió y que ningún registro puede retirar. Las cuentas, transacciones y alias de Signum siguen el estándar del W3C, así que cada uno puede escribirse como did:signum:… y resolverse en un documento que indica su clave pública y su perfil. Eso es lo que permite a otra aplicación verificar una afirmación sobre una cuenta sin tener que fiarse de nadie por el camino.',
+    },
     unconfirmed: {
       term: 'Sin confirmar',
       help: 'Enviada, pero todavía no está en un bloque. El nodo la tiene retenida. Forja un bloque y verás cómo se asienta.',

@@ -53,6 +53,10 @@ export default {
       term: 'Address',
       help: 'The account id in readable form: the same number, regrouped into blocks behind a network prefix, with a checksum on the end so a typo is caught instead of sending money to nobody. Address and id name the same account.',
     },
+    did: {
+      term: 'DID',
+      help: 'A decentralised identifier: a name for something that no company issued and no registry can take away. Signum accounts, transactions and aliases follow the W3C standard, so each can be written as did:signum:… and resolved into a document naming its public key and its profile. That is what lets another application verify a claim about an account without having to trust anyone in between.',
+    },
     unconfirmed: {
       term: 'Unconfirmed',
       help: 'Sent, but not yet in a block. The node is holding it. Forge a block and watch it settle.',
