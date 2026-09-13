@@ -9,6 +9,72 @@ export default {
     comingSoon: 'em breve',
   },
   unreachable: { title: 'Nenhum nó em {{host}}', description: 'Inicie-o com ./scripts/start.sh' },
+  glossary: {
+    block: {
+      term: 'Bloco',
+      help: 'Um lote de transações, escrito na cadeia de uma só vez e depois inalterável. Enquanto uma transação não estiver num bloco, não aconteceu mesmo.',
+    },
+    height: {
+      term: 'Altura',
+      help: 'Quantos blocos a cadeia tem. Só conta para cima, por isso serve também de relógio da cadeia.',
+    },
+    forge: {
+      term: 'Forjar',
+      help: 'Criar o bloco seguinte. O Signum diz forjar em vez de minerar porque custa um disco rígido e não eletricidade. Aqui custa carregar num botão.',
+    },
+    forger: {
+      term: 'Forjador',
+      help: 'A conta a que os blocos que forjas são creditados e que recebe as suas taxas e recompensas. Escolhe uma antes de forjar.',
+    },
+    passphrase: {
+      term: 'Frase-passe',
+      help: 'Não é uma palavra-passe que protege uma conta: *é* a conta. O endereço é calculado a partir dela, a mesma frase dá sempre a mesma conta, e ninguém consegue recuperar uma frase perdida.',
+    },
+    address: {
+      term: 'Endereço',
+      help: 'Onde uma conta pode ser alcançada, calculado a partir da sua frase-passe. As letras a seguir ao prefixo são uma soma de verificação: um erro de escrita é apanhado em vez de mandar dinheiro para lado nenhum.',
+    },
+    publicKey: {
+      term: 'Chave pública',
+      help: 'A metade aberta da conta. Uma conta que nunca recebeu nada é desconhecida da cadeia, por isso o primeiro pagamento para ela tem de levar esta chave consigo.',
+    },
+    unconfirmed: {
+      term: 'Não confirmada',
+      help: 'Enviada, mas ainda não está num bloco. O nó está a segurá-la. Forja um bloco e vê-a assentar.',
+    },
+    fee: {
+      term: 'Taxa',
+      help: 'O que uma transação custa a quem a envia, paga a quem forja o bloco. O Signum define um mínimo por tipo de transação e por tamanho do anexo.',
+    },
+    payload: {
+      term: 'Conteúdo',
+      help: 'Dados que a transação leva consigo: texto simples, texto cifrado ou um registo estruturado. É esta parte que torna uma cadeia útil para mais do que dinheiro.',
+    },
+    src44: {
+      term: 'SRC44',
+      help: 'O formato combinado do Signum para o conteúdo: nome, descrição, tipo, ligações e os teus próprios campos. Como toda a gente usa o mesmo formato, outras aplicações conseguem ler o que escreves.',
+    },
+    token: {
+      term: 'Token',
+      help: 'Um ativo teu na cadeia, com nome, quantidade e casas decimais próprios. O Signum faz isto nativamente: sem contrato inteligente, sem implantação.',
+    },
+    alias: {
+      term: 'Alias',
+      help: 'Um nome registado na cadeia que aponta para algo: uma conta, uma ligação ou o conteúdo que escolheres. Um registo de nomes dentro do próprio protocolo.',
+    },
+    subscription: {
+      term: 'Subscrição',
+      help: 'Um pagamento que se repete sozinho. Configura-lo uma vez e a cadeia executa-o até ser cancelado.',
+    },
+    multiOut: {
+      term: 'Multi-Out',
+      help: 'Uma transação que paga a muitas contas: até 64 com valores diferentes, ou 128 a receberem todas o mesmo. Uma taxa em vez de cem.',
+    },
+    contact: {
+      term: 'Contacto',
+      help: 'Um nome que dás a uma conta que não é tua, guardado apenas neste navegador. Torna o fluxo legível sem escrever nada na cadeia.',
+    },
+  },
   console: {
     back: 'Página inicial',
     tab: { transactions: 'Transações', blocks: 'Blocos', accounts: 'Contas' },

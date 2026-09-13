@@ -9,6 +9,72 @@ export default {
     comingSoon: 'kommt als Nächstes',
   },
   unreachable: { title: 'Kein Node auf {{host}}', description: 'Starte ihn mit ./scripts/start.sh' },
+  glossary: {
+    block: {
+      term: 'Block',
+      help: 'Ein Bündel Transaktionen, in einem Zug in die Chain geschrieben und danach unveränderlich. Solange eine Transaktion in keinem Block steht, ist sie nicht wirklich passiert.',
+    },
+    height: {
+      term: 'Höhe',
+      help: 'Wie viele Blöcke die Chain hat. Sie zählt nur aufwärts und ist damit zugleich die Uhr der Chain.',
+    },
+    forge: {
+      term: 'Forgen',
+      help: 'Den nächsten Block erzeugen. Signum sagt forgen statt minen, weil es eine Festplatte kostet und keinen Strom. Hier kostet es einen Knopfdruck.',
+    },
+    forger: {
+      term: 'Forger',
+      help: 'Das Konto, dem deine Blöcke gutgeschrieben werden und das ihre Gebühren und Belohnungen einsammelt. Wähle eines, bevor du forgst.',
+    },
+    passphrase: {
+      term: 'Passphrase',
+      help: 'Kein Passwort, das ein Konto schützt — sie *ist* das Konto. Die Adresse wird aus ihr berechnet, dieselbe Passphrase ergibt immer dasselbe Konto, und eine verlorene kann niemand wiederherstellen.',
+    },
+    address: {
+      term: 'Adresse',
+      help: 'Wo ein Konto erreichbar ist, berechnet aus seiner Passphrase. Die Zeichen hinter dem Präfix sind eine Prüfsumme — ein Tippfehler fällt auf, statt Geld ins Nichts zu schicken.',
+    },
+    publicKey: {
+      term: 'Public Key',
+      help: 'Die offene Hälfte des Kontos. Ein Konto, das noch nie etwas empfangen hat, kennt die Chain nicht — die erste Zahlung dorthin muss diesen Schlüssel mitbringen.',
+    },
+    unconfirmed: {
+      term: 'Unbestätigt',
+      help: 'Abgeschickt, aber noch in keinem Block. Der Node hält sie fest. Forge einen Block und sieh zu, wie sie sich setzt.',
+    },
+    fee: {
+      term: 'Gebühr',
+      help: 'Was eine Transaktion ihren Sender kostet, gezahlt an den, der den Block forgt. Signum legt ein Minimum je Transaktionsart und je Anhangsgröße fest.',
+    },
+    payload: {
+      term: 'Payload',
+      help: 'Daten, die eine Transaktion mitführt — Klartext, verschlüsselter Text oder ein strukturierter Datensatz. Dieser Teil macht eine Chain zu mehr als Geld.',
+    },
+    src44: {
+      term: 'SRC44',
+      help: 'Signums vereinbarte Form für Payload: Name, Beschreibung, Typ, Links und eigene Felder. Weil alle dieselbe Form nutzen, können andere Anwendungen lesen, was du schreibst.',
+    },
+    token: {
+      term: 'Token',
+      help: 'Ein eigener Wert auf der Chain, mit Name, Menge und Nachkommastellen. Signum kann das nativ — kein Smart Contract, kein Deployment.',
+    },
+    alias: {
+      term: 'Alias',
+      help: 'Ein auf der Chain registrierter Name, der auf etwas zeigt: ein Konto, einen Link oder beliebigen Inhalt. Ein Namensregister im Protokoll selbst.',
+    },
+    subscription: {
+      term: 'Subscription',
+      help: 'Eine Zahlung, die sich von selbst wiederholt. Einmal eingerichtet, führt die Chain sie aus, bis sie gekündigt wird.',
+    },
+    multiOut: {
+      term: 'Multi-Out',
+      help: 'Eine Transaktion, die viele Konten bezahlt — bis zu 64 mit einzelnen Beträgen oder 128 mit demselben. Eine Gebühr statt hundert.',
+    },
+    contact: {
+      term: 'Kontakt',
+      help: 'Ein Name, den du einem fremden Konto gibst, nur in diesem Browser gespeichert. Er macht den Stream lesbar, ohne etwas auf die Chain zu schreiben.',
+    },
+  },
   console: {
     back: 'Startseite',
     tab: { transactions: 'Transaktionen', blocks: 'Blöcke', accounts: 'Accounts' },

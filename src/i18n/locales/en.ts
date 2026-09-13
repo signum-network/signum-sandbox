@@ -20,6 +20,72 @@ export default {
     title: 'No node at {{host}}',
     description: 'Start it with ./scripts/start.sh',
   },
+  glossary: {
+    block: {
+      term: 'Block',
+      help: 'A batch of transactions, written to the chain in one go and never changed afterwards. Until a transaction is in a block, it has not really happened.',
+    },
+    height: {
+      term: 'Height',
+      help: 'How many blocks the chain has. It only ever counts up, so it doubles as the chain’s clock.',
+    },
+    forge: {
+      term: 'Forge',
+      help: 'Making the next block. Signum calls it forging rather than mining because it costs a hard drive, not electricity. Here it costs one button press.',
+    },
+    forger: {
+      term: 'Forger',
+      help: 'The account credited with the blocks you make, and the one that collects their fees and rewards. Pick one before forging.',
+    },
+    passphrase: {
+      term: 'Passphrase',
+      help: 'Not a password protecting an account — it *is* the account. The address is calculated from it, so the same passphrase always gives the same account, and nobody can restore a lost one.',
+    },
+    address: {
+      term: 'Address',
+      help: 'Where an account can be reached, calculated from its passphrase. The letters after the prefix are a checksum, so a typo is caught rather than sending money to nobody.',
+    },
+    publicKey: {
+      term: 'Public key',
+      help: 'The account’s open half. An account that has never received anything is unknown to the chain, so the first payment to it has to carry this key along.',
+    },
+    unconfirmed: {
+      term: 'Unconfirmed',
+      help: 'Sent, but not yet in a block. The node is holding it. Forge a block and watch it settle.',
+    },
+    fee: {
+      term: 'Fee',
+      help: 'What a transaction costs its sender, paid to whoever forges the block. Signum sets a minimum per transaction type and per attachment size.',
+    },
+    payload: {
+      term: 'Payload',
+      help: 'Data carried along by a transaction — plain text, encrypted text, or a structured record. This is the part that makes a chain useful for more than money.',
+    },
+    src44: {
+      term: 'SRC44',
+      help: 'Signum’s agreed shape for a payload: name, description, type, links and your own fields. Because everyone uses the same shape, other applications can read what you write.',
+    },
+    token: {
+      term: 'Token',
+      help: 'Your own asset on the chain, with its own name, supply and decimals. Signum does this natively — no smart contract, no deployment.',
+    },
+    alias: {
+      term: 'Alias',
+      help: 'A name registered on the chain that points at something: an account, a link, or any content you choose. A name registry built into the protocol.',
+    },
+    subscription: {
+      term: 'Subscription',
+      help: 'A payment that repeats on its own. You set it up once and the chain carries it out until it is cancelled.',
+    },
+    multiOut: {
+      term: 'Multi-out',
+      help: 'One transaction paying many accounts — up to 64 with individual amounts, or 128 all getting the same. One fee instead of a hundred.',
+    },
+    contact: {
+      term: 'Contact',
+      help: 'A name you give an account you do not own, kept in this browser only. It makes the stream readable without putting anything on the chain.',
+    },
+  },
   console: {
     back: 'Start page',
     tab: { transactions: 'Transactions', blocks: 'Blocks', accounts: 'Accounts' },
