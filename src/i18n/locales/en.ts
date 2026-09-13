@@ -327,7 +327,7 @@ export default {
       },
       passphraseIsTheAccount: {
         title: 'That passphrase is the account',
-        body: 'It is not a password protecting an account. The address you see was calculated from those words. Type them again anywhere in the world and you get the same account back.',
+        body: 'It is not a password protecting an account — it is the seed the account grows from. Signum turns it into a key pair: the private key signs your transactions, the public key lets anyone check that signature, and the account id behind the address you see was derived from that public key. Type the same words anywhere in the world and you get the same account back.',
       },
       passphraseIsForever: {
         title: 'Nobody can give it back to you',

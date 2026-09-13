@@ -316,7 +316,7 @@ export default {
       },
       passphraseIsTheAccount: {
         title: 'Essa frase-passe é a conta',
-        body: 'Não é uma palavra-passe que protege uma conta. O endereço que vês foi calculado a partir dessas palavras. Escreve-as outra vez em qualquer parte do mundo e tens a mesma conta de volta.',
+        body: 'Não é uma palavra-passe que protege uma conta: é a semente de onde a conta nasce. A Signum transforma-a num par de chaves — a privada assina as tuas transações, a pública deixa qualquer um verificar essa assinatura, e o id da conta por trás do endereço que vês foi derivado dessa chave pública. Escreve as mesmas palavras em qualquer parte do mundo e tens a mesma conta de volta.',
       },
       passphraseIsForever: {
         title: 'Ninguém ta pode devolver',
