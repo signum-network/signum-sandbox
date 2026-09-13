@@ -189,6 +189,38 @@ The console asks once, on first entry: new here, or an old hand? The answer sets
 
 This couples the tour to the rest of the UI, and that coupling is designed in from the start rather than bolted on: components that the tour needs to highlight or pre-fill expose that capability, and steps complete against observed state rather than against clicks. The tour content itself belongs to the second delivery layer, but the hooks are built with the components.
 
+## Decentralised identifiers
+
+Signum entities are W3C DID conformant, which is the feature that makes the
+chain interesting for verification: an account, a transaction or an alias can
+be named by a `did:signum:…` identifier and resolved to a DID document. The
+console links these alongside the raw JSON response it already offers.
+
+**The resolver lives in the console, not beside it.** `signum-did-resolver`
+exists as a hosted Vercel service, and self-hosting it would mean a Node
+runtime next to the JVM, a second process, a second port and a second thing to
+package — for a project whose deliverable is one jar and one script. It also
+recognises exactly three networks (`mainnet`, `testnet`, `stagenet`) with no
+mechanism for registering another, so running it against a mock chain would
+mean maintaining a fork. Resolution is a pure transformation of data the
+console has already loaded — account id, public key, SRC44 profile — so it is
+a function in `src/lib/`, tested the way everything else there is, and it works
+offline.
+
+**The network segment is `sandbox`.** A DID printed without one claims mainnet,
+and someone could reasonably paste it into the real resolver and get nothing;
+`did:signum:sandbox:acc:…` says where it resolves and where it does not.
+`sandbox` rather than `mocknet` because it names the thing a reader is holding.
+This extends the method by one network, which is a change worth making
+upstream in the resolver rather than only here.
+
+The documents the console produces match the shape the real resolver returns —
+`didResolutionMetadata`, a `didDocument` carrying `@context`,
+`verificationMethod` and `src44`, and `didDocumentMetadata` — so what a
+newcomer learns here is what they will meet outside.
+
+Delivered after the scenarios, with its own plan.
+
 ## Architecture
 
 ```
