@@ -11,6 +11,7 @@ import type { SandboxAccount } from '@/lib/accounts'
 import { Identicon } from '../Identicon'
 import { ConsoleButton, RowButton } from '../ConsoleButton'
 import { Row } from './AccountFields'
+import { Term } from '@/components/console/Term'
 
 /** How much of each direction the view shows before it stops being a summary. */
 const RECENT = 10
@@ -147,7 +148,7 @@ export function WatchView({
               {field.value}
             </Row>
           ))}
-          <Row label={t('console.accounts.holdings')}>
+          <Row label={<Term id="token">{t('console.accounts.holdings')}</Term>}>
             {chain?.assetBalances?.length
               ? chain.assetBalances.map((b) => `${b.balanceQNT} × ${b.asset}`).join(', ')
               : t('console.accounts.noHoldings')}

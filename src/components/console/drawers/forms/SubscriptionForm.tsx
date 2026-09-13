@@ -7,6 +7,7 @@ import type { Contacts } from '@/lib/contacts'
 import { createSubscription, resolveRecipientPublicKey } from '@/lib/send'
 import { useFromAccount } from '@/hooks/useFromAccount'
 import { AccountSelect, FeeField, Field, RecipientPicker, SubmitButton, TextInput } from './fields'
+import { Term } from '@/components/console/Term'
 
 export function SubscriptionForm({
   accounts,
@@ -65,7 +66,7 @@ export function SubscriptionForm({
       <Field label={t('console.send.amount')}>
         <TextInput value={amount} onChange={setAmount} placeholder="100" />
       </Field>
-      <Field label={t('console.send.frequency')}>
+      <Field label={<Term id="subscription">{t('console.send.frequency')}</Term>}>
         <TextInput value={frequency} onChange={setFrequency} placeholder="3600" />
       </Field>
       <FeeField action="subscription" value={fee} onChange={setFee} />

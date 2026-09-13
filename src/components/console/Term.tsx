@@ -14,6 +14,11 @@ import { useBeginnerMode } from './BeginnerMode'
  * `children` is for the places where the surrounding sentence needs its own
  * wording: the tooltip still comes from the glossary, but the visible word is
  * whatever fits the line.
+ *
+ * Several of these words are inside a button — the forge button, a row that
+ * expands, a toggle — so the `i` stops the click going any further. Pressing
+ * a help icon must never be pressing what it is explaining, and a newcomer
+ * asking what forging is should not thereby forge.
  */
 export function Term({ id, children }: { id: GlossaryTerm; children?: ReactNode }) {
   const { t } = useTranslation()
@@ -25,7 +30,15 @@ export function Term({ id, children }: { id: GlossaryTerm; children?: ReactNode 
   return (
     <span className="inline-flex items-center gap-1">
       {label}
-      <InfoTooltip text={t(helpKey(id))} />
+      <span
+        onClick={(event) => {
+          event.stopPropagation()
+          event.preventDefault()
+        }}
+        className="inline-flex"
+      >
+        <InfoTooltip text={t(helpKey(id))} />
+      </span>
     </span>
   )
 }

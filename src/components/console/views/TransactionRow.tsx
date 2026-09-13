@@ -105,7 +105,11 @@ export function TransactionRow({
         </span>
         <span className={item.confirmed ? 'text-[var(--muted)]' : 'text-[var(--blue3)]'}>
           {item.confirmed
-            ? t('console.tx.block', { height: item.tx.height ?? '—' })
+            ? (
+                <Term id="block">
+                  {t('console.tx.block', { height: item.tx.height ?? '—' })}
+                </Term>
+              )
             : <Term id="unconfirmed">{t('console.tx.unconfirmed')}</Term>}
         </span>
       </RowButton>

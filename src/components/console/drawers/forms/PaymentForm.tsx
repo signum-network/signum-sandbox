@@ -9,6 +9,7 @@ import { useFromAccount } from '@/hooks/useFromAccount'
 import { Toggle } from '@/components/console/Toggle'
 import { AccountSelect, FeeField, Field, RecipientPicker, SubmitButton, TextInput } from './fields'
 import { PayloadEditor, usePayload } from './payload'
+import { Term } from '@/components/console/Term'
 
 export function PaymentForm({
   accounts,
@@ -71,7 +72,11 @@ export function PaymentForm({
         <TextInput value={amount} onChange={setAmount} placeholder="100" />
       </Field>
       <div className="mb-2">
-        <Toggle checked={attach} onChange={setAttach} label={t('console.send.attach')} />
+        <Toggle
+          checked={attach}
+          onChange={setAttach}
+          label={<Term id="payload">{t('console.send.attach')}</Term>}
+        />
       </div>
       {attach && (
         <PayloadEditor state={payload} label={t('console.send.message')} variant="attachment" />

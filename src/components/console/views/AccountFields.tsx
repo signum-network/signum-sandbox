@@ -2,13 +2,14 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { ReactNode } from 'react'
 import { ConsoleButton } from '../ConsoleButton'
+import { Term } from '@/components/console/Term'
 
 export const actionButton =
   'border px-2 py-[1px] text-[10px] uppercase tracking-[1px] text-[var(--blue3)]'
 export const actionBorder = { borderColor: 'var(--border2)' }
 
 /** One labelled line of an account's detail, so every line lines up. */
-export function Row({ label, children }: { label: string; children: ReactNode }) {
+export function Row({ label, children }: { label: ReactNode; children: ReactNode }) {
   return (
     <div className="flex flex-wrap items-baseline gap-3 py-[2px]">
       <span className="min-w-[110px] text-[var(--muted)]">{label}</span>
@@ -47,7 +48,7 @@ export function PassphraseField({ passphrase }: { passphrase: string }) {
   const { t } = useTranslation()
   const [revealed, setRevealed] = useState(false)
   return (
-    <Row label={t('console.accounts.passphrase')}>
+    <Row label={<Term id="passphrase">{t('console.accounts.passphrase')}</Term>}>
       <span className="font-mono">{revealed ? passphrase : '•'.repeat(24)}</span>{' '}
       <ConsoleButton onClick={() => setRevealed(!revealed)}>
         {revealed ? t('console.accounts.passphraseHide') : t('console.accounts.passphraseReveal')}

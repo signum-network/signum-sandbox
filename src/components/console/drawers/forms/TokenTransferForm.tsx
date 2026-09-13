@@ -12,6 +12,7 @@ import { Select } from '@/components/console/Select'
 import { Toggle } from '@/components/console/Toggle'
 import { AccountSelect, FeeField, Field, RecipientPicker, SubmitButton, TextInput } from './fields'
 import { PayloadEditor, usePayload } from './payload'
+import { Term } from '@/components/console/Term'
 
 export function TokenTransferForm({
   accounts,
@@ -100,7 +101,11 @@ export function TokenTransferForm({
         <TextInput value={quantity} onChange={setQuantity} placeholder="1" />
       </Field>
       <label className="mb-2 flex items-center gap-2">
-        <Toggle checked={attach} onChange={setAttach} label={t('console.send.attach')} />
+        <Toggle
+          checked={attach}
+          onChange={setAttach}
+          label={<Term id="payload">{t('console.send.attach')}</Term>}
+        />
       </label>
       {attach && (
         <PayloadEditor state={payload} label={t('console.send.message')} variant="attachment" />

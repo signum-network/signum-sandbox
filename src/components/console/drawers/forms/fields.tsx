@@ -8,6 +8,7 @@ import type { Contacts } from '@/lib/contacts'
 import { ConsoleButton } from '@/components/console/ConsoleButton'
 import { Identicon } from '@/components/console/Identicon'
 import { Select } from '@/components/console/Select'
+import { Term } from '@/components/console/Term'
 
 const border = { borderColor: 'var(--border2)' }
 
@@ -34,7 +35,7 @@ export function knownRecipients(accounts: SandboxAccount[], contacts: Contacts):
   return [...owned, ...fromContacts]
 }
 
-export function Field({ label, children }: { label: string; children: ReactNode }) {
+export function Field({ label, children }: { label: ReactNode; children: ReactNode }) {
   return (
     <label className="mb-2 block">
       <span className="mb-1 block text-[9px] uppercase tracking-[1px] text-[var(--muted)]">
@@ -315,7 +316,7 @@ export function FeeField({
 }) {
   const { t } = useTranslation()
   return (
-    <Field label={t('console.send.fee')}>
+    <Field label={<Term id="fee">{t('console.send.fee')}</Term>}>
       <SuggestInput
         value={value}
         onChange={onChange}

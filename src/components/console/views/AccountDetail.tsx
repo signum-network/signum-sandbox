@@ -10,6 +10,7 @@ import { summarize } from '@/lib/txSummary'
 import { displayName, type Contacts } from '@/lib/contacts'
 import { PassphraseField, Row } from './AccountFields'
 import { RowButton } from '../ConsoleButton'
+import { Term } from '@/components/console/Term'
 
 /** How much of an account's history the detail shows before it stops being a summary. */
 const RECENT = 5
@@ -100,7 +101,7 @@ export function AccountDetail({
     >
       <PassphraseField passphrase={account.passphrase} />
       <Row label={t('console.accounts.id')}>{account.id}</Row>
-      <Row label={t('console.accounts.address')}>{account.address}</Row>
+      <Row label={<Term id="address">{t('console.accounts.address')}</Term>}>{account.address}</Row>
 
       {notOnChain ? (
         <p className="mt-1 text-[var(--muted)]">{t('console.accounts.notOnChain')}</p>
@@ -118,7 +119,7 @@ export function AccountDetail({
           </Row>
 
           {chain?.publicKey && (
-            <Row label={t('console.accounts.publicKey')}>
+            <Row label={<Term id="publicKey">{t('console.accounts.publicKey')}</Term>}>
               <span className="font-mono break-all">{chain.publicKey}</span>
             </Row>
           )}
@@ -135,7 +136,7 @@ export function AccountDetail({
                 <Row label={t('console.accounts.description')}>{chain.description}</Row>
               )}
 
-          <Row label={t('console.accounts.holdings')}>
+          <Row label={<Term id="token">{t('console.accounts.holdings')}</Term>}>
             {chain?.assetBalances?.length ? (
               <span className="flex flex-col gap-[2px]">
                 {chain.assetBalances.map((b) => (
@@ -147,7 +148,7 @@ export function AccountDetail({
             )}
           </Row>
 
-          <Row label={t('console.accounts.aliases')}>
+          <Row label={<Term id="alias">{t('console.accounts.aliases')}</Term>}>
             {aliases.data?.aliases.length
               ? aliases.data.aliases
                   .map((a) => (a.aliasURI ? `${a.aliasName} → ${a.aliasURI}` : a.aliasName))

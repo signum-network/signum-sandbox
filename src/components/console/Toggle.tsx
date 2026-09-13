@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { motion } from 'framer-motion'
 import { sfx, useAudio } from '@/audio'
 
@@ -16,7 +17,7 @@ export function Toggle({
 }: {
   checked: boolean
   onChange: (checked: boolean) => void
-  label: string
+  label: ReactNode
   disabled?: boolean
 }) {
   const { play } = useAudio()

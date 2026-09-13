@@ -26,6 +26,7 @@ import {
   TextArea,
   TextInput,
 } from './fields'
+import { Term } from '@/components/console/Term'
 
 export function MultiOutForm({
   accounts,
@@ -134,7 +135,7 @@ export function MultiOutForm({
       )}
 
       <span className="mb-1 block text-[9px] uppercase tracking-[1px] text-[var(--muted)]">
-        {t('console.send.recipients')} · {filled.length}/{limit}
+        <Term id="multiOut">{t('console.send.recipients')}</Term> · {filled.length}/{limit}
       </span>
 
       {rows.map((row, index) => (

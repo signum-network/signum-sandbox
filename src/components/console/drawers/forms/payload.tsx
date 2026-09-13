@@ -4,6 +4,7 @@ import { EMPTY_SRC44, buildSrc44, type Src44Fields } from '@/lib/src44'
 import { Toggle } from '@/components/console/Toggle'
 import { Field, TextArea } from './fields'
 import { Src44Form, type Src44Variant } from './Src44Form'
+import { Term } from '@/components/console/Term'
 
 export interface PayloadState {
   structured: boolean
@@ -64,7 +65,7 @@ export function PayloadEditor({
         <Toggle
           checked={state.structured}
           onChange={state.setStructured}
-          label={t('console.src44.structured')}
+          label={<Term id="src44">{t('console.src44.structured')}</Term>}
         />
       </div>
       {state.structured ? (
