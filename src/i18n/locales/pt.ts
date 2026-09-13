@@ -28,15 +28,19 @@ export default {
     },
     passphrase: {
       term: 'Frase-passe',
-      help: 'Não é uma palavra-passe que protege uma conta: *é* a conta. O endereço é calculado a partir dela, a mesma frase dá sempre a mesma conta, e ninguém consegue recuperar uma frase perdida.',
-    },
-    address: {
-      term: 'Endereço',
-      help: 'Onde uma conta pode ser alcançada, calculado a partir da sua frase-passe. As letras a seguir ao prefixo são uma soma de verificação: um erro de escrita é apanhado em vez de mandar dinheiro para lado nenhum.',
+      help: 'Não é uma palavra-passe que protege uma conta: é a semente de onde a conta nasce. A Signum deriva dela um par de chaves — a privada assina as tuas transações, a pública deixa qualquer um verificar essa assinatura. A mesma frase dá as mesmas chaves e a mesma conta em qualquer parte do mundo, e uma frase perdida ninguém a devolve.',
     },
     publicKey: {
       term: 'Chave pública',
-      help: 'A metade aberta da conta. Uma conta que nunca recebeu nada é desconhecida da cadeia, por isso o primeiro pagamento para ela tem de levar esta chave consigo.',
+      help: 'A metade do par de chaves que podes distribuir. É o que prova que uma transação foi mesmo assinada por esta conta, e dela deriva o id da conta. A uma conta que a cadeia nunca viu é preciso enviar a chave pública junto com o primeiro pagamento.',
+    },
+    accountId: {
+      term: 'Id da conta',
+      help: 'Um número derivado da chave pública, e o nome verdadeiro da conta na cadeia: tudo o que o nó sabe sobre uma conta depende dele. O endereço é esse mesmo número escrito para pessoas.',
+    },
+    address: {
+      term: 'Endereço',
+      help: 'O id da conta em forma legível: o mesmo número, reagrupado em blocos depois de um prefixo de rede e com uma soma de verificação no fim, para que um erro de escrita seja apanhado em vez de enviar dinheiro a ninguém. Endereço e id nomeiam a mesma conta.',
     },
     unconfirmed: {
       term: 'Não confirmada',
@@ -60,7 +64,7 @@ export default {
     },
     alias: {
       term: 'Alias',
-      help: 'Um nome registado na cadeia que aponta para algo: uma conta, uma ligação ou o conteúdo que escolheres. Um registo de nomes dentro do próprio protocolo.',
+      help: 'Um nome registado na cadeia que aponta para algo: uma conta, um link ou o conteúdo que escolheres. Cada nome existe uma só vez, aquilo para onde aponta pode mudar quando quiseres, e o próprio alias pode passar para outra conta — quase um NFT editável. Na rede principal da Signum custa cerca de 50 SIGNA por ano.',
     },
     subscription: {
       term: 'Subscrição',

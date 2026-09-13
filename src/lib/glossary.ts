@@ -9,9 +9,15 @@ export const GLOSSARY_TERMS = [
   'height',
   'forge',
   'forger',
+  // Four words that are one idea, listed in the order the chain derives them:
+  // the passphrase is the seed, the seed makes a key pair, the public key
+  // makes the account id, and the address is that id written for people. Read
+  // out of order they look like four unrelated identifiers, which is exactly
+  // the confusion the glossary is here to remove.
   'passphrase',
-  'address',
   'publicKey',
+  'accountId',
+  'address',
   'unconfirmed',
   'fee',
   'payload',

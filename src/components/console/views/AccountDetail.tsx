@@ -100,7 +100,7 @@ export function AccountDetail({
       style={{ borderColor: 'var(--blue2)', background: 'rgba(0,102,255,.06)' }}
     >
       <PassphraseField passphrase={account.passphrase} />
-      <Row label={t('console.accounts.id')}>{account.id}</Row>
+      <Row label={<Term id="accountId">{t('console.accounts.id')}</Term>}>{account.id}</Row>
       <Row label={<Term id="address">{t('console.accounts.address')}</Term>}>{account.address}</Row>
 
       {notOnChain ? (

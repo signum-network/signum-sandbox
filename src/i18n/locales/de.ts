@@ -28,15 +28,19 @@ export default {
     },
     passphrase: {
       term: 'Passphrase',
-      help: 'Kein Passwort, das ein Konto schützt — sie *ist* das Konto. Die Adresse wird aus ihr berechnet, dieselbe Passphrase ergibt immer dasselbe Konto, und eine verlorene kann niemand wiederherstellen.',
-    },
-    address: {
-      term: 'Adresse',
-      help: 'Wo ein Konto erreichbar ist, berechnet aus seiner Passphrase. Die Zeichen hinter dem Präfix sind eine Prüfsumme — ein Tippfehler fällt auf, statt Geld ins Nichts zu schicken.',
+      help: 'Kein Passwort, das ein Konto schützt — sie ist der Seed, aus dem das Konto wächst. Signum leitet daraus ein Schlüsselpaar ab: Der private Schlüssel signiert deine Transaktionen, der öffentliche lässt jeden diese Signatur prüfen. Dieselbe Passphrase ergibt dieselben Schlüssel und dasselbe Konto, überall auf der Welt — und eine verlorene kann niemand wiederherstellen.',
     },
     publicKey: {
       term: 'Public Key',
-      help: 'Die offene Hälfte des Kontos. Ein Konto, das noch nie etwas empfangen hat, kennt die Chain nicht — die erste Zahlung dorthin muss diesen Schlüssel mitbringen.',
+      help: 'Die Hälfte des Schlüsselpaars, die du herausgeben kannst. Mit ihr lässt sich beweisen, dass eine Transaktion wirklich von diesem Konto signiert wurde, und aus ihr wird die Account-Id abgeleitet. Einem Konto, das die Chain noch nie gesehen hat, muss die erste Zahlung diesen Schlüssel mitbringen.',
+    },
+    accountId: {
+      term: 'Account-Id',
+      help: 'Eine Zahl, abgeleitet aus dem Public Key, und der eigentliche Name des Kontos auf der Chain — alles, was der Node über ein Konto weiß, hängt daran. Die Adresse ist dieselbe Zahl, für Menschen geschrieben.',
+    },
+    address: {
+      term: 'Adresse',
+      help: 'Die Account-Id in lesbarer Form: dieselbe Zahl, in Blöcke gruppiert hinter einem Netz-Präfix, mit einer Prüfsumme am Ende, damit ein Tippfehler auffällt, statt Geld ins Nichts zu schicken. Adresse und Id benennen dasselbe Konto.',
     },
     unconfirmed: {
       term: 'Unbestätigt',
@@ -60,7 +64,7 @@ export default {
     },
     alias: {
       term: 'Alias',
-      help: 'Ein auf der Chain registrierter Name, der auf etwas zeigt: ein Konto, einen Link oder beliebigen Inhalt. Ein Namensregister im Protokoll selbst.',
+      help: 'Ein auf der Chain registrierter Name, der auf etwas zeigt: ein Konto, einen Link oder beliebigen Inhalt. Jeden Namen gibt es nur einmal, worauf er zeigt lässt sich jederzeit ändern, und der Alias selbst ist übertragbar — im Grunde ein editierbares NFT. Im Signum-Mainnet kostet einer etwa 50 SIGNA pro Jahr.',
     },
     subscription: {
       term: 'Subscription',

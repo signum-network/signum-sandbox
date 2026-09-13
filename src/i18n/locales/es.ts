@@ -28,15 +28,19 @@ export default {
     },
     passphrase: {
       term: 'Frase de contraseña',
-      help: 'No es una contraseña que protege una cuenta: *es* la cuenta. La dirección se calcula a partir de ella, la misma frase da siempre la misma cuenta, y nadie puede recuperar una perdida.',
-    },
-    address: {
-      term: 'Dirección',
-      help: 'Dónde se puede alcanzar una cuenta, calculada a partir de su frase de contraseña. Las letras que siguen al prefijo son una suma de verificación: una errata se detecta en lugar de mandar el dinero a nadie.',
+      help: 'No es una contraseña que proteja una cuenta: es la semilla de la que nace la cuenta. Signum deriva de ella un par de claves, la privada firma tus transacciones y la pública permite a cualquiera comprobar esa firma. La misma frase da las mismas claves y la misma cuenta en cualquier parte del mundo, y una frase perdida no la recupera nadie.',
     },
     publicKey: {
       term: 'Clave pública',
-      help: 'La mitad abierta de la cuenta. Una cuenta que nunca ha recibido nada es desconocida para la cadena, así que el primer pago que le llegue tiene que traer esta clave consigo.',
+      help: 'La mitad del par de claves que puedes repartir. Es lo que demuestra que una transacción la firmó de verdad esta cuenta, y de ella se deriva el id de cuenta. A una cuenta que la cadena nunca ha visto hay que enviarle su clave pública junto con el primer pago.',
+    },
+    accountId: {
+      term: 'Id de cuenta',
+      help: 'Un número derivado de la clave pública, y el nombre real de la cuenta en la cadena: todo lo que el nodo sabe de una cuenta cuelga de él. La dirección es ese mismo número escrito para personas.',
+    },
+    address: {
+      term: 'Dirección',
+      help: 'El id de cuenta en forma legible: el mismo número, reagrupado en bloques tras un prefijo de red y con una suma de control al final, de modo que una errata se detecta en vez de enviar dinero a nadie. Dirección e id nombran la misma cuenta.',
     },
     unconfirmed: {
       term: 'Sin confirmar',
@@ -60,7 +64,7 @@ export default {
     },
     alias: {
       term: 'Alias',
-      help: 'Un nombre registrado en la cadena que apunta a algo: una cuenta, un enlace o el contenido que elijas. Un registro de nombres dentro del propio protocolo.',
+      help: 'Un nombre registrado en la cadena que apunta a algo: una cuenta, un enlace o el contenido que elijas. Cada nombre existe una sola vez, lo que hay detrás puede cambiarse cuando quieras, y el alias mismo se puede traspasar a otra cuenta: casi un NFT editable. En la red principal de Signum cuesta unos 50 SIGNA al año.',
     },
     subscription: {
       term: 'Suscripción',

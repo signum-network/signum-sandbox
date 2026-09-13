@@ -39,15 +39,19 @@ export default {
     },
     passphrase: {
       term: 'Passphrase',
-      help: 'Not a password protecting an account — it *is* the account. The address is calculated from it, so the same passphrase always gives the same account, and nobody can restore a lost one.',
-    },
-    address: {
-      term: 'Address',
-      help: 'Where an account can be reached, calculated from its passphrase. The letters after the prefix are a checksum, so a typo is caught rather than sending money to nobody.',
+      help: 'Not a password protecting an account — it is the seed the account grows from. Signum derives a key pair from it: the private key signs your transactions, the public key lets anyone check that signature. Same passphrase, same keys, same account, anywhere in the world — and nobody can restore a lost one.',
     },
     publicKey: {
       term: 'Public key',
-      help: 'The account’s open half. An account that has never received anything is unknown to the chain, so the first payment to it has to carry this key along.',
+      help: 'The half of the key pair you can hand out. It is what proves a transaction really was signed by this account, and the account id is derived from it. An account the chain has never seen has to have its public key sent along with the first payment to it.',
+    },
+    accountId: {
+      term: 'Account id',
+      help: 'A number derived from the public key, and the account’s real name on the chain — everything the node knows about an account hangs off it. The address is the same number written for people.',
+    },
+    address: {
+      term: 'Address',
+      help: 'The account id in readable form: the same number, regrouped into blocks behind a network prefix, with a checksum on the end so a typo is caught instead of sending money to nobody. Address and id name the same account.',
     },
     unconfirmed: {
       term: 'Unconfirmed',
@@ -71,7 +75,7 @@ export default {
     },
     alias: {
       term: 'Alias',
-      help: 'A name registered on the chain that points at something: an account, a link, or any content you choose. A name registry built into the protocol.',
+      help: 'A name registered on the chain that points at something: an account, a link, or any content you choose. Each name exists only once, what it points at can be changed whenever you like, and the alias itself can be handed to another account — an editable NFT, near enough. On the Signum mainnet one costs roughly 50 SIGNA a year.',
     },
     subscription: {
       term: 'Subscription',
