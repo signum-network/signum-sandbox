@@ -1,7 +1,14 @@
 import { readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { STALE_ON_BLOCK, STALE_ON_PENDING } from './queryKeys'
+import { STALE_ON_BLOCK, STALE_ON_PENDING } from '../src/lib/queryKeys'
+
+/*
+ * Lives outside src/ on purpose: it reads the source tree with node's fs, and
+ * src/ is browser code whose type environment should not know that fs exists.
+ * tsconfig only checks src, so keeping it here also keeps @types/node out of
+ * the project.
+ */
 
 /**
  * Answers that no block can change, so they are deliberately absent from the
