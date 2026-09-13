@@ -7,7 +7,9 @@ import { ledger } from '@/lib/ledger'
 import { resolveRecipientPublicKey, transferToken } from '@/lib/send'
 import { useFromAccount } from '@/hooks/useFromAccount'
 import { Select } from '@/components/console/Select'
+import { Toggle } from '@/components/console/Toggle'
 import { AccountSelect, Field, RecipientPicker, SubmitButton, TextInput } from './fields'
+import { PayloadEditor, usePayload } from './payload'
 
 export function TokenTransferForm({
   accounts,
@@ -27,6 +29,11 @@ export function TokenTransferForm({
   const [to, setTo] = useState('')
   const [assetId, setAssetId] = useState('')
   const [quantity, setQuantity] = useState('')
+  // A transfer can carry a message beside the asset, and that message can be
+  // an SRC44 descriptor — what the transfer was for, in a form another
+  // application can read.
+  const [attach, setAttach] = useState(false)
+  const payload = usePayload()
   const [busy, setBusy] = useState(false)
 
   // SignumJS names this getAssetsByOwner, not getAccountAssets — the client
@@ -40,14 +47,17 @@ export function TokenTransferForm({
 
   const submit = async () => {
     const from = accounts.find((a) => a.id === fromId)
+    const attached = payload.value ?? undefined
     if (!from || !to || !assetId || !quantity) return
+    if (attach && attached === undefined) return
     setBusy(true)
     try {
       const recipientPublicKey = await resolveRecipientPublicKey(to, accounts)
-      await transferToken(from, to, assetId, quantity, recipientPublicKey)
+      await transferToken(from, to, assetId, quantity, recipientPublicKey, attach ? attached : undefined)
       setTo('')
       setAssetId('')
       setQuantity('')
+      payload.reset()
       onSent()
     } catch (error) {
       onError(error instanceof Error ? error.message : String(error))
@@ -78,6 +88,12 @@ export function TokenTransferForm({
       <Field label={t('console.send.amount')}>
         <TextInput value={quantity} onChange={setQuantity} placeholder="1" />
       </Field>
+      <label className="mb-2 flex items-center gap-2">
+        <Toggle checked={attach} onChange={setAttach} label={t('console.send.attach')} />
+      </label>
+      {attach && (
+        <PayloadEditor state={payload} label={t('console.send.message')} variant="attachment" />
+      )}
       <SubmitButton label={t('console.send.submit')} busy={busy} onClick={() => void submit()} />
     </div>
   )

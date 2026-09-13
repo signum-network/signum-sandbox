@@ -5,7 +5,8 @@ import type { Contacts } from '@/lib/contacts'
 import { resolveRecipientPublicKey, sendPayment } from '@/lib/send'
 import { useFromAccount } from '@/hooks/useFromAccount'
 import { Toggle } from '@/components/console/Toggle'
-import { AccountSelect, Field, RecipientPicker, SubmitButton, TextArea, TextInput } from './fields'
+import { AccountSelect, Field, RecipientPicker, SubmitButton, TextInput } from './fields'
+import { PayloadEditor, usePayload } from './payload'
 
 export function PaymentForm({
   accounts,
@@ -25,19 +26,21 @@ export function PaymentForm({
   const [to, setTo] = useState('')
   const [amount, setAmount] = useState('')
   const [attach, setAttach] = useState(false)
-  const [message, setMessage] = useState('')
+  const payload = usePayload()
   const [busy, setBusy] = useState(false)
 
   const submit = async () => {
     const from = accounts.find((a) => a.id === fromId)
+    const attached = payload.value ?? undefined
     if (!from || !to || !amount) return
+    if (attach && attached === undefined) return
     setBusy(true)
     try {
       const recipientPublicKey = await resolveRecipientPublicKey(to, accounts)
-      await sendPayment(from, to, amount, recipientPublicKey, attach ? message : undefined)
+      await sendPayment(from, to, amount, recipientPublicKey, attach ? attached : undefined)
       setTo('')
       setAmount('')
-      setMessage('')
+      payload.reset()
       onSent()
     } catch (error) {
       onError(error instanceof Error ? error.message : String(error))
@@ -61,9 +64,7 @@ export function PaymentForm({
         <Toggle checked={attach} onChange={setAttach} label={t('console.send.attach')} />
       </div>
       {attach && (
-        <Field label={t('console.send.message')}>
-          <TextArea value={message} onChange={setMessage} />
-        </Field>
+        <PayloadEditor state={payload} label={t('console.send.message')} variant="attachment" />
       )}
       <SubmitButton label={t('console.send.submit')} busy={busy} onClick={() => void submit()} />
     </div>

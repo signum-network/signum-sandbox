@@ -185,12 +185,20 @@ export async function issueToken(
   )
 }
 
+/**
+ * A transfer can carry a message alongside the asset — verified against
+ * v3.9.11, where the transaction comes back holding both `version.AssetTransfer`
+ * and `version.Message`. That message is a payload like any other, so it can
+ * be an SRC44 descriptor: an application shipping a token can say what the
+ * transfer was for in a form another application can read.
+ */
 export async function transferToken(
   from: SandboxAccount,
   to: string,
   assetId: string,
   quantity: string,
   recipientPublicKey: string | undefined,
+  message?: string,
 ) {
   return asId(
     await signingLedger.asset.transferAsset({
@@ -199,6 +207,7 @@ export async function transferToken(
       quantity,
       recipientId: toNumericId(to),
       recipientPublicKey,
+      attachment: message ? new AttachmentMessage({ message, messageIsText: true }) : undefined,
     }),
   )
 }
