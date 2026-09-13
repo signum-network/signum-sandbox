@@ -1014,7 +1014,15 @@ export type { ConsoleTab, DrawerName }
 import { describe, expect, it } from 'vitest'
 import type { Transaction } from '@signumjs/core'
 import type { FeedItem } from './chainFeed'
-import { TOUR_STEPS, isStepComplete, observeFeed, type Observation, type TourStep } from './tour'
+import en from '@/i18n/locales/en'
+import {
+  TOUR_STEPS,
+  TOUR_USE_CASES,
+  isStepComplete,
+  observeFeed,
+  type Observation,
+  type TourStep,
+} from './tour'
 
 const base: Observation = {
   height: 10,
@@ -1130,6 +1138,21 @@ describe('observeFeed', () => {
   })
 })
 
+describe('TOUR_USE_CASES', () => {
+  // Same guard as the glossary: an idea with no words is not an idea. The
+  // other nine locales follow from locales.test.ts.
+  const useCase = (
+    en as unknown as { tour: { useCase: Record<string, { title?: string; body?: string }> } }
+  ).tour.useCase
+
+  it('has a headline and a sentence for every idea', () => {
+    for (const id of TOUR_USE_CASES) {
+      expect(useCase[id]?.title, `${id}.title`).toBeTruthy()
+      expect(useCase[id]?.body, `${id}.body`).toBeTruthy()
+    }
+  })
+})
+
 describe('TOUR_STEPS', () => {
   it('has unique ids, since a step id is a translation key', () => {
     expect(new Set(TOUR_STEPS.map((s) => s.id)).size).toBe(TOUR_STEPS.length)
@@ -1140,6 +1163,16 @@ describe('TOUR_STEPS', () => {
   // step is given.
   it('gives every step either a chain rule or an acknowledge button', () => {
     for (const s of TOUR_STEPS) expect(s.completion.kind).toBeTruthy()
+  })
+
+  // The overlay lays the finale out differently and reads its list from
+  // TOUR_USE_CASES. More than one, or one that still points at a control,
+  // would render a wide centred card over a highlight ring.
+  it('ends on exactly one finale, and it points at nothing', () => {
+    const finales = TOUR_STEPS.filter((s) => s.finale)
+    expect(finales).toHaveLength(1)
+    expect(finales[0]).toBe(TOUR_STEPS[TOUR_STEPS.length - 1])
+    expect(finales[0].target).toBeNull()
   })
 })
 ```
@@ -1172,7 +1205,6 @@ export type TourTarget =
   | 'height'
   | 'send-button'
   | 'transactions-tab'
-  | 'help-button'
 
 /**
  * What finishes a step. Every kind but `acknowledge` is answered by the chain
@@ -1198,7 +1230,36 @@ export interface TourStep {
   opens?: { tab?: ConsoleTab; drawer?: DrawerName }
   /** Filled into the send drawer when the step begins. */
   prefill?: { signa: string }
+  /**
+   * Drawn as a wide card in the middle of the screen instead of a callout
+   * beside a control. Exactly one step is one: the last, which has nothing
+   * left to point at and a list to show.
+   */
+  finale?: true
 }
+
+/**
+ * What to go and build.
+ *
+ * The tour spends eighteen steps on mechanics — sign, send, forge, settle —
+ * and mechanics are not why anyone stays. This is the payoff: eight things
+ * this chain is actually good for, each named with the Signum feature that
+ * carries it, so it reads as a starting point rather than a brochure.
+ *
+ * Every one of them is buildable with what the console just demonstrated.
+ * That is the selection rule — no rollups, no bridges, nothing that needs a
+ * feature this node does not have.
+ */
+export const TOUR_USE_CASES = [
+  'tracing',
+  'notarising',
+  'credentials',
+  'tokenising',
+  'games',
+  'registry',
+  'machines',
+  'channels',
+] as const
 
 /** Everything the tour needs to know about the console, at one moment. */
 export interface Observation {
@@ -1336,14 +1397,14 @@ export const TOUR_STEPS: TourStep[] = [
   },
   { id: 'forgeAgain', target: 'forge-button', completion: { kind: 'somethingSettled' } },
   { id: 'settled', target: null, completion: { kind: 'acknowledge' } },
-  { id: 'done', target: 'help-button', completion: { kind: 'acknowledge' } },
+  { id: 'finale', target: null, completion: { kind: 'acknowledge' }, finale: true },
 ]
 ```
 
 - [ ] **Step 5: Run the test**
 
 Run: `bun run test -- tour`
-Expected: PASS, 13 tests
+Expected: PASS, 15 tests
 
 - [ ] **Step 6: Commit**
 
@@ -1459,13 +1520,17 @@ English, top level, beside `console`:
   tour: {
     position: 'Step {{position}} of {{total}}',
     next: 'Got it',
+    finish: 'Go and build something',
+    finaleFooter:
+      'All of it is in the Send drawer, each with a line saying what it does. Beginner mode and this tour live behind Help, and the full JSON API is one click further.',
     stop: 'End the tour',
     waiting: 'Waiting for you…',
     step: {},
+    useCase: {},
   },
 ```
 
-Leave `step` empty for now; Task 14 fills it. German, Spanish and the rest get the same four strings and the same empty `step` object. An empty object flattens to no keys at all, so `locales.test.ts` stays satisfied either way.
+Leave `step` and `useCase` empty for now; Task 14 fills them. Every locale gets the same five strings and the same two empty objects. An empty object flattens to no keys at all, so `locales.test.ts` stays satisfied either way.
 
 - [ ] **Step 2: Write the overlay**
 
@@ -1474,9 +1539,12 @@ Leave `step` empty for now; Task 14 fills it. German, Spanish and the rest get t
 import { useLayoutEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ConsoleButton, RowButton } from '@/components/console/ConsoleButton'
+import { TOUR_USE_CASES } from '@/lib/tour'
 import type { TourStore } from '@/hooks/useTour'
 
 const CALLOUT_WIDTH = 300
+/** The last step is a list, not a sentence, and 300px is a column of words. */
+const FINALE_WIDTH = 460
 const GAP = 10
 
 interface Box {
@@ -1532,13 +1600,15 @@ export function TourOverlay({ tour }: { tour: TourStore }) {
   if (!tour.active || !tour.step) return null
 
   const acknowledgeable = tour.step.completion.kind === 'acknowledge'
+  const finale = tour.step.finale === true
+  const width = finale ? FINALE_WIDTH : CALLOUT_WIDTH
   // Below the target if there is room, above it otherwise; and never off the
-  // right edge.
+  // right edge. The finale has no target and centres itself.
   const below = box ? box.top + box.height + GAP : 0
   const calloutTop = box && below + 180 > window.innerHeight ? box.top - 180 : below
   const calloutLeft = box
-    ? Math.min(box.left, window.innerWidth - CALLOUT_WIDTH - GAP)
-    : window.innerWidth / 2 - CALLOUT_WIDTH / 2
+    ? Math.min(box.left, window.innerWidth - width - GAP)
+    : window.innerWidth / 2 - width / 2
 
   return (
     <>
@@ -1557,11 +1627,15 @@ export function TourOverlay({ tour }: { tour: TourStore }) {
       )}
 
       <div
-        className="fixed z-50 p-3"
+        className="themed-scroll console-scroll fixed z-50 overflow-y-auto p-3"
         style={{
-          top: box ? calloutTop : window.innerHeight / 2 - 90,
+          // The finale is the one card tall enough to run off a short screen,
+          // so it is pinned near the top and scrolls inside itself rather than
+          // hiding its own last idea and its own button below the fold.
+          top: finale ? '8vh' : box ? calloutTop : window.innerHeight / 2 - 90,
           left: calloutLeft,
-          width: CALLOUT_WIDTH,
+          width,
+          maxHeight: finale ? '84vh' : undefined,
           background: 'var(--bg2)',
           border: '1px solid var(--blue2)',
           boxShadow: '0 8px 32px rgba(0,0,0,.5)',
@@ -1576,15 +1650,43 @@ export function TourOverlay({ tour }: { tour: TourStore }) {
           </RowButton>
         </div>
 
-        <p className="mb-1 text-[11px] text-[var(--fg)]">
+        <p
+          className={finale ? 'mb-1 text-[13px] text-[var(--blue3)]' : 'mb-1 text-[11px] text-[var(--fg)]'}
+        >
           {t(`tour.step.${tour.step.id}.title`)}
         </p>
         <p className="mb-3 text-[10px] leading-relaxed text-[var(--muted)]">
           {t(`tour.step.${tour.step.id}.body`)}
         </p>
 
+        {/*
+          The list only the last step has. Two columns where there is room:
+          eight ideas stacked in one column reads as a form to work through,
+          and the point of this card is that it should feel like an open door.
+        */}
+        {finale && (
+          <ul className="mb-3 grid gap-2 sm:grid-cols-2">
+            {TOUR_USE_CASES.map((id) => (
+              <li key={id} className="border-l pl-2" style={{ borderColor: 'var(--blue2)' }}>
+                <p className="text-[10px] text-[var(--fg)]">{t(`tour.useCase.${id}.title`)}</p>
+                <p className="text-[10px] leading-relaxed text-[var(--muted)]">
+                  {t(`tour.useCase.${id}.body`)}
+                </p>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {finale && (
+          <p className="mb-3 text-[10px] leading-relaxed text-[var(--muted)]">
+            {t('tour.finaleFooter')}
+          </p>
+        )}
+
         {acknowledgeable ? (
-          <ConsoleButton onClick={tour.acknowledge}>{t('tour.next')}</ConsoleButton>
+          <ConsoleButton onClick={tour.acknowledge}>
+            {t(finale ? 'tour.finish' : 'tour.next')}
+          </ConsoleButton>
         ) : (
           <span className="text-[10px] text-[var(--blue3)]">{t('tour.waiting')}</span>
         )}
@@ -1641,7 +1743,7 @@ In `Header.tsx`:
 
 ```tsx
         {(['send', 'chain', 'help'] as const).map((name) => (
-          <span key={name} data-tour={name === 'send' ? 'send-button' : name === 'help' ? 'help-button' : undefined}>
+          <span key={name} data-tour={name === 'send' ? 'send-button' : undefined}>
             <ConsoleButton onClick={() => onOpenDrawer(name)}>
               {t(`console.drawer.${name}`)}
             </ConsoleButton>
@@ -1816,9 +1918,43 @@ git commit -m "feat: name the places the tour can point at"
         title: 'That is the whole loop',
         body: 'Sign, broadcast, wait for a block, done. Every chain works this way; most just make you wait longer to see it.',
       },
-      done: {
-        title: 'The rest is yours',
-        body: 'Messages, your own tokens, aliases, standing orders — all of it is in the Send drawer with a line saying what it does. Beginner mode and this tour live behind Help, and the full JSON API is one click further.',
+      finale: {
+        title: 'You can build on a blockchain now',
+        body: 'That was all of it: an account, a block, a transaction, a confirmation. Everything past that is what you decide to put in the payload — and people put remarkable things in there. Eight of them, all buildable with exactly what you just did:',
+      },
+    },
+    useCase: {
+      tracing: {
+        title: 'Trace a supply chain',
+        body: 'Every handover is a payment carrying a structured payload. Nobody owns the record, nobody can quietly edit last month, and a partner can read it without asking you for access.',
+      },
+      notarising: {
+        title: 'Prove something existed',
+        body: 'Put a document’s fingerprint in a payload. The block it lands in is a timestamp nobody can move — a notary for a fraction of a SIGNA.',
+      },
+      credentials: {
+        title: 'Issue certificates that verify themselves',
+        body: 'A diploma, a licence, a safety inspection: issue it as a token held by its owner. Checking it is one query, and faking it is not illegal but impossible.',
+      },
+      tokenising: {
+        title: 'Tokenise a business',
+        body: 'Shares, revenue, membership. Issue the token natively, pay every holder in a single multi-out, and let a subscription handle the part that repeats.',
+      },
+      games: {
+        title: 'Build a game with progress that is real',
+        body: 'Items as tokens the player genuinely owns, achievements as payloads nobody can roll back, and a save file that outlives your servers.',
+      },
+      registry: {
+        title: 'Run a registry with no registrar',
+        body: 'Aliases are a name system inside the protocol. A name points at an account, a link or any content you choose, and ownership moves with one transaction.',
+      },
+      machines: {
+        title: 'Let machines pay each other',
+        body: 'Fees in hundredths of a SIGNA make per-use billing worth doing. A meter, a charging point or a sensor settles in seconds, with no invoice in between.',
+      },
+      channels: {
+        title: 'Send messages no server can read',
+        body: 'An encrypted payload gives two accounts a private channel that needs no backend, no sign-up and nobody’s permission to keep working.',
       },
     },
 ```
@@ -1895,9 +2031,43 @@ git commit -m "feat: name the places the tour can point at"
         title: 'Das ist der ganze Kreislauf',
         body: 'Signieren, senden, auf einen Block warten, fertig. So arbeitet jede Chain; die meisten lassen dich nur länger warten, bis du es siehst.',
       },
-      done: {
-        title: 'Der Rest gehört dir',
-        body: 'Nachrichten, eigene Token, Aliasse, Daueraufträge — alles liegt im Senden-Dialog, mit einer Zeile dazu, was es tut. Einsteiger-Modus und diese Tour findest du unter Hilfe, und die vollständige JSON-API ist einen Klick weiter.',
+      finale: {
+        title: 'Du kannst jetzt auf einer Blockchain bauen',
+        body: 'Mehr war es nicht: ein Konto, ein Block, eine Transaktion, eine Bestätigung. Alles Weitere ist das, was du in den Payload legst — und Leute legen Erstaunliches hinein. Acht davon, alle mit genau dem baubar, was du gerade getan hast:',
+      },
+    },
+    useCase: {
+      tracing: {
+        title: 'Eine Lieferkette nachvollziehen',
+        body: 'Jede Übergabe ist eine Zahlung mit strukturiertem Payload. Niemandem gehört das Protokoll, niemand kann den letzten Monat still korrigieren, und ein Partner liest mit, ohne dich um Zugang zu bitten.',
+      },
+      notarising: {
+        title: 'Beweisen, dass etwas existiert hat',
+        body: 'Leg den Fingerabdruck eines Dokuments in einen Payload. Der Block, in dem er landet, ist ein Zeitstempel, den niemand verschieben kann — ein Notar für den Bruchteil eines SIGNA.',
+      },
+      credentials: {
+        title: 'Zertifikate ausstellen, die sich selbst prüfen',
+        body: 'Ein Zeugnis, eine Lizenz, eine Prüfplakette: als Token ausgeben, den der Inhaber hält. Die Prüfung ist eine Abfrage, und eine Fälschung ist nicht verboten, sondern unmöglich.',
+      },
+      tokenising: {
+        title: 'Ein Unternehmen tokenisieren',
+        body: 'Anteile, Erlöse, Mitgliedschaft. Den Token nativ ausgeben, alle Inhaber in einem einzigen Multi-Out auszahlen, und den wiederkehrenden Teil einer Subscription überlassen.',
+      },
+      games: {
+        title: 'Ein Spiel mit echtem Fortschritt bauen',
+        body: 'Gegenstände als Token, die dem Spieler wirklich gehören, Erfolge als Payload, den niemand zurückdreht, und ein Spielstand, der deine Server überlebt.',
+      },
+      registry: {
+        title: 'Ein Register ohne Registrar führen',
+        body: 'Aliasse sind ein Namenssystem im Protokoll selbst. Ein Name zeigt auf ein Konto, einen Link oder beliebigen Inhalt, und der Besitz wechselt mit einer Transaktion.',
+      },
+      machines: {
+        title: 'Maschinen einander bezahlen lassen',
+        body: 'Gebühren in Hundertstel-SIGNA machen Abrechnung pro Nutzung lohnend. Ein Zähler, eine Ladesäule oder ein Sensor rechnet in Sekunden ab, ganz ohne Rechnung dazwischen.',
+      },
+      channels: {
+        title: 'Nachrichten senden, die kein Server liest',
+        body: 'Ein verschlüsselter Payload gibt zwei Konten einen privaten Kanal — ohne Backend, ohne Anmeldung und ohne dass jemand die Erlaubnis erteilen muss.',
       },
     },
 ```
@@ -1906,7 +2076,9 @@ git commit -m "feat: name the places the tour can point at"
 
 - [ ] **Step 3: Fill the remaining eight locales**
 
-Same eighteen ids. `locales.test.ts` fails on any missing or extra key.
+Same eighteen step ids and the same eight `useCase` ids, both keys each. `locales.test.ts` fails on any missing or extra key.
+
+The use-case list is the one block in this plan that is marketing as much as documentation, and it is the last thing a newcomer reads. Translate it for effect, not for accuracy alone: short headlines, and a claim in each body that a reader can picture. If a sentence lands flat in the target language, rewrite it rather than transliterating the English.
 
 - [ ] **Step 4: Verify**
 
