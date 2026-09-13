@@ -50,7 +50,7 @@ export function TransactionsView({
     // A column so the list can take the space that is left and scroll inside
     // it, while the pager stays where the eye last saw it.
     <div className="flex min-h-0 flex-1 flex-col">
-      <ul className="themed-scroll min-h-0 flex-1 overflow-y-auto">
+      <ul className="themed-scroll console-scroll min-h-0 flex-1 overflow-y-auto pr-2">
         {shown.items.map((item) => (
           <TransactionRow
             key={item.id}

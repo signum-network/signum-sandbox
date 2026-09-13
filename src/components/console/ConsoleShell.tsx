@@ -142,7 +142,7 @@ export function ConsoleShell() {
             />
           )}
           {tab === 'watch' && watched.watchedId && (
-            <div className="themed-scroll min-h-0 flex-1 overflow-y-auto">
+            <div className="themed-scroll console-scroll min-h-0 flex-1 overflow-y-auto pr-2">
               <WatchView
               accountId={watched.watchedId}
               accounts={accounts.accounts}
@@ -156,7 +156,7 @@ export function ConsoleShell() {
             </div>
           )}
           {tab === 'accounts' && (
-            <div className="themed-scroll min-h-0 flex-1 overflow-y-auto">
+            <div className="themed-scroll console-scroll min-h-0 flex-1 overflow-y-auto pr-2">
               <AccountsView
               store={accounts}
               contacts={contacts}
@@ -170,7 +170,7 @@ export function ConsoleShell() {
         </div>
         {drawer && (
           <div
-            className="themed-scroll w-[34%] overflow-y-auto border p-3"
+            className="themed-scroll console-scroll w-[34%] overflow-y-auto border p-3"
             style={{ borderColor: 'var(--blue2)' }}
           >
             <div className="flex items-center justify-between">

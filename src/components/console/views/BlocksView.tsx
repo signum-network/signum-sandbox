@@ -47,7 +47,7 @@ export function BlocksView({
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <ul className="themed-scroll min-h-0 flex-1 overflow-y-auto">
+      <ul className="themed-scroll console-scroll min-h-0 flex-1 overflow-y-auto pr-2">
         {shown.map((block) => (
         <BlockRow
           key={block.block}

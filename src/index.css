@@ -249,6 +249,16 @@ body {
   background: transparent;
 }
 
+/* Not from upstream: the console's lists sit directly against their scrollbar,
+   which reads as cramped at the vendored 5px. This narrows it and the row
+   content keeps a gutter of its own, so nothing touches the bar. Kept as a
+   separate class rather than editing .themed-scroll, so re-copying index.css
+   from signum-node/web stays a copy. */
+.console-scroll::-webkit-scrollbar {
+  width: 3px;
+  height: 3px;
+}
+
 /* Not from upstream: the spec requires honouring reduced-motion preferences.
    Keep this block when re-copying index.css from signum-node/web. */
 @media (prefers-reduced-motion: reduce) {
