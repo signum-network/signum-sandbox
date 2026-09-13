@@ -105,6 +105,9 @@ export default {
       tour: 'Пройти тур',
       tourNote: 'Дев’ять хвилин, і все це на справжньому блокчейні.',
       tourStop: 'Зупинити тур',
+      glossary: 'Глосарій',
+      glossarySearch: 'Шукати слово або його значення',
+      glossaryNoMatch: 'Нічого не знайдено',
     },
     note: {
       transactions:

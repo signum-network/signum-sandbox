@@ -105,6 +105,9 @@ export default {
       tour: 'Tour starten',
       tourNote: 'Neun Minuten, alles auf der echten Chain.',
       tourStop: 'Tour beenden',
+      glossary: 'Glossar',
+      glossarySearch: 'Wort oder Bedeutung suchen',
+      glossaryNoMatch: 'Nichts gefunden',
     },
     note: {
       transactions:

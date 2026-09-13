@@ -10,22 +10,28 @@ import { RowButton } from '../ConsoleButton'
 export function SearchField({
   value,
   onChange,
+  placeholder,
+  fill,
 }: {
   value: string
   onChange: (value: string) => void
+  /** Overrides the stream's own wording. */
+  placeholder?: string
+  /** Takes the full width instead of the 240px the tab bar gives it. */
+  fill?: boolean
 }) {
   const { t } = useTranslation()
 
   return (
     <span
-      className="flex items-center border bg-transparent px-2 py-1"
-      style={{ borderColor: 'var(--border2)', minWidth: 240 }}
+      className={`flex items-center border bg-transparent px-2 py-1${fill ? ' w-full' : ''}`}
+      style={{ borderColor: 'var(--border2)', ...(fill ? {} : { minWidth: 240 }) }}
     >
       <input
         className="flex-1 bg-transparent text-[13px] text-[var(--fg)] outline-none"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder={t('console.search.placeholder')}
+        placeholder={placeholder ?? t('console.search.placeholder')}
       />
       {value !== '' && (
         <RowButton

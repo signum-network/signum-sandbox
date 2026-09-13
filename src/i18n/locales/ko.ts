@@ -105,6 +105,9 @@ export default {
       tour: '둘러보기 시작',
       tourNote: '9분이면 됩니다. 전부 실제 체인 위에서 진행됩니다.',
       tourStop: '둘러보기 중단',
+      glossary: '용어집',
+      glossarySearch: '단어나 뜻으로 검색',
+      glossaryNoMatch: '일치하는 것이 없습니다',
     },
     note: {
       transactions:

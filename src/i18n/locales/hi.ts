@@ -105,6 +105,9 @@ export default {
       tour: 'टूर शुरू करें',
       tourNote: 'नौ मिनट, और यह सब असली चेन पर।',
       tourStop: 'टूर रोकें',
+      glossary: 'शब्दावली',
+      glossarySearch: 'शब्द या उसका अर्थ खोजें',
+      glossaryNoMatch: 'कुछ नहीं मिला',
     },
     note: {
       transactions:

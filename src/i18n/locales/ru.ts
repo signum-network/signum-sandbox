@@ -105,6 +105,9 @@ export default {
       tour: 'Пройти тур',
       tourNote: 'Девять минут, и всё это в настоящей цепочке.',
       tourStop: 'Остановить тур',
+      glossary: 'Глоссарий',
+      glossarySearch: 'Искать слово или его значение',
+      glossaryNoMatch: 'Ничего не найдено',
     },
     note: {
       transactions:

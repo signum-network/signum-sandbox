@@ -105,6 +105,9 @@ export default {
       tour: 'Hacer el recorrido',
       tourNote: 'Nueve minutos, todo sobre la cadena real.',
       tourStop: 'Detener el recorrido',
+      glossary: 'Glosario',
+      glossarySearch: 'Buscar una palabra o su significado',
+      glossaryNoMatch: 'Sin coincidencias',
     },
     note: {
       transactions:

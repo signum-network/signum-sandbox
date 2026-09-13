@@ -105,6 +105,9 @@ export default {
       tour: 'ツアーを始める',
       tourNote: '9 分ほど、すべて本物のチェーン上で行います。',
       tourStop: 'ツアーを終了',
+      glossary: '用語集',
+      glossarySearch: '用語または意味で検索',
+      glossaryNoMatch: '一致するものがありません',
     },
     note: {
       transactions:

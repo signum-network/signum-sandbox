@@ -116,6 +116,9 @@ export default {
       tour: 'Take the tour',
       tourNote: 'Nine minutes, all of it on the real chain.',
       tourStop: 'Stop the tour',
+      glossary: 'Glossary',
+      glossarySearch: 'Search a word or its meaning',
+      glossaryNoMatch: 'Nothing matches',
     },
     note: {
       transactions:

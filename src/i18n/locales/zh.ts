@@ -105,6 +105,9 @@ export default {
       tour: '开始导览',
       tourNote: '九分钟，全程都在真实的链上进行。',
       tourStop: '结束导览',
+      glossary: '术语表',
+      glossarySearch: '搜索词条或其释义',
+      glossaryNoMatch: '没有匹配项',
     },
     note: {
       transactions:

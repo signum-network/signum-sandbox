@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { Toggle } from '@/components/console/Toggle'
 import { ConsoleButton } from '@/components/console/ConsoleButton'
+import { Glossary } from './Glossary'
 
 /**
  * Sound, theme and language moved into the app header, where they sit on
@@ -41,6 +42,8 @@ export function HelpDrawer({
           {t('console.help.tourNote')}
         </p>
       </div>
+
+      <Glossary />
 
       <a
         className="text-[13px] text-[var(--blue3)] underline"

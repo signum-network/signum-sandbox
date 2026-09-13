@@ -105,6 +105,9 @@ export default {
       tour: 'Fazer a visita guiada',
       tourNote: 'Nove minutos, tudo na cadeia a sério.',
       tourStop: 'Parar a visita guiada',
+      glossary: 'Glossário',
+      glossarySearch: 'Procurar uma palavra ou o seu significado',
+      glossaryNoMatch: 'Sem correspondências',
     },
     note: {
       transactions:
