@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next'
 import type { SandboxAccount } from '@/lib/accounts'
 import { setAccountInfo } from '@/lib/send'
 import { useFromAccount } from '@/hooks/useFromAccount'
-import { AccountSelect, Field, SubmitButton, TextArea, TextInput } from './fields'
+import { AccountSelect, Field, SubmitButton, TextInput } from './fields'
+import { PayloadEditor, usePayload } from './payload'
 
 export function AccountInfoForm({
   accounts,
@@ -19,17 +20,19 @@ export function AccountInfoForm({
   const { t } = useTranslation()
   const [accountId, setAccountId] = useFromAccount(forgerId)
   const [name, setName] = useState('')
-  const [description, setDescription] = useState('')
+  // Account info is what SRC44 was written for, so the structured form is the
+  // starting point here rather than an option to discover.
+  const payload = usePayload(true)
   const [busy, setBusy] = useState(false)
 
   const submit = async () => {
     const account = accounts.find((a) => a.id === accountId)
-    if (!account || !name) return
+    if (!account || !name || payload.value === null) return
     setBusy(true)
     try {
-      await setAccountInfo(account, name, description)
+      await setAccountInfo(account, name, payload.value)
       setName('')
-      setDescription('')
+      payload.reset()
       onSent()
     } catch (error) {
       onError(error instanceof Error ? error.message : String(error))
@@ -46,9 +49,7 @@ export function AccountInfoForm({
       <Field label={t('console.send.infoName')}>
         <TextInput value={name} onChange={setName} />
       </Field>
-      <Field label={t('console.send.infoDescription')}>
-        <TextArea value={description} onChange={setDescription} />
-      </Field>
+      <PayloadEditor state={payload} label={t('console.send.infoDescription')} />
       <SubmitButton label={t('console.send.submit')} busy={busy} onClick={() => void submit()} />
     </div>
   )

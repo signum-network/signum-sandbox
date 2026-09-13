@@ -4,6 +4,7 @@ import type { SandboxAccount } from '@/lib/accounts'
 import { setAlias } from '@/lib/send'
 import { useFromAccount } from '@/hooks/useFromAccount'
 import { AccountSelect, Field, SubmitButton, TextInput } from './fields'
+import { PayloadEditor, usePayload } from './payload'
 
 export function AliasForm({
   accounts,
@@ -19,17 +20,17 @@ export function AliasForm({
   const { t } = useTranslation()
   const [accountId, setAccountId] = useFromAccount(forgerId)
   const [aliasName, setAliasName] = useState('')
-  const [aliasContent, setAliasContent] = useState('')
+  const payload = usePayload()
   const [busy, setBusy] = useState(false)
 
   const submit = async () => {
     const account = accounts.find((a) => a.id === accountId)
-    if (!account || !aliasName) return
+    if (!account || !aliasName || payload.value === null) return
     setBusy(true)
     try {
-      await setAlias(account, aliasName, aliasContent)
+      await setAlias(account, aliasName, payload.value)
       setAliasName('')
-      setAliasContent('')
+      payload.reset()
       onSent()
     } catch (error) {
       onError(error instanceof Error ? error.message : String(error))
@@ -46,9 +47,7 @@ export function AliasForm({
       <Field label={t('console.send.aliasName')}>
         <TextInput value={aliasName} onChange={setAliasName} />
       </Field>
-      <Field label={t('console.send.aliasContent')}>
-        <TextInput value={aliasContent} onChange={setAliasContent} />
-      </Field>
+      <PayloadEditor state={payload} label={t('console.send.aliasContent')} />
       <SubmitButton label={t('console.send.submit')} busy={busy} onClick={() => void submit()} />
     </div>
   )

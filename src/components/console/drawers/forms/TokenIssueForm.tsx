@@ -4,7 +4,8 @@ import type { SandboxAccount } from '@/lib/accounts'
 import { issueToken } from '@/lib/send'
 import { useFromAccount } from '@/hooks/useFromAccount'
 import { Toggle } from '@/components/console/Toggle'
-import { AccountSelect, Field, SubmitButton, TextArea, TextInput } from './fields'
+import { AccountSelect, Field, SubmitButton, TextInput } from './fields'
+import { PayloadEditor, usePayload } from './payload'
 
 export function TokenIssueForm({
   accounts,
@@ -22,13 +23,13 @@ export function TokenIssueForm({
   const [tokenName, setTokenName] = useState('')
   const [tokenQuantity, setTokenQuantity] = useState('1000')
   const [tokenDecimals, setTokenDecimals] = useState('0')
-  const [tokenDescription, setTokenDescription] = useState('')
+  const payload = usePayload()
   const [mintable, setMintable] = useState(false)
   const [busy, setBusy] = useState(false)
 
   const submit = async () => {
     const issuer = accounts.find((a) => a.id === issuerId)
-    if (!issuer || !tokenName || !tokenQuantity) return
+    if (!issuer || !tokenName || !tokenQuantity || payload.value === null) return
     setBusy(true)
     try {
       await issueToken(
@@ -36,13 +37,13 @@ export function TokenIssueForm({
         tokenName,
         tokenQuantity,
         Number(tokenDecimals),
-        tokenDescription,
+        payload.value,
         mintable,
       )
       setTokenName('')
       setTokenQuantity('1000')
       setTokenDecimals('0')
-      setTokenDescription('')
+      payload.reset()
       setMintable(false)
       onSent()
     } catch (error) {
@@ -66,9 +67,7 @@ export function TokenIssueForm({
       <Field label={t('console.send.tokenDecimals')}>
         <TextInput value={tokenDecimals} onChange={setTokenDecimals} placeholder="0" />
       </Field>
-      <Field label={t('console.send.tokenDescription')}>
-        <TextArea value={tokenDescription} onChange={setTokenDescription} />
-      </Field>
+      <PayloadEditor state={payload} label={t('console.send.tokenDescription')} />
       <div className="mb-2">
         <Toggle checked={mintable} onChange={setMintable} label={t('console.send.mintable')} />
       </div>

@@ -5,7 +5,8 @@ import type { Contacts } from '@/lib/contacts'
 import { resolveRecipientPublicKey, sendEncryptedMessage, sendPlainMessage } from '@/lib/send'
 import { useFromAccount } from '@/hooks/useFromAccount'
 import { Toggle } from '@/components/console/Toggle'
-import { AccountSelect, Field, RecipientPicker, SubmitButton, TextArea } from './fields'
+import { AccountSelect, Field, RecipientPicker, SubmitButton } from './fields'
+import { PayloadEditor, usePayload } from './payload'
 
 export function MessageForm({
   accounts,
@@ -23,12 +24,15 @@ export function MessageForm({
   const { t } = useTranslation()
   const [fromId, setFromId] = useFromAccount(forgerId)
   const [to, setTo] = useState('')
-  const [message, setMessage] = useState('')
+  // A message is text far more often than it is a descriptor, so structured
+  // is the option here rather than the default.
+  const payload = usePayload()
   const [encrypt, setEncrypt] = useState(false)
   const [busy, setBusy] = useState(false)
 
   const submit = async () => {
     const from = accounts.find((a) => a.id === fromId)
+    const message = payload.value
     if (!from || !to || !message) return
     setBusy(true)
     try {
@@ -46,7 +50,7 @@ export function MessageForm({
         await sendPlainMessage(from, to, message, recipientPublicKey)
       }
       setTo('')
-      setMessage('')
+      payload.reset()
       onSent()
     } catch (error) {
       onError(error instanceof Error ? error.message : String(error))
@@ -63,9 +67,7 @@ export function MessageForm({
       <Field label={t('console.send.to')}>
         <RecipientPicker accounts={accounts} contacts={contacts} value={to} onChange={setTo} />
       </Field>
-      <Field label={t('console.send.message')}>
-        <TextArea value={message} onChange={setMessage} />
-      </Field>
+      <PayloadEditor state={payload} label={t('console.send.message')} />
       <div className="mb-2">
         <Toggle checked={encrypt} onChange={setEncrypt} label={t('console.send.encrypt')} />
       </div>

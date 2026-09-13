@@ -6,13 +6,10 @@ import {
   type UnsignedTransaction,
 } from '@signumjs/core'
 import { Amount } from '@signumjs/util'
-import { src44 } from '@signumjs/standards'
 import { ledger, signingLedger } from './ledger'
 import { knownPublicKey } from './recipient'
 import { feeFor, type SendAction } from './fees'
 import type { SandboxAccount } from './accounts'
-
-const { DescriptorDataBuilder } = src44
 
 const keysOf = (account: SandboxAccount) => generateSignKeys(account.passphrase)
 
@@ -149,19 +146,21 @@ export async function sendEncryptedMessage(
   )
 }
 
+/**
+ * `description` is passed through exactly as given — the form decides whether
+ * it is plain text or an SRC44 descriptor, and building one here as well
+ * would wrap a descriptor inside another descriptor's description.
+ */
 export async function setAccountInfo(
   account: SandboxAccount,
   name: string,
   description: string,
 ) {
-  // SRC44 is what makes the description machine-readable; building it through
-  // DescriptorDataBuilder means what lands on chain is valid by construction.
-  const descriptor = DescriptorDataBuilder.create(name).setDescription(description).build()
   return asId(
     await signingLedger.account.setAccountInfo({
       ...base(account, 'accountInfo'),
       name,
-      description: descriptor.stringify(),
+      description,
     }),
   )
 }
