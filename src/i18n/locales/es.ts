@@ -89,6 +89,15 @@ export default {
       title: 'Todavía no ha pasado nada',
       description: 'Crea una cuenta y luego forja un bloque para darle fondos.',
     },
+    firstVisit: {
+      title: '¿Es tu primera vez aquí?',
+      description:
+        'Esta es una cadena de Signum desechable que corre en tu máquina. Aquí nada vale nada, así que aquí nada puede salir mal.',
+      newHere: 'Soy nuevo en esto',
+      oldHand: 'Ya me manejo',
+      newHereNote: 'Explicaciones por todas partes, y la oferta de guiarte paso a paso',
+      oldHandNote: 'Directo a la consola',
+    },
     drawer: { send: 'Enviar', chain: 'Cadena', help: 'Ayuda', close: 'Cerrar' },
     tx: {
       unconfirmed: 'sin confirmar',

@@ -89,6 +89,15 @@ export default {
       title: '아직 아무 일도 없습니다',
       description: '계정을 만든 다음 블록을 생성해 자금을 지급하세요.',
     },
+    firstVisit: {
+      title: '여기는 처음이신가요?',
+      description:
+        '이것은 이 컴퓨터에서 실행되는 일회용 Signum 체인입니다. 여기 있는 것은 아무 가치도 없으니, 여기서는 무엇도 잘못될 수 없습니다.',
+      newHere: '처음입니다',
+      oldHand: '어느 정도 압니다',
+      newHereNote: '곳곳에 설명이 붙고, 원하면 처음부터 안내해 드립니다',
+      oldHandNote: '바로 콘솔로',
+    },
     drawer: { send: '보내기', chain: '체인', help: '도움말', close: '닫기' },
     tx: {
       unconfirmed: '미확인',

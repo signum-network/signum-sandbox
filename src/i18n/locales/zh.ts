@@ -89,6 +89,15 @@ export default {
       title: '还什么都没发生',
       description: '先创建一个账户，再铸造一个区块给它注入资金。',
     },
+    firstVisit: {
+      title: '第一次来？',
+      description:
+        '这是一条运行在你本机上的一次性 Signum 链。这里的一切都不值钱，所以这里的一切都不会出错。',
+      newHere: '我是新手',
+      oldHand: '我熟门熟路',
+      newHereNote: '处处都有讲解，还可以带你走一遍',
+      oldHandNote: '直接进入控制台',
+    },
     drawer: { send: '发送', chain: '链', help: '帮助', close: '关闭' },
     tx: {
       unconfirmed: '未确认',

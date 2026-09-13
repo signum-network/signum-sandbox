@@ -89,6 +89,15 @@ export default {
       title: 'まだ何も起きていません',
       description: 'アカウントを作成し、ブロックを生成して資金を与えてください。',
     },
+    firstVisit: {
+      title: 'ここは初めてですか？',
+      description:
+        'これはお使いのマシンで動く使い捨ての Signum チェーンです。ここにあるものには何の価値もないので、何も失敗しようがありません。',
+      newHere: '初めてです',
+      oldHand: '勝手はわかっています',
+      newHereNote: 'いたるところに説明が出て、ひと通り案内もします',
+      oldHandNote: 'そのままコンソールへ',
+    },
     drawer: { send: '送信', chain: 'チェーン', help: 'ヘルプ', close: '閉じる' },
     tx: {
       unconfirmed: '未確認',

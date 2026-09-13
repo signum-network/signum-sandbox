@@ -100,6 +100,15 @@ export default {
       title: 'Nothing has happened yet',
       description: 'Create an account, then forge a block to give it funds.',
     },
+    firstVisit: {
+      title: 'First time here?',
+      description:
+        'This is a throwaway Signum chain that runs on your machine. Nothing here is worth anything, so nothing here can go wrong.',
+      newHere: 'I’m new to this',
+      oldHand: 'I know my way around',
+      newHereNote: 'Explanations everywhere, and an offer to walk you through it',
+      oldHandNote: 'Straight to the console',
+    },
     drawer: { send: 'Send', chain: 'Chain', help: 'Help', close: 'Close' },
     tx: {
       unconfirmed: 'unconfirmed',

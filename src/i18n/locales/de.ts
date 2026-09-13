@@ -89,6 +89,15 @@ export default {
       title: 'Noch ist nichts passiert',
       description: 'Lege einen Account an und forge einen Block, um ihn zu füllen.',
     },
+    firstVisit: {
+      title: 'Zum ersten Mal hier?',
+      description:
+        'Das ist eine Wegwerf-Chain von Signum, die auf deinem Rechner läuft. Nichts davon ist etwas wert, also kann nichts davon schiefgehen.',
+      newHere: 'Ich bin neu hier',
+      oldHand: 'Ich kenne mich aus',
+      newHereNote: 'Erklärungen überall, und das Angebot, dich durchzuführen',
+      oldHandNote: 'Direkt in die Konsole',
+    },
     drawer: { send: 'Senden', chain: 'Chain', help: 'Hilfe', close: 'Schließen' },
     tx: {
       unconfirmed: 'unbestätigt',

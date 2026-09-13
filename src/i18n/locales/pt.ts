@@ -89,6 +89,15 @@ export default {
       title: 'Ainda não aconteceu nada',
       description: 'Crie uma conta e depois forje um bloco para lhe dar fundos.',
     },
+    firstVisit: {
+      title: 'Primeira vez por aqui?',
+      description:
+        'Esta é uma cadeia de Signum descartável que corre na tua máquina. Aqui nada vale nada, por isso aqui nada pode correr mal.',
+      newHere: 'Sou novo nisto',
+      oldHand: 'Já me oriento',
+      newHereNote: 'Explicações por todo o lado, e a oferta de te guiar passo a passo',
+      oldHandNote: 'Direto para a consola',
+    },
     drawer: { send: 'Enviar', chain: 'Cadeia', help: 'Ajuda', close: 'Fechar' },
     tx: {
       unconfirmed: 'não confirmada',
