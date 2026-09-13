@@ -2235,3 +2235,46 @@ git commit -m "feat: the tour runs on the real chain"
 **One deliberate deviation from the spec.** The spec ends the account chapter by "funding the new account from the miner". This plan funds it by making it the forger and forging one block. It reaches the same place — an account with a balance, visible on chain — with one fewer concept and no second account to explain first, and it answers a question the spec's version leaves hanging: where the money in a chain comes from in the first place. Update the spec's "Beginner mode and the tour" section to match once this lands.
 
 **Ten locales, every time.** `locales.test.ts` compares flattened key sets and will catch a missed one, but it cannot catch a lazy translation. These strings are the product for the audience this layer is built for.
+
+---
+
+## After execution
+
+This plan was carried out on 2026-09-13. The code is now the record; where it
+diverges from the tasks above, the code is right and this is why.
+
+**`Observation` holds transaction ids, not counts.** Tasks 10 and 15 count the
+user's own transactions in the feed. A count falls as well as rises — pending
+transactions confirm, confirmed ones age out of the fifty-block window — so
+"one more than when the step began" can be false at the moment the user does
+the thing. `observeFeed` now returns `ownedSent` and `ownedUnconfirmed` as sets
+of ids, `sentSomething` asks whether an id is new, and `somethingSettled` asks
+whether an id has left the pending set.
+
+**A subscription paying out is not the user sending something.** The chain
+issues those on the subscriber's behalf, so the sender is an owned account.
+`observeFeed` filters them.
+
+**The prefill is applied on arrival, not at mount.** `openSend` completes when
+the drawer opens, so `PaymentForm` is already mounted when the step carrying
+the prefill begins, and a `useState` initial value is read too late.
+
+**The overlay sits below the console's popovers.** `Select` opens its panel
+under the same trigger the callout hangs from; at an equal z-index the callout
+covered the options the step was asking the user to choose from.
+
+**Beginner mode is read in a lazy initialiser.** An effect ran after the first
+paint, so the entry question flashed on every reload with live buttons on it.
+
+**Eleven more terms than Task 9 could reach.** `Row`, `Field` and `Toggle` each
+took `label: string`, which kept the address, public key, holdings, aliases,
+passphrase and fee off screen. Widening the three to `ReactNode` also gave
+multi-out, subscription, payload and block an anchor. `Term` stops the click
+reaching what contains it — the help icon on the forge button would otherwise
+have forged a block.
+
+**`console.tx.fee` was deleted.** Ten translations, zero renders.
+
+**Two extra guards.** `TOUR_STEPS` now has a translation-key test, and the
+use-case headlines have a length test, since the finale lays them out in a
+grid.
