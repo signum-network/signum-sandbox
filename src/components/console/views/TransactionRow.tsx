@@ -4,6 +4,7 @@ import { nodeHost } from '@/lib/ledger'
 import { useQuery } from '@tanstack/react-query'
 import { decodePayload, decryptFor } from '@/lib/payload'
 import type { SandboxAccount } from '@/lib/accounts'
+import { ConsoleButton, RowButton } from '../ConsoleButton'
 import { displayName, type Contacts } from '@/lib/contacts'
 import { toComparableId } from '@/lib/recipient'
 import { summarize } from '@/lib/txSummary'
@@ -40,9 +41,7 @@ function SaveContactField({
         placeholder={t('console.accounts.localLabel')}
         onChange={(e) => setName(e.target.value)}
       />
-      <button
-        className="border px-2 py-[2px] text-[10px] uppercase tracking-[1px] text-[var(--blue3)]"
-        style={{ borderColor: 'var(--border2)' }}
+      <ConsoleButton
         disabled={!name.trim()}
         onClick={() => {
           onSave(address, name.trim())
@@ -50,7 +49,7 @@ function SaveContactField({
         }}
       >
         {t('console.tx.saveContact')}
-      </button>
+      </ConsoleButton>
     </div>
   )
 }
@@ -90,7 +89,7 @@ export function TransactionRow({
 
   return (
     <li className="border-b" style={{ borderColor: 'var(--border2)' }}>
-      <button
+      <RowButton
         className="flex w-full items-center justify-between py-2 text-left text-[11px]"
         onClick={() => setOpen(!open)}
       >
@@ -108,7 +107,7 @@ export function TransactionRow({
             ? t('console.tx.block', { height: item.tx.height ?? '—' })
             : t('console.tx.unconfirmed')}
         </span>
-      </button>
+      </RowButton>
 
       {open && (
         <div

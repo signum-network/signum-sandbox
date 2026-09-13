@@ -6,6 +6,7 @@ import type { SandboxAccount } from '@/lib/accounts'
 import { displayName, type Contacts } from '@/lib/contacts'
 import { isTransaction } from '@/lib/chainFeed'
 import { summarize } from '@/lib/txSummary'
+import { RowButton } from '../ConsoleButton'
 
 /**
  * A block only ever quotes a name it can already resolve locally (owned
@@ -71,7 +72,7 @@ export function BlockRow({
   return (
     <li className="border-b" style={{ borderColor: 'var(--border2)' }}>
       <div className="flex items-center justify-between py-2 text-[11px]">
-        <button
+        <RowButton
           className="flex-1 text-left"
           onClick={() => setOpen(!open)}
           disabled={count === 0}
@@ -84,7 +85,7 @@ export function BlockRow({
             {' '}
             · {t('console.blocks.forger')} {displayName(block.generatorRS, accounts, contacts)}
           </span>
-        </button>
+        </RowButton>
         <a
           className="text-[var(--muted)] underline"
           target="_blank"
@@ -109,12 +110,12 @@ export function BlockRow({
                 copy of all that here. It filters to the transaction itself,
                 not to its block: you asked about this one.
               */}
-              <button
+              <RowButton
                 className="flex w-full items-center py-1 text-left"
                 onClick={() => onSelectTransaction(tx.transaction)}
               >
                 <TransactionSummaryLine transaction={tx} accounts={accounts} contacts={contacts} />
-              </button>
+              </RowButton>
             </li>
           ))}
         </ul>

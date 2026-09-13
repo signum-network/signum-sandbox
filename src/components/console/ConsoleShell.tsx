@@ -6,6 +6,7 @@ import { useContacts } from '@/hooks/useContacts'
 import { useChainFeed } from '@/hooks/useChainFeed'
 import { Unreachable } from '@/components/startpage'
 import { AppHeader } from '@/components/AppHeader'
+import { ConsoleButton, RowButton } from './ConsoleButton'
 import { interpret, resolveQuery } from '@/lib/search'
 import { useNameLookup } from '@/hooks/useNameLookup'
 import { Header } from './Header'
@@ -68,18 +69,17 @@ export function ConsoleShell() {
       <div className="mb-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
           {TABS.map((name) => (
-            <button
+            <ConsoleButton
               key={name}
+              active={tab === name}
               onClick={() => setTab(name)}
-              className="border px-3 py-1 text-[10px] font-bold uppercase tracking-[1px]"
               style={{
-                borderColor: tab === name ? 'var(--blue2)' : 'var(--border2)',
                 background: tab === name ? 'rgba(0,102,255,.18)' : 'transparent',
                 color: tab === name ? 'var(--blue3)' : 'var(--muted)',
               }}
             >
               {t(`console.tab.${name}`)}
-            </button>
+            </ConsoleButton>
           ))}
         </div>
         <SearchField value={search} onChange={setSearch} />
@@ -123,9 +123,12 @@ export function ConsoleShell() {
               <span className="text-[10px] uppercase tracking-[1px] text-[var(--blue3)]">
                 {t(`console.drawer.${drawer}`)}
               </span>
-              <button className="text-[11px] text-[var(--muted)]" onClick={() => setDrawer(null)}>
+              <RowButton
+                className="text-[11px] text-[var(--muted)]"
+                onClick={() => setDrawer(null)}
+              >
                 ✕
-              </button>
+              </RowButton>
             </div>
             {drawer === 'send' && <SendDrawer store={accounts} contacts={contacts.contacts} />}
             {drawer === 'chain' && <ChainDrawer height={state.height} />}

@@ -4,6 +4,7 @@ import type { AccountStore } from '@/hooks/useAccounts'
 import type { ContactStore } from '@/hooks/useContacts'
 import { matchesAccountQuery, type Query } from '@/lib/search'
 import { AccountRow } from './AccountRow'
+import { ConsoleButton } from '../ConsoleButton'
 import { ContactList } from './ContactList'
 
 export function AccountsView({
@@ -38,7 +39,6 @@ export function AccountsView({
   }
 
   const field = 'border bg-transparent px-2 py-1 text-[11px] text-[var(--fg)]'
-  const button = 'border px-3 py-1 text-[10px] uppercase tracking-[1px] text-[var(--blue3)]'
   const border = { borderColor: 'var(--border2)' }
 
   const shown = store.accounts.filter((account) =>
@@ -73,9 +73,7 @@ export function AccountsView({
           onChange={(e) => setCreateName(e.target.value)}
           placeholder={t('console.accounts.localLabel')}
         />
-        <button
-          className={button}
-          style={border}
+        <ConsoleButton
           onClick={() => {
             if (!createName.trim()) return
             store.create(createName.trim())
@@ -83,7 +81,7 @@ export function AccountsView({
           }}
         >
           {t('console.accounts.create')}
-        </button>
+        </ConsoleButton>
       </div>
 
       <div className="mb-3 flex flex-wrap items-center gap-2 border-t pt-2" style={border}>
@@ -101,9 +99,7 @@ export function AccountsView({
           onChange={(e) => setPassphrase(e.target.value)}
           placeholder={t('console.accounts.passphrase')}
         />
-        <button
-          className={button}
-          style={border}
+        <ConsoleButton
           onClick={() => {
             if (!importName.trim() || !passphrase.trim()) return
             store.importPassphrase(importName.trim(), passphrase.trim())
@@ -112,7 +108,7 @@ export function AccountsView({
           }}
         >
           {t('console.accounts.import')}
-        </button>
+        </ConsoleButton>
       </div>
 
       {shown.length === 0 && (

@@ -4,6 +4,7 @@ import { Address } from '@signumjs/core'
 import type { Contacts } from '@/lib/contacts'
 import { matchesAccountQuery, type Query } from '@/lib/search'
 import { Identicon } from '../Identicon'
+import { ConsoleButton } from '../ConsoleButton'
 
 /**
  * A contact only ever stores an id (see Contacts in src/lib/contacts.ts); the
@@ -38,7 +39,6 @@ export function ContactList({
   const [name, setName] = useState('')
 
   const field = 'border bg-transparent px-2 py-1 text-[11px] text-[var(--fg)]'
-  const button = 'border px-3 py-1 text-[10px] uppercase tracking-[1px] text-[var(--blue3)]'
   const border = { borderColor: 'var(--border2)' }
 
   const entries = Object.entries(contacts)
@@ -66,9 +66,7 @@ export function ContactList({
           onChange={(e) => setName(e.target.value)}
           placeholder={t('console.accounts.localLabel')}
         />
-        <button
-          className={button}
-          style={border}
+        <ConsoleButton
           onClick={() => {
             if (!address.trim() || !name.trim()) return
             onAdd(address.trim(), name.trim())
@@ -77,7 +75,7 @@ export function ContactList({
           }}
         >
           {t('console.accounts.addContact')}
-        </button>
+        </ConsoleButton>
       </div>
 
       {entries.length === 0 && (
@@ -94,13 +92,11 @@ export function ContactList({
             <Identicon value={c.address} />
             <span className="font-bold text-[var(--fg)]">{c.name}</span>
             <span className="text-[var(--muted)]">{c.address}</span>
-            <button
-              className={`${button} ml-auto`}
-              style={border}
-              onClick={() => onRemove(c.id)}
-            >
-              {t('console.accounts.remove')}
-            </button>
+            <span className="ml-auto">
+              <ConsoleButton onClick={() => onRemove(c.id)}>
+                {t('console.accounts.remove')}
+              </ConsoleButton>
+            </span>
           </li>
         ))}
       </ul>

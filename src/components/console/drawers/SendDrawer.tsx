@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from '@tanstack/react-query'
+import { sfx, useAudio } from '@/audio'
+import { ConsoleButton } from '@/components/console/ConsoleButton'
 import type { AccountStore } from '@/hooks/useAccounts'
 import type { Contacts } from '@/lib/contacts'
 import { PaymentForm } from './forms/PaymentForm'
@@ -35,7 +37,11 @@ export function SendDrawer({ store, contacts }: { store: AccountStore; contacts:
   const { t } = useTranslation()
   const client = useQueryClient()
   const [kind, setKind] = useState<SendKind>('payment')
-  const [notice, setNotice] = useState<string | null>(null)
+  const { play } = useAudio()
+  // Success and failure used to share one line in one colour, so a rejection
+  // read exactly like a send. They now differ in what they say, how they look
+  // and how they sound.
+  const [notice, setNotice] = useState<{ ok: boolean; text: string } | null>(null)
 
   if (!store.available) {
     return <p className="mt-2 text-[11px] text-[var(--muted)]">{t('console.guard.title')}</p>
@@ -44,25 +50,31 @@ export function SendDrawer({ store, contacts }: { store: AccountStore; contacts:
   // A fresh transaction shows up as unconfirmed only after the feed refetches;
   // the socket will do it too, but not before the user looks.
   const onSent = () => {
-    setNotice(t('console.send.sent'))
+    play(sfx.confirm)
+    setNotice({ ok: true, text: t('console.send.sent') })
     void client.invalidateQueries({ queryKey: ['unconfirmed'] })
+  }
+
+  const onError = (text: string) => {
+    play(sfx.warn)
+    setNotice({ ok: false, text })
   }
 
   return (
     <div className="mt-2">
       <div className="mb-3 flex flex-wrap gap-1">
         {KINDS.map((name) => (
-          <button
+            <ConsoleButton
             key={name}
-            onClick={() => { setKind(name); setNotice(null) }}
-            className="border px-2 py-[2px] text-[9px] uppercase tracking-[1px]"
-            style={{
-              borderColor: kind === name ? 'var(--blue2)' : 'var(--border2)',
-              color: kind === name ? 'var(--blue3)' : 'var(--muted)',
+            active={kind === name}
+            onClick={() => {
+              setKind(name)
+              setNotice(null)
             }}
+            style={{ color: kind === name ? 'var(--blue3)' : 'var(--muted)' }}
           >
-            {t(`console.kind.${name === 'message' ? 'message' : name}`)}
-          </button>
+            {t(`console.kind.${name}`)}
+          </ConsoleButton>
         ))}
       </div>
 
@@ -72,7 +84,7 @@ export function SendDrawer({ store, contacts }: { store: AccountStore; contacts:
           forgerId={store.forgerId}
           contacts={contacts}
           onSent={onSent}
-          onError={setNotice}
+          onError={onError}
         />
       )}
       {kind === 'multiOut' && (
@@ -81,7 +93,7 @@ export function SendDrawer({ store, contacts }: { store: AccountStore; contacts:
           forgerId={store.forgerId}
           contacts={contacts}
           onSent={onSent}
-          onError={setNotice}
+          onError={onError}
         />
       )}
       {kind === 'message' && (
@@ -90,7 +102,7 @@ export function SendDrawer({ store, contacts }: { store: AccountStore; contacts:
           forgerId={store.forgerId}
           contacts={contacts}
           onSent={onSent}
-          onError={setNotice}
+          onError={onError}
         />
       )}
       {kind === 'accountInfo' && (
@@ -98,7 +110,7 @@ export function SendDrawer({ store, contacts }: { store: AccountStore; contacts:
           accounts={store.accounts}
           forgerId={store.forgerId}
           onSent={onSent}
-          onError={setNotice}
+          onError={onError}
         />
       )}
       {kind === 'tokenIssue' && (
@@ -106,7 +118,7 @@ export function SendDrawer({ store, contacts }: { store: AccountStore; contacts:
           accounts={store.accounts}
           forgerId={store.forgerId}
           onSent={onSent}
-          onError={setNotice}
+          onError={onError}
         />
       )}
       {kind === 'tokenTransfer' && (
@@ -115,7 +127,7 @@ export function SendDrawer({ store, contacts }: { store: AccountStore; contacts:
           forgerId={store.forgerId}
           contacts={contacts}
           onSent={onSent}
-          onError={setNotice}
+          onError={onError}
         />
       )}
       {kind === 'mintAsset' && (
@@ -123,11 +135,11 @@ export function SendDrawer({ store, contacts }: { store: AccountStore; contacts:
           accounts={store.accounts}
           forgerId={store.forgerId}
           onSent={onSent}
-          onError={setNotice}
+          onError={onError}
         />
       )}
       {kind === 'alias' && (
-        <AliasForm accounts={store.accounts} forgerId={store.forgerId} onSent={onSent} onError={setNotice} />
+        <AliasForm accounts={store.accounts} forgerId={store.forgerId} onSent={onSent} onError={onError} />
       )}
       {kind === 'subscription' && (
         <SubscriptionForm
@@ -135,7 +147,7 @@ export function SendDrawer({ store, contacts }: { store: AccountStore; contacts:
           forgerId={store.forgerId}
           contacts={contacts}
           onSent={onSent}
-          onError={setNotice}
+          onError={onError}
         />
       )}
       {kind === 'cancelSubscription' && (
@@ -143,11 +155,18 @@ export function SendDrawer({ store, contacts }: { store: AccountStore; contacts:
           accounts={store.accounts}
           forgerId={store.forgerId}
           onSent={onSent}
-          onError={setNotice}
+          onError={onError}
         />
       )}
 
-      {notice && <p className="mt-2 text-[10px] text-[var(--blue3)]">{notice}</p>}
+      {notice && (
+        <p
+          className="mt-2 text-[10px]"
+          style={{ color: notice.ok ? 'var(--green)' : 'var(--mag)' }}
+        >
+          {notice.ok ? '✓' : '✕'} {notice.text}
+        </p>
+      )}
     </div>
   )
 }

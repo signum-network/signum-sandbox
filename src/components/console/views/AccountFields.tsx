@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { ReactNode } from 'react'
+import { ConsoleButton } from '../ConsoleButton'
 
 export const actionButton =
   'border px-2 py-[1px] text-[10px] uppercase tracking-[1px] text-[var(--blue3)]'
@@ -20,17 +21,16 @@ export function CopyButton({ value }: { value: string }) {
   const { t } = useTranslation()
   const [copied, setCopied] = useState(false)
   return (
-    <button
-      className={actionButton}
-      style={actionBorder}
-      onClick={async () => {
-        await navigator.clipboard.writeText(value)
-        setCopied(true)
-        setTimeout(() => setCopied(false), 1200)
+    <ConsoleButton
+      onClick={() => {
+        void navigator.clipboard.writeText(value).then(() => {
+          setCopied(true)
+          setTimeout(() => setCopied(false), 1200)
+        })
       }}
     >
       {copied ? t('console.accounts.copied') : t('console.accounts.copy')}
-    </button>
+    </ConsoleButton>
   )
 }
 
@@ -49,13 +49,9 @@ export function PassphraseField({ passphrase }: { passphrase: string }) {
   return (
     <Row label={t('console.accounts.passphrase')}>
       <span className="font-mono">{revealed ? passphrase : '•'.repeat(24)}</span>{' '}
-      <button
-        className={actionButton}
-        style={actionBorder}
-        onClick={() => setRevealed(!revealed)}
-      >
+      <ConsoleButton onClick={() => setRevealed(!revealed)}>
         {revealed ? t('console.accounts.passphraseHide') : t('console.accounts.passphraseReveal')}
-      </button>{' '}
+      </ConsoleButton>{' '}
       <CopyButton value={passphrase} />{' '}
       <span className="text-[10px] text-[var(--muted)]">{t('console.accounts.fake')}</span>
     </Row>

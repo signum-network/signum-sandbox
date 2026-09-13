@@ -9,6 +9,7 @@ import { formatQuantity } from '@/lib/token'
 import { summarize } from '@/lib/txSummary'
 import { displayName, type Contacts } from '@/lib/contacts'
 import { PassphraseField, Row } from './AccountFields'
+import { RowButton } from '../ConsoleButton'
 
 /** How much of an account's history the detail shows before it stops being a summary. */
 const RECENT = 5
@@ -160,7 +161,7 @@ export function AccountDetail({
                 {history.data.transactions.map((tx) => {
                   const summary = summarize(tx)
                   return (
-                    <button
+                    <RowButton
                       key={tx.transaction}
                       className="text-left"
                       onClick={() => onSelectTransaction(tx.transaction)}
@@ -178,7 +179,7 @@ export function AccountDetail({
                           : ''}
                         {summary.amountSigna ? ` · ${summary.amountSigna} SIGNA` : ''}
                       </span>
-                    </button>
+                    </RowButton>
                   )
                 })}
               </span>

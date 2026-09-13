@@ -1,6 +1,7 @@
 import { useId, type ReactNode } from 'react'
 import type { SandboxAccount } from '@/lib/accounts'
 import type { Contacts } from '@/lib/contacts'
+import { ConsoleButton } from '@/components/console/ConsoleButton'
 import { Select } from '@/components/console/Select'
 
 const border = { borderColor: 'var(--border2)' }
@@ -149,13 +150,8 @@ export function SubmitButton({
   onClick: () => void
 }) {
   return (
-    <button
-      className="border px-3 py-1 text-[10px] uppercase tracking-[1px] text-[var(--blue3)]"
-      style={border}
-      disabled={busy}
-      onClick={onClick}
-    >
+    <ConsoleButton disabled={busy} onClick={onClick}>
       {label}
-    </button>
+    </ConsoleButton>
   )
 }

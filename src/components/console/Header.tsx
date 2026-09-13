@@ -7,6 +7,8 @@ import { Select } from '@/components/console/Select'
 import { AUTO_INTERVALS_S, MAINNET_INTERVAL_S, formatInterval } from '@/lib/autoForge'
 import { Countdown } from '@/components/console/Countdown'
 import { Toggle } from '@/components/console/Toggle'
+import { ConsoleButton } from '@/components/console/ConsoleButton'
+import { sfx, useAudio } from '@/audio'
 
 export function Header({
   state,
@@ -30,6 +32,7 @@ export function Header({
     error,
   } = useForge(accounts.forger)
   const [requested, setRequested] = useState(false)
+  const { play } = useAudio()
 
   // submitNonce reports success even when several calls collapse into a single
   // block, so the button promises a request, not a block. The height beside it
@@ -38,12 +41,16 @@ export function Header({
   // succeeded — on failure useForge's own error takes that spot instead.
   const forgeClicked = async () => {
     const ok = await forgeOnce()
-    if (!ok) return
+    if (!ok) {
+      // The message appears beside the button, but a forge you asked for and
+      // did not get deserves to be heard as well as read.
+      play(sfx.warn)
+      return
+    }
     setRequested(true)
     setTimeout(() => setRequested(false), 3000)
   }
 
-  const button = 'border px-3 py-1 text-[10px] uppercase tracking-[1px]'
   const border = { borderColor: 'var(--border2)' }
 
   return (
@@ -105,14 +112,9 @@ export function Header({
           </>
         )}
 
-        <button
-          className={button}
-          style={{ ...border, color: canForge ? 'var(--blue3)' : 'var(--muted)' }}
-          disabled={!canForge || busy}
-          onClick={() => void forgeClicked()}
-        >
+        <ConsoleButton disabled={!canForge || busy} onClick={() => void forgeClicked()}>
           ⛏ {t('console.forge.action')}
-        </button>
+        </ConsoleButton>
 
         {requested && (
           <span className="text-[10px] text-[var(--muted)]">{t('console.forge.requested')}</span>
@@ -134,14 +136,9 @@ export function Header({
         </div>
 
         {(['send', 'chain', 'help'] as const).map((name) => (
-          <button
-            key={name}
-            className={button}
-            style={{ ...border, color: 'var(--blue3)' }}
-            onClick={() => onOpenDrawer(name)}
-          >
+          <ConsoleButton key={name} onClick={() => onOpenDrawer(name)}>
             {t(`console.drawer.${name}`)}
-          </button>
+          </ConsoleButton>
         ))}
       </span>
     </div>

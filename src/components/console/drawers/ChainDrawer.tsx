@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from '@tanstack/react-query'
 import { resetChain } from '@/lib/chainAdmin'
+import { ConsoleButton } from '@/components/console/ConsoleButton'
 import { resetScriptCommand } from '@/lib/platform'
 
 export function ChainDrawer({ height }: { height: number | null }) {
@@ -27,14 +28,9 @@ export function ChainDrawer({ height }: { height: number | null }) {
 
   return (
     <div className="mt-2">
-      <button
-        className="border px-3 py-1 text-[10px] uppercase tracking-[1px] text-[var(--blue3)]"
-        style={{ borderColor: 'var(--border2)' }}
-        disabled={busy}
-        onClick={() => void reset()}
-      >
+      <ConsoleButton disabled={busy} onClick={() => void reset()}>
         {t('console.chain.reset')}
-      </button>
+      </ConsoleButton>
       {notice && <p className="mt-2 text-[10px] text-[var(--muted)]">{notice}</p>}
     </div>
   )
