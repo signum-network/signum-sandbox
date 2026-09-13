@@ -64,7 +64,7 @@ export function Header({
         and the personal settings are in AppHeader above, so this bar changes
         exactly when the chain does.
       */}
-      <span className="text-[11px]">
+      <span className="text-[11px]" data-tour="height">
         <span className="text-[var(--muted)]">
           <Term id="height">{t('console.chain.height')}</Term>{' '}
         </span>
@@ -122,9 +122,11 @@ export function Header({
           label={t('console.forge.auto')}
         />
 
-        <ConsoleButton disabled={!canForge || busy} onClick={() => void forgeClicked()}>
-          ⛏ <Term id="forge">{t('console.forge.action')}</Term>
-        </ConsoleButton>
+        <span className="flex" data-tour="forge-button">
+          <ConsoleButton disabled={!canForge || busy} onClick={() => void forgeClicked()}>
+            ⛏ <Term id="forge">{t('console.forge.action')}</Term>
+          </ConsoleButton>
+        </span>
 
         {requested && (
           <span className="text-[10px] text-[var(--muted)]">{t('console.forge.requested')}</span>
@@ -135,7 +137,7 @@ export function Header({
           </span>
         )}
 
-        <div className="w-36">
+        <div className="w-36" data-tour="forger-select">
           <Select
             value={accounts.forgerId ?? ''}
             placeholder={t('console.forge.chooseForger')}
@@ -146,9 +148,11 @@ export function Header({
         </div>
 
         {(['send', 'chain', 'help'] as const).map((name) => (
-          <ConsoleButton key={name} onClick={() => onOpenDrawer(name)}>
-            {t(`console.drawer.${name}`)}
-          </ConsoleButton>
+          <span key={name} className="flex" data-tour={name === 'send' ? 'send-button' : undefined}>
+            <ConsoleButton onClick={() => onOpenDrawer(name)}>
+              {t(`console.drawer.${name}`)}
+            </ConsoleButton>
+          </span>
         ))}
       </span>
     </div>

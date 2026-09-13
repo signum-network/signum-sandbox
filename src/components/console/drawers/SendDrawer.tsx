@@ -50,7 +50,19 @@ const KINDS: SendKind[] = [
   'cancelSubscription',
 ]
 
-export function SendDrawer({ store, contacts }: { store: AccountStore; contacts: Contacts }) {
+export interface SendPrefill {
+  signa: string
+}
+
+export function SendDrawer({
+  store,
+  contacts,
+  prefill,
+}: {
+  store: AccountStore
+  contacts: Contacts
+  prefill?: SendPrefill
+}) {
   const { t } = useTranslation()
   const client = useQueryClient()
   const [kind, setKind] = useState<SendKind>('payment')
@@ -105,6 +117,7 @@ export function SendDrawer({ store, contacts }: { store: AccountStore; contacts:
           accounts={store.accounts}
           forgerId={store.forgerId}
           contacts={contacts}
+          initialSigna={prefill?.signa}
           onSent={onSent}
           onError={onError}
         />

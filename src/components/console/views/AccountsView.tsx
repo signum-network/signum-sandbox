@@ -69,7 +69,7 @@ export function AccountsView({
         which read as one blended action. Stacking with a rule between them
         costs one extra line of height and buys the two an obvious boundary.
       */}
-      <div className="mb-3 flex flex-wrap items-center gap-2">
+      <div className="mb-3 flex flex-wrap items-center gap-2" data-tour="create-account">
         <input
           className={field}
           style={border}

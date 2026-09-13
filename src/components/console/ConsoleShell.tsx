@@ -95,19 +95,30 @@ export function ConsoleShell() {
         <div className="mb-3 flex shrink-0 items-center justify-between">
           <div className="flex items-center gap-2">
             {[...TABS, ...(watched.watchedId ? (['watch'] as const) : [])].map((name) => (
-              <ConsoleButton
+              <span
                 key={name}
-                active={tab === name}
-                onClick={() => setTab(name)}
-                style={{
-                  background: tab === name ? 'rgba(0,102,255,.18)' : 'transparent',
-                  color: tab === name ? 'var(--blue3)' : 'var(--muted)',
-                }}
+                className="flex"
+                data-tour={
+                  name === 'accounts'
+                    ? 'accounts-tab'
+                    : name === 'transactions'
+                      ? 'transactions-tab'
+                      : undefined
+                }
               >
-                {name === 'watch'
-                  ? displayName(watched.watchedId ?? '', accounts.accounts, contacts.contacts)
-                  : t(`console.tab.${name}`)}
-              </ConsoleButton>
+                <ConsoleButton
+                  active={tab === name}
+                  onClick={() => setTab(name)}
+                  style={{
+                    background: tab === name ? 'rgba(0,102,255,.18)' : 'transparent',
+                    color: tab === name ? 'var(--blue3)' : 'var(--muted)',
+                  }}
+                >
+                  {name === 'watch'
+                    ? displayName(watched.watchedId ?? '', accounts.accounts, contacts.contacts)
+                    : t(`console.tab.${name}`)}
+                </ConsoleButton>
+              </span>
             ))}
           </div>
           <SearchField value={search} onChange={changeSearch} />

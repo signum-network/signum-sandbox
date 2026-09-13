@@ -15,19 +15,22 @@ export function PaymentForm({
   accounts,
   forgerId,
   contacts,
+  initialSigna,
   onSent,
   onError,
 }: {
   accounts: SandboxAccount[]
   forgerId: string | null
   contacts: Contacts
+  /** A starting amount, for the tour. The field stays fully editable. */
+  initialSigna?: string
   onSent: () => void
   onError: (message: string) => void
 }) {
   const { t } = useTranslation()
   const [fromId, setFromId] = useFromAccount(forgerId)
   const [to, setTo] = useState('')
-  const [amount, setAmount] = useState('')
+  const [amount, setAmount] = useState(initialSigna ?? '')
   const [attach, setAttach] = useState(false)
   const payload = usePayload()
   const [fee, setFee] = useState(feeFor('payment').getSigna())
