@@ -10,7 +10,15 @@ import { resolveRecipientPublicKey, transferToken } from '@/lib/send'
 import { useFromAccount } from '@/hooks/useFromAccount'
 import { Select } from '@/components/console/Select'
 import { Toggle } from '@/components/console/Toggle'
-import { AccountSelect, FeeField, Field, RecipientPicker, SubmitButton, TextInput, QuantityHint } from './fields'
+import {
+  AccountSelect,
+  FeeField,
+  Field,
+  QuantityHint,
+  RecipientPicker,
+  SubmitButton,
+  TextInput,
+} from './fields'
 import { PayloadEditor, usePayload } from './payload'
 import { Term } from '@/components/console/Term'
 
