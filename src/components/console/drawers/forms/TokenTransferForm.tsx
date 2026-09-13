@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { Amount } from '@signumjs/util'
+import { feeFor } from '@/lib/fees'
 import { useTranslation } from 'react-i18next'
 import { useQuery } from '@tanstack/react-query'
 import type { SandboxAccount } from '@/lib/accounts'
@@ -8,7 +10,7 @@ import { resolveRecipientPublicKey, transferToken } from '@/lib/send'
 import { useFromAccount } from '@/hooks/useFromAccount'
 import { Select } from '@/components/console/Select'
 import { Toggle } from '@/components/console/Toggle'
-import { AccountSelect, Field, RecipientPicker, SubmitButton, TextInput } from './fields'
+import { AccountSelect, FeeField, Field, RecipientPicker, SubmitButton, TextInput } from './fields'
 import { PayloadEditor, usePayload } from './payload'
 
 export function TokenTransferForm({
@@ -34,6 +36,7 @@ export function TokenTransferForm({
   // application can read.
   const [attach, setAttach] = useState(false)
   const payload = usePayload()
+  const [fee, setFee] = useState(feeFor('transferAsset').getSigna())
   const [busy, setBusy] = useState(false)
 
   // SignumJS names this getAssetsByOwner, not getAccountAssets — the client
@@ -53,7 +56,15 @@ export function TokenTransferForm({
     setBusy(true)
     try {
       const recipientPublicKey = await resolveRecipientPublicKey(to, accounts)
-      await transferToken(from, to, assetId, quantity, recipientPublicKey, attach ? attached : undefined)
+      await transferToken({
+        from,
+        to,
+        assetId,
+        quantity,
+        recipientPublicKey,
+        message: attach ? attached : undefined,
+        fee: Amount.fromSigna(fee),
+      })
       setTo('')
       setAssetId('')
       setQuantity('')
@@ -94,6 +105,7 @@ export function TokenTransferForm({
       {attach && (
         <PayloadEditor state={payload} label={t('console.send.message')} variant="attachment" />
       )}
+      <FeeField action="transferAsset" value={fee} onChange={setFee} />
       <SubmitButton label={t('console.send.submit')} busy={busy} onClick={() => void submit()} />
     </div>
   )

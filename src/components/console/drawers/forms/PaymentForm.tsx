@@ -1,11 +1,13 @@
 import { useState } from 'react'
+import { Amount } from '@signumjs/util'
+import { feeFor } from '@/lib/fees'
 import { useTranslation } from 'react-i18next'
 import type { SandboxAccount } from '@/lib/accounts'
 import type { Contacts } from '@/lib/contacts'
 import { resolveRecipientPublicKey, sendPayment } from '@/lib/send'
 import { useFromAccount } from '@/hooks/useFromAccount'
 import { Toggle } from '@/components/console/Toggle'
-import { AccountSelect, Field, RecipientPicker, SubmitButton, TextInput } from './fields'
+import { AccountSelect, FeeField, Field, RecipientPicker, SubmitButton, TextInput } from './fields'
 import { PayloadEditor, usePayload } from './payload'
 
 export function PaymentForm({
@@ -27,6 +29,7 @@ export function PaymentForm({
   const [amount, setAmount] = useState('')
   const [attach, setAttach] = useState(false)
   const payload = usePayload()
+  const [fee, setFee] = useState(feeFor('payment').getSigna())
   const [busy, setBusy] = useState(false)
 
   const submit = async () => {
@@ -37,7 +40,14 @@ export function PaymentForm({
     setBusy(true)
     try {
       const recipientPublicKey = await resolveRecipientPublicKey(to, accounts)
-      await sendPayment(from, to, amount, recipientPublicKey, attach ? attached : undefined)
+      await sendPayment({
+        from,
+        to,
+        signa: amount,
+        recipientPublicKey,
+        message: attach ? attached : undefined,
+        fee: Amount.fromSigna(fee),
+      })
       setTo('')
       setAmount('')
       payload.reset()
@@ -66,6 +76,7 @@ export function PaymentForm({
       {attach && (
         <PayloadEditor state={payload} label={t('console.send.message')} variant="attachment" />
       )}
+      <FeeField action="payment" value={fee} onChange={setFee} />
       <SubmitButton label={t('console.send.submit')} busy={busy} onClick={() => void submit()} />
     </div>
   )

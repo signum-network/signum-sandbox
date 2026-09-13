@@ -11,17 +11,27 @@ import { knownPublicKey } from './recipient'
 import { feeFor, type SendAction } from './fees'
 import type { SandboxAccount } from './accounts'
 
+/**
+ * What every send takes on top of its own fields: the fee, when the sender
+ * wants one other than the action's default.
+ */
+export interface Fee {
+  fee?: Amount
+}
+
 const keysOf = (account: SandboxAccount) => generateSignKeys(account.passphrase)
 
 /**
- * Every send shares these three fields. The fee is looked up per action
- * rather than fixed, since Signum's minimum fee is set per transaction
- * type — see feeFor's comment in ./fees for how each number was measured.
+ * Every send shares these three fields. The fee defaults to what the action
+ * needs — Signum's minimum is per transaction type, see feeFor in ./fees for
+ * how each number was measured — and a caller can override it, because the
+ * real minimum also rises with the attachment and only the sender knows what
+ * they are willing to pay.
  */
-const base = (account: SandboxAccount, action: SendAction) => {
+const base = (account: SandboxAccount, action: SendAction, fee?: Amount) => {
   const keys = keysOf(account)
   return {
-    feePlanck: feeFor(action).getPlanck(),
+    feePlanck: (fee ?? feeFor(action)).getPlanck(),
     senderPublicKey: keys.publicKey,
     senderPrivateKey: keys.signPrivateKey,
   }
@@ -66,16 +76,18 @@ export async function resolveRecipientPublicKey(
   }
 }
 
-export async function sendPayment(
-  from: SandboxAccount,
-  to: string,
-  signa: string,
-  recipientPublicKey: string | undefined,
-  message?: string,
-) {
+export interface PaymentArgs extends Fee {
+  from: SandboxAccount
+  to: string
+  signa: string
+  recipientPublicKey: string | undefined
+  message?: string
+}
+
+export async function sendPayment({ from, to, signa, recipientPublicKey, message, fee }: PaymentArgs) {
   return asId(
     await signingLedger.transaction.sendAmountToSingleRecipient({
-      ...base(from, 'payment'),
+      ...base(from, 'payment', fee),
       amountPlanck: Amount.fromSigna(signa).getPlanck(),
       recipientId: toNumericId(to),
       recipientPublicKey,
@@ -90,13 +102,15 @@ export async function sendPayment(
  * has never seen therefore cannot be paid this way — a protocol limit, not an
  * omission here. The form warns instead.
  */
-export async function sendMultiOut(
-  from: SandboxAccount,
-  recipients: { address: string; signa: string }[],
-) {
+export interface MultiOutArgs extends Fee {
+  from: SandboxAccount
+  recipients: { address: string; signa: string }[]
+}
+
+export async function sendMultiOut({ from, recipients, fee }: MultiOutArgs) {
   return asId(
     await signingLedger.transaction.sendAmountToMultipleRecipients({
-      ...base(from, 'multiOut'),
+      ...base(from, 'multiOut', fee),
       recipientAmounts: recipients.map((r) => ({
         recipient: toNumericId(r.address),
         amountNQT: Amount.fromSigna(r.signa).getPlanck(),
@@ -105,15 +119,17 @@ export async function sendMultiOut(
   )
 }
 
-export async function sendPlainMessage(
-  from: SandboxAccount,
-  to: string,
-  message: string,
-  recipientPublicKey: string | undefined,
-) {
+export interface MessageArgs extends Fee {
+  from: SandboxAccount
+  to: string
+  message: string
+  recipientPublicKey: string | undefined
+}
+
+export async function sendPlainMessage({ from, to, message, recipientPublicKey, fee }: MessageArgs) {
   return asId(
     await signingLedger.message.sendMessage({
-      ...base(from, 'message'),
+      ...base(from, 'message', fee),
       message,
       messageIsText: true,
       recipientId: toNumericId(to),
@@ -128,15 +144,23 @@ export async function sendPlainMessage(
  * resolves it and passes it in, so this function has no opinion about where it
  * came from.
  */
-export async function sendEncryptedMessage(
-  from: SandboxAccount,
-  to: string,
-  recipientPublicKey: string,
-  message: string,
-) {
+export interface EncryptedMessageArgs extends Fee {
+  from: SandboxAccount
+  to: string
+  recipientPublicKey: string
+  message: string
+}
+
+export async function sendEncryptedMessage({
+  from,
+  to,
+  recipientPublicKey,
+  message,
+  fee,
+}: EncryptedMessageArgs) {
   return asId(
     await signingLedger.message.sendEncryptedMessage({
-      ...base(from, 'message'),
+      ...base(from, 'message', fee),
       message,
       messageIsText: true,
       recipientId: toNumericId(to),
@@ -151,31 +175,43 @@ export async function sendEncryptedMessage(
  * it is plain text or an SRC44 descriptor, and building one here as well
  * would wrap a descriptor inside another descriptor's description.
  */
-export async function setAccountInfo(
-  account: SandboxAccount,
-  name: string,
-  description: string,
-) {
+export interface AccountInfoArgs extends Fee {
+  account: SandboxAccount
+  name: string
+  description: string
+}
+
+export async function setAccountInfo({ account, name, description, fee }: AccountInfoArgs) {
   return asId(
     await signingLedger.account.setAccountInfo({
-      ...base(account, 'accountInfo'),
+      ...base(account, 'accountInfo', fee),
       name,
       description,
     }),
   )
 }
 
-export async function issueToken(
-  issuer: SandboxAccount,
-  name: string,
-  quantity: string,
-  decimals: number,
-  description: string,
-  mintable: boolean,
-) {
+export interface IssueTokenArgs extends Fee {
+  issuer: SandboxAccount
+  name: string
+  quantity: string
+  decimals: number
+  description: string
+  mintable: boolean
+}
+
+export async function issueToken({
+  issuer,
+  name,
+  quantity,
+  decimals,
+  description,
+  mintable,
+  fee,
+}: IssueTokenArgs) {
   return asId(
     await signingLedger.asset.issueAsset({
-      ...base(issuer, 'issueAsset'),
+      ...base(issuer, 'issueAsset', fee),
       name,
       quantity,
       decimals,
@@ -192,17 +228,27 @@ export async function issueToken(
  * be an SRC44 descriptor: an application shipping a token can say what the
  * transfer was for in a form another application can read.
  */
-export async function transferToken(
-  from: SandboxAccount,
-  to: string,
-  assetId: string,
-  quantity: string,
-  recipientPublicKey: string | undefined,
-  message?: string,
-) {
+export interface TransferTokenArgs extends Fee {
+  from: SandboxAccount
+  to: string
+  assetId: string
+  quantity: string
+  recipientPublicKey: string | undefined
+  message?: string
+}
+
+export async function transferToken({
+  from,
+  to,
+  assetId,
+  quantity,
+  recipientPublicKey,
+  message,
+  fee,
+}: TransferTokenArgs) {
   return asId(
     await signingLedger.asset.transferAsset({
-      ...base(from, 'transferAsset'),
+      ...base(from, 'transferAsset', fee),
       assetId,
       quantity,
       recipientId: toNumericId(to),
@@ -218,20 +264,32 @@ export async function transferToken(
  * already filtered its asset list down to mintable ones; this function
  * trusts that and lets the node be the final word regardless.
  */
-export async function mintAsset(issuer: SandboxAccount, assetId: string, quantity: string) {
+export interface MintArgs extends Fee {
+  issuer: SandboxAccount
+  assetId: string
+  quantity: string
+}
+
+export async function mintAsset({ issuer, assetId, quantity, fee }: MintArgs) {
   return asId(
     await signingLedger.asset.mintAsset({
-      ...base(issuer, 'mintAsset'),
+      ...base(issuer, 'mintAsset', fee),
       assetId,
       quantity,
     }),
   )
 }
 
-export async function setAlias(account: SandboxAccount, aliasName: string, content: string) {
+export interface AliasArgs extends Fee {
+  account: SandboxAccount
+  aliasName: string
+  content: string
+}
+
+export async function setAlias({ account, aliasName, content, fee }: AliasArgs) {
   return asId(
     await signingLedger.alias.setAlias({
-      ...base(account, 'alias'),
+      ...base(account, 'alias', fee),
       aliasName,
       aliasURI: content,
     }),
@@ -246,15 +304,23 @@ export async function setAlias(account: SandboxAccount, aliasName: string, conte
  * price is fixed at zero here rather than exposed, because selling aliases is
  * a marketplace feature and the sandbox is not a marketplace.
  */
-export async function transferAlias(
-  from: SandboxAccount,
-  aliasName: string,
-  to: string,
-  recipientPublicKey: string | undefined,
-) {
+export interface AliasTransferArgs extends Fee {
+  from: SandboxAccount
+  aliasName: string
+  to: string
+  recipientPublicKey: string | undefined
+}
+
+export async function transferAlias({
+  from,
+  aliasName,
+  to,
+  recipientPublicKey,
+  fee,
+}: AliasTransferArgs) {
   return asId(
     await signingLedger.alias.sellAlias({
-      ...base(from, 'alias'),
+      ...base(from, 'alias', fee),
       aliasName,
       amountPlanck: '0',
       recipientId: toNumericId(to),
@@ -263,16 +329,25 @@ export async function transferAlias(
   )
 }
 
-export async function createSubscription(
-  from: SandboxAccount,
-  to: string,
-  signa: string,
-  frequency: number,
-  recipientPublicKey: string | undefined,
-) {
+export interface SubscriptionArgs extends Fee {
+  from: SandboxAccount
+  to: string
+  signa: string
+  frequency: number
+  recipientPublicKey: string | undefined
+}
+
+export async function createSubscription({
+  from,
+  to,
+  signa,
+  frequency,
+  recipientPublicKey,
+  fee,
+}: SubscriptionArgs) {
   return asId(
     await signingLedger.transaction.createSubscription({
-      ...base(from, 'subscription'),
+      ...base(from, 'subscription', fee),
       amountPlanck: Amount.fromSigna(signa).getPlanck(),
       recipientId: toNumericId(to),
       recipientPublicKey,
@@ -291,10 +366,15 @@ export async function createSubscription(
  * the caller filtering by `sender`, not from the query or the node — see
  * SubscriptionCancelForm, which does that filtering before ever calling this.
  */
-export async function cancelSubscription(account: SandboxAccount, subscriptionId: string) {
+export interface CancelSubscriptionArgs extends Fee {
+  account: SandboxAccount
+  subscriptionId: string
+}
+
+export async function cancelSubscription({ account, subscriptionId, fee }: CancelSubscriptionArgs) {
   return asId(
     await signingLedger.transaction.cancelSubscription({
-      ...base(account, 'cancelSubscription'),
+      ...base(account, 'cancelSubscription', fee),
       subscriptionId,
     }),
   )

@@ -1,10 +1,12 @@
 import { useState } from 'react'
+import { Amount } from '@signumjs/util'
+import { feeFor } from '@/lib/fees'
 import { useTranslation } from 'react-i18next'
 import type { SandboxAccount } from '@/lib/accounts'
 import type { Contacts } from '@/lib/contacts'
 import { resolveRecipientPublicKey, sendMultiOut } from '@/lib/send'
 import { useFromAccount } from '@/hooks/useFromAccount'
-import { AccountSelect, Field, knownRecipients, SubmitButton, TextArea } from './fields'
+import { AccountSelect, FeeField, Field, SubmitButton, TextArea, knownRecipients } from './fields'
 
 export function MultiOutForm({
   accounts,
@@ -22,6 +24,7 @@ export function MultiOutForm({
   const { t } = useTranslation()
   const [fromId, setFromId] = useFromAccount(forgerId)
   const [recipients, setRecipients] = useState('')
+  const [fee, setFee] = useState(feeFor('multiOut').getSigna())
   const [busy, setBusy] = useState(false)
   const parties = knownRecipients(accounts, contacts)
 
@@ -48,7 +51,7 @@ export function MultiOutForm({
         onError(t('console.send.needsPublicKey'))
         return
       }
-      await sendMultiOut(from, parsed)
+      await sendMultiOut({ from, recipients: parsed, fee: Amount.fromSigna(fee) })
       setRecipients('')
       onSent()
     } catch (error) {
@@ -79,6 +82,7 @@ export function MultiOutForm({
           {t('console.send.knownParties')} {parties.map((p) => `${p.name} (${p.address})`).join(', ')}
         </p>
       )}
+      <FeeField action="multiOut" value={fee} onChange={setFee} />
       <SubmitButton label={t('console.send.submit')} busy={busy} onClick={() => void submit()} />
     </div>
   )

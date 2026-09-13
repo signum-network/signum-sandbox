@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { Amount } from '@signumjs/util'
+import { feeFor } from '@/lib/fees'
 import { useTranslation } from 'react-i18next'
 import { useQuery } from '@tanstack/react-query'
 import type { SandboxAccount } from '@/lib/accounts'
@@ -7,7 +9,7 @@ import { ledger } from '@/lib/ledger'
 import { resolveRecipientPublicKey, transferAlias } from '@/lib/send'
 import { useFromAccount } from '@/hooks/useFromAccount'
 import { Select } from '@/components/console/Select'
-import { AccountSelect, Field, RecipientPicker, SubmitButton } from './fields'
+import { AccountSelect, FeeField, Field, RecipientPicker, SubmitButton } from './fields'
 
 export function AliasTransferForm({
   accounts,
@@ -26,6 +28,7 @@ export function AliasTransferForm({
   const [fromId, setFromId] = useFromAccount(forgerId)
   const [aliasName, setAliasName] = useState('')
   const [to, setTo] = useState('')
+  const [fee, setFee] = useState(feeFor('alias').getSigna())
   const [busy, setBusy] = useState(false)
 
   // Only an alias the sender actually holds can be handed on, so the list is
@@ -43,7 +46,7 @@ export function AliasTransferForm({
     setBusy(true)
     try {
       const recipientPublicKey = await resolveRecipientPublicKey(to, accounts)
-      await transferAlias(from, aliasName, to, recipientPublicKey)
+      await transferAlias({ from, aliasName, to, recipientPublicKey, fee: Amount.fromSigna(fee) })
       setAliasName('')
       setTo('')
       onSent()
@@ -75,6 +78,7 @@ export function AliasTransferForm({
       <Field label={t('console.send.to')}>
         <RecipientPicker accounts={accounts} contacts={contacts} value={to} onChange={setTo} />
       </Field>
+      <FeeField action="alias" value={fee} onChange={setFee} />
       <SubmitButton label={t('console.send.submit')} busy={busy} onClick={() => void submit()} />
     </div>
   )

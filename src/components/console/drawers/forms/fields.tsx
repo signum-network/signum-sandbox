@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { sfx, useAudio } from '@/audio'
+import { useTranslation } from 'react-i18next'
+import { feePresets, type SendAction } from '@/lib/fees'
 import type { SandboxAccount } from '@/lib/accounts'
 import type { Contacts } from '@/lib/contacts'
 import { ConsoleButton } from '@/components/console/ConsoleButton'
@@ -84,30 +86,50 @@ export function TextInput({
  * a plain case-insensitive contains over the name and the address, since the
  * list is a handful of entries and anything cleverer would be guessing.
  */
-export function RecipientPicker({
-  accounts,
-  contacts,
+export interface Suggestion {
+  value: string
+  label: string
+  sublabel?: string
+  icon?: ReactNode
+}
+
+/**
+ * A text field that suggests without constraining.
+ *
+ * Two of the console's inputs are the same interaction — a recipient you
+ * usually pick but sometimes type, a fee you usually pick but sometimes type —
+ * so they are one component rather than two popovers that drift apart. The
+ * suggestions are drawn here rather than by a native datalist, which the
+ * browser renders in its own chrome.
+ */
+export function SuggestInput({
   value,
   onChange,
+  suggestions,
   placeholder,
+  filter = true,
 }: {
-  accounts: SandboxAccount[]
-  contacts: Contacts
   value: string
   onChange: (v: string) => void
+  suggestions: Suggestion[]
   placeholder?: string
+  /** Off for a short fixed list, where filtering as you type only hides options. */
+  filter?: boolean
 }) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
   const { play } = useAudio()
 
   const needle = value.trim().toLowerCase()
-  const matches = knownRecipients(accounts, contacts).filter(
-    (p) =>
-      needle === '' ||
-      p.name.toLowerCase().includes(needle) ||
-      p.address.toLowerCase().includes(needle),
-  )
+  const matches =
+    filter && needle !== ''
+      ? suggestions.filter(
+          (s) =>
+            s.label.toLowerCase().includes(needle) ||
+            s.value.toLowerCase().includes(needle) ||
+            (s.sublabel ?? '').toLowerCase().includes(needle),
+        )
+      : suggestions
 
   useEffect(() => {
     if (!open) return
@@ -125,19 +147,13 @@ export function RecipientPicker({
     }
   }, [open])
 
-  const choose = (address: string) => {
-    play(sfx.click)
-    onChange(address)
-    setOpen(false)
-  }
-
   return (
     <div ref={ref} className="relative">
       <input
         className="w-full border bg-transparent px-2 py-1 text-[11px] text-[var(--fg)]"
         style={border}
         value={value}
-        placeholder={placeholder ?? 'TS-…'}
+        placeholder={placeholder}
         onChange={(e) => {
           onChange(e.target.value)
           setOpen(true)
@@ -152,29 +168,35 @@ export function RecipientPicker({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -6, scale: 0.97 }}
             transition={{ type: 'spring', stiffness: 420, damping: 28 }}
-            className="themed-scroll absolute left-0 top-full z-50 mt-1 max-h-56 w-full overflow-y-auto"
+            className="themed-scroll console-scroll absolute left-0 top-full z-50 mt-1 max-h-56 w-full overflow-y-auto"
             style={{
               background: 'var(--bg2)',
               border: '1px solid var(--border2)',
               boxShadow: '0 16px 48px rgba(0,0,0,.4)',
             }}
           >
-            {matches.map((p) => (
+            {matches.map((s) => (
               <motion.button
-                key={p.id}
+                key={s.value}
                 type="button"
                 className="flex w-full items-center gap-2 px-2 py-1.5 text-left text-[11px]"
                 style={{ color: 'var(--fg)' }}
                 whileHover={{ backgroundColor: 'rgba(255,255,255,.07)', color: 'var(--blue2)' }}
                 onHoverStart={() => play(sfx.tick)}
-                onClick={() => choose(p.address)}
+                onClick={() => {
+                  play(sfx.click)
+                  onChange(s.value)
+                  setOpen(false)
+                }}
               >
-                <Identicon value={p.address} size={14} />
+                {s.icon}
                 <span className="flex min-w-0 flex-col items-start">
-                  <span className="truncate">{p.name}</span>
-                  <span className="truncate text-[9px]" style={{ color: 'var(--muted)' }}>
-                    {p.address}
-                  </span>
+                  <span className="truncate">{s.label}</span>
+                  {s.sublabel && (
+                    <span className="truncate text-[9px]" style={{ color: 'var(--muted)' }}>
+                      {s.sublabel}
+                    </span>
+                  )}
                 </span>
               </motion.button>
             ))}
@@ -182,6 +204,39 @@ export function RecipientPicker({
         )}
       </AnimatePresence>
     </div>
+  )
+}
+
+/**
+ * A "To" field: the known parties as suggestions, any address by typing.
+ * A sandbox exists to try addresses the book has never seen, so the field
+ * never constrains what can be entered.
+ */
+export function RecipientPicker({
+  accounts,
+  contacts,
+  value,
+  onChange,
+  placeholder,
+}: {
+  accounts: SandboxAccount[]
+  contacts: Contacts
+  value: string
+  onChange: (v: string) => void
+  placeholder?: string
+}) {
+  return (
+    <SuggestInput
+      value={value}
+      onChange={onChange}
+      placeholder={placeholder ?? 'TS-…'}
+      suggestions={knownRecipients(accounts, contacts).map((p) => ({
+        value: p.address,
+        label: p.name,
+        sublabel: p.address,
+        icon: <Identicon value={p.address} size={14} />,
+      }))}
+    />
   )
 }
 
@@ -237,5 +292,36 @@ export function SubmitButton({
     <ConsoleButton disabled={busy} onClick={onClick}>
       {label}
     </ConsoleButton>
+  )
+}
+
+/**
+ * The fee, in SIGNA, with the action's own presets to pick from.
+ *
+ * It defaults to what the action needs rather than to a global number, and it
+ * can be raised or lowered by typing: the true minimum depends on the size of
+ * the attachment, which nothing here can know in advance. A fee the node
+ * refuses comes back naming the minimum it wanted, so the honest design is to
+ * let the attempt happen and pass that answer on.
+ */
+export function FeeField({
+  action,
+  value,
+  onChange,
+}: {
+  action: SendAction
+  value: string
+  onChange: (signa: string) => void
+}) {
+  const { t } = useTranslation()
+  return (
+    <Field label={t('console.send.fee')}>
+      <SuggestInput
+        value={value}
+        onChange={onChange}
+        filter={false}
+        suggestions={feePresets(action).map((signa) => ({ value: signa, label: `${signa} SIGNA` }))}
+      />
+    </Field>
   )
 }

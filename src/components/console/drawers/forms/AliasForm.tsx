@@ -1,9 +1,11 @@
 import { useState } from 'react'
+import { Amount } from '@signumjs/util'
+import { feeFor } from '@/lib/fees'
 import { useTranslation } from 'react-i18next'
 import type { SandboxAccount } from '@/lib/accounts'
 import { setAlias } from '@/lib/send'
 import { useFromAccount } from '@/hooks/useFromAccount'
-import { AccountSelect, Field, SubmitButton, TextInput } from './fields'
+import { AccountSelect, FeeField, Field, SubmitButton, TextInput } from './fields'
 import { PayloadEditor, usePayload } from './payload'
 
 export function AliasForm({
@@ -21,6 +23,7 @@ export function AliasForm({
   const [accountId, setAccountId] = useFromAccount(forgerId)
   const [aliasName, setAliasName] = useState('')
   const payload = usePayload()
+  const [fee, setFee] = useState(feeFor('alias').getSigna())
   const [busy, setBusy] = useState(false)
 
   const submit = async () => {
@@ -28,7 +31,7 @@ export function AliasForm({
     if (!account || !aliasName || payload.value === null) return
     setBusy(true)
     try {
-      await setAlias(account, aliasName, payload.value)
+      await setAlias({ account, aliasName, content: payload.value, fee: Amount.fromSigna(fee) })
       setAliasName('')
       payload.reset()
       onSent()
@@ -48,6 +51,7 @@ export function AliasForm({
         <TextInput value={aliasName} onChange={setAliasName} />
       </Field>
       <PayloadEditor state={payload} label={t('console.send.aliasContent')} />
+      <FeeField action="alias" value={fee} onChange={setFee} />
       <SubmitButton label={t('console.send.submit')} busy={busy} onClick={() => void submit()} />
     </div>
   )

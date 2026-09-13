@@ -1,10 +1,12 @@
 import { useState } from 'react'
+import { Amount } from '@signumjs/util'
+import { feeFor } from '@/lib/fees'
 import { useTranslation } from 'react-i18next'
 import type { SandboxAccount } from '@/lib/accounts'
 import type { Contacts } from '@/lib/contacts'
 import { createSubscription, resolveRecipientPublicKey } from '@/lib/send'
 import { useFromAccount } from '@/hooks/useFromAccount'
-import { AccountSelect, Field, RecipientPicker, SubmitButton, TextInput } from './fields'
+import { AccountSelect, FeeField, Field, RecipientPicker, SubmitButton, TextInput } from './fields'
 
 export function SubscriptionForm({
   accounts,
@@ -24,6 +26,7 @@ export function SubscriptionForm({
   const [to, setTo] = useState('')
   const [amount, setAmount] = useState('')
   const [frequency, setFrequency] = useState('3600')
+  const [fee, setFee] = useState(feeFor('subscription').getSigna())
   const [busy, setBusy] = useState(false)
 
   const submit = async () => {
@@ -32,7 +35,14 @@ export function SubscriptionForm({
     setBusy(true)
     try {
       const recipientPublicKey = await resolveRecipientPublicKey(to, accounts)
-      await createSubscription(from, to, amount, Number(frequency), recipientPublicKey)
+      await createSubscription({
+        from,
+        to,
+        signa: amount,
+        frequency: Number(frequency),
+        recipientPublicKey,
+        fee: Amount.fromSigna(fee),
+      })
       setTo('')
       setAmount('')
       setFrequency('3600')
@@ -58,6 +68,7 @@ export function SubscriptionForm({
       <Field label={t('console.send.frequency')}>
         <TextInput value={frequency} onChange={setFrequency} placeholder="3600" />
       </Field>
+      <FeeField action="subscription" value={fee} onChange={setFee} />
       <SubmitButton label={t('console.send.submit')} busy={busy} onClick={() => void submit()} />
     </div>
   )

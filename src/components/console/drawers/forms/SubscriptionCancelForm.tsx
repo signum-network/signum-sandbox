@@ -1,13 +1,14 @@
 import { useState } from 'react'
+import { Amount } from '@signumjs/util'
+import { feeFor } from '@/lib/fees'
 import { useTranslation } from 'react-i18next'
 import { useQuery } from '@tanstack/react-query'
-import { Amount } from '@signumjs/util'
 import type { SandboxAccount } from '@/lib/accounts'
 import { ledger } from '@/lib/ledger'
 import { cancelSubscription } from '@/lib/send'
 import { useFromAccount } from '@/hooks/useFromAccount'
 import { Select } from '@/components/console/Select'
-import { AccountSelect, Field, SubmitButton } from './fields'
+import { AccountSelect, FeeField, Field, SubmitButton } from './fields'
 
 export function SubscriptionCancelForm({
   accounts,
@@ -23,6 +24,7 @@ export function SubscriptionCancelForm({
   const { t } = useTranslation()
   const [accountId, setAccountId] = useFromAccount(forgerId)
   const [subscriptionId, setSubscriptionId] = useState('')
+  const [fee, setFee] = useState(feeFor('cancelSubscription').getSigna())
   const [busy, setBusy] = useState(false)
 
   // getAccountSubscriptions is documented as "subscriptions for this account
@@ -50,7 +52,7 @@ export function SubscriptionCancelForm({
     if (!account || !subscriptionId) return
     setBusy(true)
     try {
-      await cancelSubscription(account, subscriptionId)
+      await cancelSubscription({ account, subscriptionId, fee: Amount.fromSigna(fee) })
       setSubscriptionId('')
       onSent()
     } catch (error) {
@@ -81,6 +83,7 @@ export function SubscriptionCancelForm({
           }))}
         />
       </Field>
+      <FeeField action="cancelSubscription" value={fee} onChange={setFee} />
       <SubmitButton label={t('console.send.submit')} busy={busy} onClick={() => void submit()} />
     </div>
   )

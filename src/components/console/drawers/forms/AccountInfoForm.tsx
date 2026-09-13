@@ -1,9 +1,11 @@
 import { useState } from 'react'
+import { Amount } from '@signumjs/util'
+import { feeFor } from '@/lib/fees'
 import { useTranslation } from 'react-i18next'
 import type { SandboxAccount } from '@/lib/accounts'
 import { setAccountInfo } from '@/lib/send'
 import { useFromAccount } from '@/hooks/useFromAccount'
-import { AccountSelect, Field, SubmitButton, TextInput } from './fields'
+import { AccountSelect, FeeField, Field, SubmitButton, TextInput } from './fields'
 import { PayloadEditor, usePayload } from './payload'
 
 export function AccountInfoForm({
@@ -23,6 +25,7 @@ export function AccountInfoForm({
   // Account info is what SRC44 was written for, so the structured form is the
   // starting point here rather than an option to discover.
   const payload = usePayload(true)
+  const [fee, setFee] = useState(feeFor('accountInfo').getSigna())
   const [busy, setBusy] = useState(false)
 
   const submit = async () => {
@@ -30,7 +33,7 @@ export function AccountInfoForm({
     if (!account || !name || payload.value === null) return
     setBusy(true)
     try {
-      await setAccountInfo(account, name, payload.value)
+      await setAccountInfo({ account, name, description: payload.value, fee: Amount.fromSigna(fee) })
       setName('')
       payload.reset()
       onSent()
@@ -50,6 +53,7 @@ export function AccountInfoForm({
         <TextInput value={name} onChange={setName} />
       </Field>
       <PayloadEditor state={payload} label={t('console.send.infoDescription')} />
+      <FeeField action="accountInfo" value={fee} onChange={setFee} />
       <SubmitButton label={t('console.send.submit')} busy={busy} onClick={() => void submit()} />
     </div>
   )

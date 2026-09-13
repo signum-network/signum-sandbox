@@ -68,3 +68,25 @@ export function feeFor(action: SendAction): Amount {
       return Amount.fromSigna(0.1)
   }
 }
+
+/**
+ * The fees the field offers without typing.
+ *
+ * The floor the node accepts for an ordinary transaction is 0.01 SIGNA and it
+ * rises with the attachment — Signum charges per 176-byte slot — so these are
+ * steps up from that floor rather than a promise. A fee the node refuses is
+ * answered by the node naming the minimum it wanted, which reaches the user
+ * verbatim, so guessing the size here would buy nothing.
+ */
+const ORDINARY_PRESETS = [0.01, 0.02, 0.05, 0.1]
+
+/**
+ * Presets for one action, in SIGNA, ascending and without duplicates. An
+ * action whose own minimum is above the ordinary steps — a token issuance at
+ * 150 — offers that too, so its default is always reachable by picking.
+ */
+export function feePresets(action: SendAction): string[] {
+  const own = Number(feeFor(action).getSigna())
+  const all = [...new Set([...ORDINARY_PRESETS, own])].sort((a, b) => a - b)
+  return all.filter((signa) => signa >= own || own <= Math.max(...ORDINARY_PRESETS)).map(String)
+}

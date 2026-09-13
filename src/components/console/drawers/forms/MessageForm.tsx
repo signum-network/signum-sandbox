@@ -1,11 +1,13 @@
 import { useState } from 'react'
+import { Amount } from '@signumjs/util'
+import { feeFor } from '@/lib/fees'
 import { useTranslation } from 'react-i18next'
 import type { SandboxAccount } from '@/lib/accounts'
 import type { Contacts } from '@/lib/contacts'
 import { resolveRecipientPublicKey, sendEncryptedMessage, sendPlainMessage } from '@/lib/send'
 import { useFromAccount } from '@/hooks/useFromAccount'
 import { Toggle } from '@/components/console/Toggle'
-import { AccountSelect, Field, RecipientPicker, SubmitButton } from './fields'
+import { AccountSelect, FeeField, Field, RecipientPicker, SubmitButton } from './fields'
 import { PayloadEditor, usePayload } from './payload'
 
 export function MessageForm({
@@ -28,6 +30,7 @@ export function MessageForm({
   // is the option here rather than the default.
   const payload = usePayload()
   const [encrypt, setEncrypt] = useState(false)
+  const [fee, setFee] = useState(feeFor('message').getSigna())
   const [busy, setBusy] = useState(false)
 
   const submit = async () => {
@@ -45,9 +48,15 @@ export function MessageForm({
           onError(t('console.send.needsPublicKey'))
           return
         }
-        await sendEncryptedMessage(from, to, recipientPublicKey, message)
+        await sendEncryptedMessage({
+          from,
+          to,
+          recipientPublicKey,
+          message,
+          fee: Amount.fromSigna(fee),
+        })
       } else {
-        await sendPlainMessage(from, to, message, recipientPublicKey)
+        await sendPlainMessage({ from, to, message, recipientPublicKey, fee: Amount.fromSigna(fee) })
       }
       setTo('')
       payload.reset()
@@ -71,6 +80,7 @@ export function MessageForm({
       <div className="mb-2">
         <Toggle checked={encrypt} onChange={setEncrypt} label={t('console.send.encrypt')} />
       </div>
+      <FeeField action="message" value={fee} onChange={setFee} />
       <SubmitButton label={t('console.send.submit')} busy={busy} onClick={() => void submit()} />
     </div>
   )
