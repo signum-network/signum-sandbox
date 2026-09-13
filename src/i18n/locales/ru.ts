@@ -228,6 +228,7 @@ export default {
       knownParties: 'Известные адресаты:',
       tokenName: 'Название токена',
       tokenQuantity: 'Количество',
+      quantityHint: '{{raw}} = {{shown}} {{symbol}} — количество считается в наименьшей единице, поэтому {{decimals}} десятичных знаков сдвигают запятую.',
       tokenDecimals: 'Знаков после запятой',
       tokenDescription: 'Описание',
       token: 'Токен',

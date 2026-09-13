@@ -6,7 +6,7 @@ import type { SandboxAccount } from '@/lib/accounts'
 import { issueToken } from '@/lib/send'
 import { useFromAccount } from '@/hooks/useFromAccount'
 import { Toggle } from '@/components/console/Toggle'
-import { AccountSelect, FeeField, Field, SubmitButton, TextInput } from './fields'
+import { AccountSelect, FeeField, Field, SubmitButton, TextInput, QuantityHint } from './fields'
 import { PayloadEditor, usePayload } from './payload'
 
 export function TokenIssueForm({
@@ -71,6 +71,15 @@ export function TokenIssueForm({
       <Field label={t('console.send.tokenDecimals')}>
         <TextInput value={tokenDecimals} onChange={setTokenDecimals} placeholder="0" />
       </Field>
+      {/*
+        Under the decimals rather than under the quantity: the surprise only
+        exists once a decimal place is set, and this is the field that sets it.
+      */}
+      <QuantityHint
+        quantity={tokenQuantity}
+        decimals={Number(tokenDecimals) || 0}
+        symbol={tokenName}
+      />
       <PayloadEditor state={payload} label={t('console.send.tokenDescription')} />
       <div className="mb-2">
         <Toggle checked={mintable} onChange={setMintable} label={t('console.send.mintable')} />

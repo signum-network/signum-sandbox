@@ -228,6 +228,7 @@ export default {
       knownParties: '既知の相手:',
       tokenName: 'トークン名',
       tokenQuantity: '数量',
+      quantityHint: '{{raw}} = {{shown}} {{symbol}} — 数量は最小単位で数えるので、小数点以下 {{decimals}} 桁のぶんだけ位が動きます。',
       tokenDecimals: '小数桁数',
       tokenDescription: '説明',
       token: 'トークン',

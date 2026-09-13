@@ -239,6 +239,7 @@ export default {
       knownParties: 'Known parties:',
       tokenName: 'Token name',
       tokenQuantity: 'Quantity',
+      quantityHint: '{{raw}} = {{shown}} {{symbol}} — a quantity counts in the smallest unit, so {{decimals}} decimals move the point.',
       tokenDecimals: 'Decimals',
       tokenDescription: 'Description',
       token: 'Token',

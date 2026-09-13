@@ -228,6 +228,7 @@ export default {
       knownParties: 'Contactos conocidos:',
       tokenName: 'Nombre del token',
       tokenQuantity: 'Cantidad',
+      quantityHint: '{{raw}} = {{shown}} {{symbol}} — una cantidad se cuenta en la unidad más pequeña, así que {{decimals}} decimales mueven la coma.',
       tokenDecimals: 'Decimales',
       tokenDescription: 'Descripción',
       token: 'Token',

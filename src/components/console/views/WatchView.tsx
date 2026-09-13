@@ -10,7 +10,7 @@ import { displayName, type Contacts } from '@/lib/contacts'
 import type { SandboxAccount } from '@/lib/accounts'
 import { Identicon } from '../Identicon'
 import { ConsoleButton, RowButton } from '../ConsoleButton'
-import { Row } from './AccountFields'
+import { Row, Holding } from './AccountFields'
 import { Term } from '@/components/console/Term'
 
 /** How much of each direction the view shows before it stops being a summary. */
@@ -149,9 +149,15 @@ export function WatchView({
             </Row>
           ))}
           <Row label={<Term id="token">{t('console.accounts.holdings')}</Term>}>
-            {chain?.assetBalances?.length
-              ? chain.assetBalances.map((b) => `${b.balanceQNT} × ${b.asset}`).join(', ')
-              : t('console.accounts.noHoldings')}
+            {chain?.assetBalances?.length ? (
+              <span className="flex flex-col gap-[2px]">
+                {chain.assetBalances.map((b) => (
+                  <Holding key={b.asset} assetId={b.asset} quantityQNT={b.balanceQNT} />
+                ))}
+              </span>
+            ) : (
+              t('console.accounts.noHoldings')
+            )}
           </Row>
           <Row label={t('console.tx.raw')}>
             <a

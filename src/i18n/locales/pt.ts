@@ -228,6 +228,7 @@ export default {
       knownParties: 'Contactos conhecidos:',
       tokenName: 'Nome do token',
       tokenQuantity: 'Quantidade',
+      quantityHint: '{{raw}} = {{shown}} {{symbol}} — uma quantidade conta-se na unidade mais pequena, por isso {{decimals}} casas decimais deslocam a vírgula.',
       tokenDecimals: 'Casas decimais',
       tokenDescription: 'Descrição',
       token: 'Token',

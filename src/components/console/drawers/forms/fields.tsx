@@ -9,6 +9,7 @@ import { ConsoleButton } from '@/components/console/ConsoleButton'
 import { Identicon } from '@/components/console/Identicon'
 import { Select } from '@/components/console/Select'
 import { Term } from '@/components/console/Term'
+import { formatQuantity } from '@/lib/token'
 
 const border = { borderColor: 'var(--border2)' }
 
@@ -43,6 +44,41 @@ export function Field({ label, children }: { label: ReactNode; children: ReactNo
       </span>
       {children}
     </label>
+  )
+}
+
+/**
+ * What a raw quantity actually comes to.
+ *
+ * Signum counts an asset quantity in its smallest unit, so a token with two
+ * decimals and a quantity of 1000 is ten tokens, not a thousand. Nothing on
+ * screen said so: an author typed 1000, issued the token, and found ten of
+ * them in the account — a factor of a hundred, discovered after the fact and
+ * unfixable, since an issued token's supply is what it is.
+ *
+ * Shown only when there are decimals to shift. At zero the raw number and
+ * the readable one are the same, and a line restating that is noise.
+ */
+export function QuantityHint({
+  quantity,
+  decimals,
+  symbol,
+}: {
+  quantity: string
+  decimals: number
+  symbol?: string
+}) {
+  const { t } = useTranslation()
+  if (decimals <= 0 || !/^\d+$/.test(quantity)) return null
+  return (
+    <p className="mb-2 -mt-1 text-[11px] leading-relaxed text-[var(--blue3)]">
+      {t('console.send.quantityHint', {
+        raw: quantity,
+        shown: formatQuantity(quantity, decimals),
+        symbol: symbol ?? '',
+        decimals,
+      })}
+    </p>
   )
 }
 

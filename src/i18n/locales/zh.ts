@@ -227,6 +227,7 @@ export default {
       knownParties: '已知联系人:',
       tokenName: '代币名称',
       tokenQuantity: '数量',
+      quantityHint: '{{raw}} = {{shown}} {{symbol}} —— 数量以最小单位计，{{decimals}} 位小数会把小数点挪过去。',
       tokenDecimals: '小数位数',
       tokenDescription: '描述',
       token: '代币',

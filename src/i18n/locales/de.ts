@@ -228,6 +228,7 @@ export default {
       knownParties: 'Bekannte Kontakte:',
       tokenName: 'Token-Name',
       tokenQuantity: 'Menge',
+      quantityHint: '{{raw}} = {{shown}} {{symbol}} — eine Menge zählt in der kleinsten Einheit, {{decimals}} Nachkommastellen verschieben also das Komma.',
       tokenDecimals: 'Nachkommastellen',
       tokenDescription: 'Beschreibung',
       token: 'Token',

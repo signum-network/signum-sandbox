@@ -10,7 +10,7 @@ import { resolveRecipientPublicKey, transferToken } from '@/lib/send'
 import { useFromAccount } from '@/hooks/useFromAccount'
 import { Select } from '@/components/console/Select'
 import { Toggle } from '@/components/console/Toggle'
-import { AccountSelect, FeeField, Field, RecipientPicker, SubmitButton, TextInput } from './fields'
+import { AccountSelect, FeeField, Field, RecipientPicker, SubmitButton, TextInput, QuantityHint } from './fields'
 import { PayloadEditor, usePayload } from './payload'
 import { Term } from '@/components/console/Term'
 
@@ -48,6 +48,8 @@ export function TokenTransferForm({
     enabled: fromId !== '',
     retry: false,
   })
+
+  const chosenToken = (tokens.data?.assets ?? []).find((asset) => asset.asset === assetId)
 
   const submit = async () => {
     const from = accounts.find((a) => a.id === fromId)
@@ -100,6 +102,11 @@ export function TokenTransferForm({
       <Field label={t('console.send.amount')}>
         <TextInput value={quantity} onChange={setQuantity} placeholder="1" />
       </Field>
+      <QuantityHint
+        quantity={quantity}
+        decimals={chosenToken?.decimals ?? 0}
+        symbol={chosenToken?.name}
+      />
       <label className="mb-2 flex items-center gap-2">
         <Toggle
           checked={attach}

@@ -5,10 +5,9 @@ import type { SandboxAccount } from '@/lib/accounts'
 import { ledger, nodeHost } from '@/lib/ledger'
 import { isUnknownAccount } from '@/lib/accountStatus'
 import { src44Fields } from '@/lib/payload'
-import { formatQuantity } from '@/lib/token'
 import { summarize } from '@/lib/txSummary'
 import { displayName, type Contacts } from '@/lib/contacts'
-import { PassphraseField, Row } from './AccountFields'
+import { PassphraseField, Row, Holding } from './AccountFields'
 import { RowButton } from '../ConsoleButton'
 import { Term } from '@/components/console/Term'
 
@@ -21,25 +20,6 @@ const RECENT = 5
  * place live on the asset. One request per distinct holding is affordable
  * here because a row is open only when someone is looking at it.
  */
-function Holding({ assetId, quantityQNT }: { assetId: string; quantityQNT: string }) {
-  const asset = useQuery({
-    queryKey: ['asset', assetId],
-    queryFn: () => ledger.asset.getAsset({ assetId }),
-    staleTime: Infinity,
-    retry: false,
-  })
-
-  const quantity = asset.data
-    ? formatQuantity(quantityQNT, asset.data.decimals)
-    : quantityQNT
-
-  return (
-    <span>
-      {quantity} {asset.data?.name ?? ''}
-      <span className="text-[var(--muted)]"> · {assetId}</span>
-    </span>
-  )
-}
 
 /**
  * The whole account in one place: what the sandbox knows about it, what the

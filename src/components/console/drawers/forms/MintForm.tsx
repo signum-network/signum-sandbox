@@ -8,7 +8,7 @@ import { ledger } from '@/lib/ledger'
 import { mintAsset } from '@/lib/send'
 import { useFromAccount } from '@/hooks/useFromAccount'
 import { Select } from '@/components/console/Select'
-import { AccountSelect, FeeField, Field, SubmitButton, TextInput } from './fields'
+import { AccountSelect, FeeField, Field, SubmitButton, TextInput, QuantityHint } from './fields'
 
 export function MintForm({
   accounts,
@@ -41,6 +41,8 @@ export function MintForm({
     retry: false,
   })
   const mintableTokens = (tokens.data?.assets ?? []).filter((asset) => asset.mintable)
+
+  const chosenToken = mintableTokens.find((asset) => asset.asset === assetId)
 
   const submit = async () => {
     const issuer = accounts.find((a) => a.id === issuerId)
@@ -78,6 +80,11 @@ export function MintForm({
       <Field label={t('console.send.amount')}>
         <TextInput value={quantity} onChange={setQuantity} placeholder="1" />
       </Field>
+      <QuantityHint
+        quantity={quantity}
+        decimals={chosenToken?.decimals ?? 0}
+        symbol={chosenToken?.name}
+      />
       <FeeField action="mintAsset" value={fee} onChange={setFee} />
       <SubmitButton label={t('console.send.submit')} busy={busy} onClick={() => void submit()} />
     </div>

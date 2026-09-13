@@ -3,6 +3,9 @@ import { useTranslation } from 'react-i18next'
 import type { ReactNode } from 'react'
 import { ConsoleButton } from '../ConsoleButton'
 import { Term } from '@/components/console/Term'
+import { useQuery } from '@tanstack/react-query'
+import { ledger } from '@/lib/ledger'
+import { formatQuantity } from '@/lib/token'
 
 export const actionButton =
   'border px-2 py-[1px] text-[12px] uppercase tracking-[1px] text-[var(--blue3)]'
@@ -56,5 +59,33 @@ export function PassphraseField({ passphrase }: { passphrase: string }) {
       <CopyButton value={passphrase} />{' '}
       <span className="text-[12px] text-[var(--muted)]">{t('console.accounts.fake')}</span>
     </Row>
+  )
+}
+
+/**
+ * One token an account holds, named and counted the way a person reads it.
+ *
+ * Shared because the watch tab had grown its own version that showed neither
+ * — a raw quantity beside a bare asset id, so a holding of ten tokens read as
+ * "1000 × 6042373...". A holding is the same fact in both places and should
+ * not be able to differ between them.
+ */
+export function Holding({ assetId, quantityQNT }: { assetId: string; quantityQNT: string }) {
+  const asset = useQuery({
+    queryKey: ['asset', assetId],
+    queryFn: () => ledger.asset.getAsset({ assetId }),
+    staleTime: Infinity,
+    retry: false,
+  })
+
+  const quantity = asset.data
+    ? formatQuantity(quantityQNT, asset.data.decimals)
+    : quantityQNT
+
+  return (
+    <span>
+      {quantity} {asset.data?.name ?? ''}
+      <span className="text-[var(--muted)]"> · {assetId}</span>
+    </span>
   )
 }

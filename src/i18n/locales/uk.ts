@@ -228,6 +228,7 @@ export default {
       knownParties: 'Відомі контакти:',
       tokenName: 'Назва токена',
       tokenQuantity: 'Кількість',
+      quantityHint: '{{raw}} = {{shown}} {{symbol}} — кількість рахується в найменшій одиниці, тож {{decimals}} десяткових знаків зсувають кому.',
       tokenDecimals: 'Десяткові знаки',
       tokenDescription: 'Опис',
       token: 'Токен',

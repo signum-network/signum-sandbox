@@ -228,6 +228,7 @@ export default {
       knownParties: '알려진 상대:',
       tokenName: '토큰 이름',
       tokenQuantity: '수량',
+      quantityHint: '{{raw}} = {{shown}} {{symbol}} — 수량은 가장 작은 단위로 세므로 소수점 {{decimals}}자리만큼 자리가 옮겨집니다.',
       tokenDecimals: '소수 자릿수',
       tokenDescription: '설명',
       token: '토큰',

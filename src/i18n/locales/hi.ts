@@ -228,6 +228,7 @@ export default {
       knownParties: 'ज्ञात पक्ष:',
       tokenName: 'टोकन नाम',
       tokenQuantity: 'मात्रा',
+      quantityHint: '{{raw}} = {{shown}} {{symbol}} — मात्रा सबसे छोटी इकाई में गिनी जाती है, इसलिए {{decimals}} दशमलव स्थान बिंदु को खिसका देते हैं।',
       tokenDecimals: 'दशमलव स्थान',
       tokenDescription: 'विवरण',
       token: 'टोकन',
