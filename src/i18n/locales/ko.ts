@@ -131,6 +131,7 @@ export default {
     },
     tx: {
       fee: '수수료',
+      andMore: '외 {{count}}개',
       unconfirmed: '미확인',
       block: '블록 {{height}}',
       raw: '원시 응답',

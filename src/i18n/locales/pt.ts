@@ -131,6 +131,7 @@ export default {
     },
     tx: {
       fee: 'Taxa',
+      andMore: '+{{count}} mais',
       unconfirmed: 'não confirmada',
       block: 'Bloco {{height}}',
       raw: 'resposta bruta',

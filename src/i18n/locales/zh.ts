@@ -131,6 +131,7 @@ export default {
     },
     tx: {
       fee: '手续费',
+      andMore: '另有 {{count}} 个',
       unconfirmed: '未确认',
       block: '区块 {{height}}',
       raw: '原始响应',

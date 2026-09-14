@@ -131,6 +131,7 @@ export default {
     },
     tx: {
       fee: 'शुल्क',
+      andMore: '+{{count}} और',
       unconfirmed: 'अपुष्ट',
       block: 'ब्लॉक {{height}}',
       raw: 'रॉ रिस्पॉन्स',

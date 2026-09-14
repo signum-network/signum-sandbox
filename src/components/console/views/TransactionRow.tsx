@@ -7,8 +7,9 @@ import { detailFields } from '@/lib/txDetail'
 import type { SandboxAccount } from '@/lib/accounts'
 import { ConsoleButton, RowButton } from '../ConsoleButton'
 import { displayName, type Contacts } from '@/lib/contacts'
-import { toComparableId } from '@/lib/recipient'
+import { addressPrefixOf, toAddress, toComparableId } from '@/lib/recipient'
 import { summarize } from '@/lib/txSummary'
+import type { Payee } from '@/lib/txDetail'
 import type { FeedItem } from '@/lib/chainFeed'
 import { Amount } from '@signumjs/util'
 import { Identicon } from '@/components/console/Identicon'
@@ -86,6 +87,65 @@ function Party({
         <Identicon value={address} size={16} />
         <span className="break-all">{address}</span>
         {name && name !== address && <span className="text-[var(--muted)]">· {name}</span>}
+      </span>
+    </Detail>
+  )
+}
+
+/**
+ * How many payees of a multi-out are drawn before the rest become a count.
+ *
+ * Multi-out reaches sixty-four recipients, and sixty-four identicons in an
+ * opened row is a wall rather than a list. Five is enough to see who is being
+ * paid and what the amounts look like; the raw response at the foot of the
+ * row still has every one of them.
+ */
+const PAYEES_SHOWN = 5
+
+/**
+ * The recipients of a multi-out, each shown the way every other account in
+ * this console is shown.
+ *
+ * They arrive as numeric ids, because that is what the attachment carries, so
+ * the address is derived here — the same derivation the contact list and the
+ * recipient picker use, for the same reason: an account has to look like the
+ * same account wherever you meet it, and the identicon is hashed from the
+ * address rather than the id.
+ */
+function Payees({
+  label,
+  payees,
+  accounts,
+  contacts,
+}: {
+  label: string
+  payees: Payee[]
+  accounts: SandboxAccount[]
+  contacts: Contacts
+}) {
+  const { t } = useTranslation()
+  const prefix = addressPrefixOf(accounts)
+  const shown = payees.slice(0, PAYEES_SHOWN)
+  const rest = payees.length - shown.length
+
+  return (
+    <Detail label={label}>
+      <span className="flex flex-col gap-[2px]">
+        {shown.map(({ id, signa }) => {
+          const address = toAddress(id, prefix)
+          const name = displayName(address, accounts, contacts)
+          return (
+            <span key={id} className="flex flex-wrap items-center gap-2">
+              <Identicon value={address} size={14} />
+              <span className="break-all">{address}</span>
+              {name !== address && <span className="text-[var(--muted)]">· {name}</span>}
+              <span className="shrink-0">· {signa} SIGNA</span>
+            </span>
+          )
+        })}
+        {rest > 0 && (
+          <span className="text-[var(--muted)]">{t('console.tx.andMore', { count: rest })}</span>
+        )}
       </span>
     </Detail>
   )
@@ -185,17 +245,27 @@ export function TransactionRow({
             can share a label (an alias arrives under `alias` or under `uri`),
             so the position is what identifies a line, not the name.
           */}
-          {fields.map((field, index) => (
-            <Detail
-              key={`${field.label}-${index}`}
-              label={t(`console.field.${field.label}`, field.label)}
-            >
-              {field.value ??
-                (field.label === 'encrypted' && decrypted.data
-                  ? decrypted.data
-                  : t('console.tx.undecryptable'))}
-            </Detail>
-          ))}
+          {fields.map((field, index) =>
+            field.payees ? (
+              <Payees
+                key={`${field.label}-${index}`}
+                label={t(`console.field.${field.label}`, field.label)}
+                payees={field.payees}
+                accounts={accounts}
+                contacts={contacts}
+              />
+            ) : (
+              <Detail
+                key={`${field.label}-${index}`}
+                label={t(`console.field.${field.label}`, field.label)}
+              >
+                {field.value ??
+                  (field.label === 'encrypted' && decrypted.data
+                    ? decrypted.data
+                    : t('console.tx.undecryptable'))}
+              </Detail>
+            ),
+          )}
 
           {/*
             Offered only for a party the console cannot already name: an

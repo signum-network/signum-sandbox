@@ -131,6 +131,7 @@ export default {
     },
     tx: {
       fee: '手数料',
+      andMore: 'ほか {{count}} 件',
       unconfirmed: '未確認',
       block: 'ブロック {{height}}',
       raw: '生のレスポンス',

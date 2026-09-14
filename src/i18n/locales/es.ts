@@ -131,6 +131,7 @@ export default {
     },
     tx: {
       fee: 'Comisión',
+      andMore: '+{{count}} más',
       unconfirmed: 'sin confirmar',
       block: 'Bloque {{height}}',
       raw: 'respuesta sin procesar',

@@ -142,6 +142,7 @@ export default {
     },
     tx: {
       fee: 'Fee',
+      andMore: '+{{count}} more',
       unconfirmed: 'unconfirmed',
       block: 'Block {{height}}',
       raw: 'raw response',

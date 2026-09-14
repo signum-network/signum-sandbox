@@ -3,11 +3,28 @@ import { Amount } from '@signumjs/util'
 import { kindOf, type TxKind } from './txKind'
 import { src44Fields } from './payload'
 
+export interface Payee {
+  /** Numeric account id, as the attachment carries it. */
+  id: string
+  signa: string
+}
+
 export interface DetailField {
   /** A translation key under `console.field`, or a raw attachment key. */
   label: string
   /** Null means "known to be here but not readable", e.g. an encrypted message. */
   value: string | null
+  /**
+   * The parties of a multi-out, left as data rather than flattened into the
+   * value.
+   *
+   * Joining them into a string here would force the row to show numeric ids,
+   * since that is what the attachment carries and a library has no business
+   * knowing the network's address prefix. Handed over as ids, the row can do
+   * what it does for every other account on screen: an address, a name if it
+   * has one, and the identicon that tells two of them apart.
+   */
+  payees?: Payee[]
 }
 
 /**
@@ -88,21 +105,21 @@ function zipTokens(ids: unknown, quantities: unknown): string {
  * which shape it is, is exactly the code that once turned a same-amount
  * multi-out into fabricated SIGNA figures, so it is not done again here.
  */
-function recipientAmounts(tx: Transaction, raw: unknown): string {
+function recipientAmounts(tx: Transaction, raw: unknown): DetailField {
   try {
-    return shorten(
-      getRecipientAmountsFromMultiOutPayment(tx)
-        .map(
-          ({ recipient, amountNQT }) =>
-            `${recipient}: ${Amount.fromPlanck(amountNQT).getSigna()} SIGNA`,
-        )
-        .join(', '),
-    )
+    return {
+      label: 'recipients',
+      value: null,
+      payees: getRecipientAmountsFromMultiOutPayment(tx).map(({ recipient, amountNQT }) => ({
+        id: recipient,
+        signa: Amount.fromPlanck(amountNQT).getSigna(),
+      })),
+    }
   } catch {
     // It throws on anything that is not a multi-out. Reaching that means the
     // kind and the attachment disagree, which is the node's word against
     // ours — show what the node sent rather than nothing.
-    return asText(raw)
+    return { label: 'recipients', value: asText(raw) }
   }
 }
 
@@ -153,7 +170,7 @@ function present(field: KnownField, raw: unknown, tx: Transaction): DetailField[
     case 'tokens':
       return [{ label: field.label, value: zipTokens(raw, attachment.quantitiesQNT) }]
     case 'recipients':
-      return [{ label: field.label, value: recipientAmounts(tx, raw) }]
+      return [recipientAmounts(tx, raw)]
     case 'src44':
       return src44Detail(raw)
     default:

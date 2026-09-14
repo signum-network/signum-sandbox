@@ -131,6 +131,7 @@ export default {
     },
     tx: {
       fee: 'Комиссия',
+      andMore: '+{{count}} ещё',
       unconfirmed: 'не подтверждено',
       block: 'Блок {{height}}',
       raw: 'необработанный ответ',

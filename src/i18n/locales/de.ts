@@ -131,6 +131,7 @@ export default {
     },
     tx: {
       fee: 'Gebühr',
+      andMore: '+{{count}} weitere',
       unconfirmed: 'unbestätigt',
       block: 'Block {{height}}',
       raw: 'Rohantwort',

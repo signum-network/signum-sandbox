@@ -167,7 +167,10 @@ describe('detailFields', () => {
         ],
       },
     } as unknown as Transaction
-    expect(valueOf(detailFields(multi), 'recipients')).toBe('123: 1 SIGNA, 456: 2 SIGNA')
+    expect(detailFields(multi).find((f) => f.label === 'recipients')?.payees).toEqual([
+      { id: '123', signa: '1' },
+      { id: '456', signa: '2' },
+    ])
   })
 
   // The same-amount shape is a flat list of ids; the share comes from the
@@ -182,7 +185,10 @@ describe('detailFields', () => {
       subtype: TransactionPaymentSubtype.MultiOutSameAmount,
       attachment: { recipients: ['12345', '67890'] },
     } as unknown as Transaction
-    expect(valueOf(detailFields(multi), 'recipients')).toBe('12345: 1 SIGNA, 67890: 1 SIGNA')
+    expect(detailFields(multi).find((f) => f.label === 'recipients')?.payees).toEqual([
+      { id: '12345', signa: '1' },
+      { id: '67890', signa: '1' },
+    ])
   })
 
   it('unfolds an SRC44 description into its fields', () => {
@@ -231,5 +237,38 @@ describe('detailFields, what a row should not be cluttered with', () => {
   it('names the announced public key rather than hiding or dumping it', () => {
     const fields = detailFields(tx(TransactionType.Payment, 0, { recipientPublicKey: 'ab12' }))
     expect(fields).toContainEqual({ label: 'announcedKey', value: 'ab12' })
+  })
+})
+
+describe('detailFields, recipients as data', () => {
+  // Handed over as ids rather than a joined string, so the row can show each
+  // one the way it shows every other account: address, name, identicon. A
+  // library has no business knowing the network's address prefix.
+  it('leaves the value empty and puts the parties in payees', () => {
+    const multi = {
+      senderRS: 'TS-AAAA',
+      type: TransactionType.Payment,
+      subtype: TransactionPaymentSubtype.MultiOut,
+      amountNQT: '0',
+      attachment: { 'version.MultiOutCreation': 1, recipients: [['7', '300000000']] },
+    } as unknown as Transaction
+    const field = detailFields(multi).find((f) => f.label === 'recipients')
+    expect(field?.value).toBeNull()
+    expect(field?.payees).toEqual([{ id: '7', signa: '3' }])
+  })
+
+  // The fallback keeps its string: reaching it means the kind and the
+  // attachment disagree, and then showing what the node sent beats showing a
+  // structure built on a disagreement.
+  it('falls back to the raw text when the attachment is not a multi-out', () => {
+    const wrong = {
+      senderRS: 'TS-AAAA',
+      type: TransactionType.Payment,
+      subtype: TransactionPaymentSubtype.MultiOut,
+      attachment: { recipients: 'not a list' },
+    } as unknown as Transaction
+    const field = detailFields(wrong).find((f) => f.label === 'recipients')
+    expect(field?.value).toBe('not a list')
+    expect(field?.payees).toBeUndefined()
   })
 })
