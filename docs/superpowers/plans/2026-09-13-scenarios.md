@@ -1520,6 +1520,8 @@ git commit -m "feat: four scenarios, written in the language"
 
 No test: every decision this could get wrong lives in the runner, which is tested. What it must get right is the mapping onto `send.ts`, and the way to get that right is to read `send.ts` rather than trust this plan.
 
+**The plan's adapter code below was written from memory of `send.ts` and is wrong in five places.** Read the real signatures; where they disagree, they win. What was found on implementation: `setAccountInfo` and `issueToken` both take `description` as a required string, not optional; `issueToken` also takes a required `mintable` the code below omits entirely; `createSubscription`'s argument is `frequency`, not `frequencyS`; `sendEncryptedMessage` requires a defined `recipientPublicKey` rather than accepting `undefined`, so the shared argument object below does not typecheck; and the blockchain status lives at `ledger.network`, not `ledger.block`. Fees need not be passed at all — `send.ts` already defaults each action to `feeFor(action)`.
+
 **`forge()` is the one operation with a contract the type cannot express.** It must not return until the chain has actually grown — see the doc comment on `ScenarioOps.forge` in `src/lib/scenarioRunner.ts`. The runner's fake satisfies the signature trivially, so nothing in the test suite will catch an implementation that only submits; the failure appears as a transfer rejected for an unknown asset, reported against a line that is not at fault.
 
 - [ ] **Step 1: Read the real signatures**
