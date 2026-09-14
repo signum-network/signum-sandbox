@@ -258,6 +258,10 @@ export default {
     },
     scenario: {
       section: 'Escenarios',
+      goto: 'Ir a los escenarios',
+      builtIn: 'Incluidos',
+      stop: 'Detener',
+      toConsole: 'A la consola',
       note: 'Un escenario describe una cadena, con una línea o dos por transacción. Carga uno, cámbialo a tu gusto y ejecútalo: se suma a la cadena que ya tienes.',
       load: 'Cargar',
       run: 'Ejecutar',

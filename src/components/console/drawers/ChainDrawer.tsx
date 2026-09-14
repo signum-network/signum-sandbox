@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Link } from '@tanstack/react-router'
 import { useQueryClient } from '@tanstack/react-query'
 import { rewindBy, rewindChain } from '@/lib/chainAdmin'
 import { REWIND_STEPS, canRewindBy, rewindProblem } from '@/lib/rewind'
@@ -88,6 +89,24 @@ export function ChainDrawer({ height }: { height: number | null }) {
         >
           {resetCommand(navigator.userAgent)}
         </code>
+      </div>
+
+      {/*
+        Winding back, emptying and filling are the three things that shape a
+        chain, so the way to the third belongs beside the other two — even
+        though it leads off this page, because a scenario is a document and a
+        drawer is a third of the width.
+      */}
+      <div className="border-t pt-3" style={{ borderColor: 'var(--border2)' }}>
+        <p className="text-[12px] uppercase tracking-[1px] text-[var(--blue3)]">
+          {t('console.scenario.section')}
+        </p>
+        <p className="mt-1 text-[12px] leading-relaxed text-[var(--muted)]">
+          {t('console.scenario.note')}
+        </p>
+        <Link className="mt-1 block text-[13px] text-[var(--blue3)] underline" to="/scenarios">
+          ↗ {t('console.scenario.goto')}
+        </Link>
       </div>
     </div>
   )

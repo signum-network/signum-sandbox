@@ -269,6 +269,10 @@ export default {
     },
     scenario: {
       section: 'Scenarios',
+      goto: 'Go to scenarios',
+      builtIn: 'Built-in',
+      stop: 'Stop',
+      toConsole: 'To the console',
       note: 'A scenario describes a chain in a line or two per transaction. Load one, change it if you like, and run it — it adds to the chain you already have.',
       load: 'Load',
       run: 'Run',

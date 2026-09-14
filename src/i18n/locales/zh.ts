@@ -257,6 +257,10 @@ export default {
     },
     scenario: {
       section: '场景',
+      goto: '前往场景',
+      builtIn: '内置',
+      stop: '停止',
+      toConsole: '前往控制台',
       note: '一个场景用一两行描述一笔交易，合起来就描述了一条链。载入一个，随意修改，然后运行——它会叠加到你现有的链上。',
       load: '载入',
       run: '运行',
