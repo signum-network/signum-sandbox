@@ -149,6 +149,37 @@ export default {
       none: 'No transactions yet',
       saveContact: 'Save as contact',
     },
+    // What a transaction carries, one label per field `txDetail.ts` knows how
+    // to name. A field it does not know keeps its own attachment key instead,
+    // so a label missing from here is never a field missing from the row.
+    field: {
+      token: 'Token',
+      quantity: 'Quantity',
+      decimals: 'Decimals',
+      mintable: 'Mintable',
+      price: 'Price',
+      order: 'Order',
+      tokenName: 'Token name',
+      description: 'Description',
+      infoName: 'Name',
+      aliasName: 'Alias',
+      content: 'Content',
+      frequency: 'Every',
+      subscription: 'Subscription',
+      amount: 'Amount',
+      contractName: 'Contract',
+      escrow: 'Escrow',
+      decision: 'Decision',
+      requiredSigners: 'Required signers',
+      deadline: 'Deadline',
+      deadlineAction: 'On deadline',
+      message: 'Message',
+      encrypted: 'Encrypted',
+      recipients: 'Recipients',
+      tokens: 'Tokens',
+      minimumHolding: 'Minimum holding',
+      paidIn: 'Paid in',
+    },
     // What a transaction is when read back, one name per subtype the chain
     // can produce — `TxKind` in src/lib/txKind.ts. `aliasTransfer` is the
     // exception: no such subtype exists (an alias moves as a sale at price
