@@ -597,6 +597,16 @@ describe('detailFields', () => {
     expect(fields[0].value).toBe('{"a":1}')
   })
 
+  // A contract's bytecode is thousands of characters. Hiding it would break
+  // the rule this file rests on; printing it buries every other field. The
+  // length is the honest middle, and the raw JSON link has the whole thing.
+  it('shortens a value too long to read, and says how long it was', () => {
+    const code = 'ab'.repeat(2000)
+    const fields = detailFields(tx(TransactionType.SmartContract, 0, { creationBytes: code }))
+    expect(fields[0].value).toContain('(4000 chars)')
+    expect(fields[0].value?.length).toBeLessThan(200)
+  })
+
   it('has nothing to say about a transaction with no attachment', () => {
     expect(detailFields({ senderRS: 'TS-A', type: 0, subtype: 0 } as Transaction)).toEqual([])
   })
@@ -629,10 +639,27 @@ export interface DetailField {
  */
 const isVersionMarker = (key: string) => key.startsWith('version.')
 
+/**
+ * Where a value stops being worth reading in a table row.
+ *
+ * A contract's attachment carries its compiled bytecode, which is thousands
+ * of characters of hex. Hiding it would break the rule this file rests on —
+ * a reader must be able to see that a field is there — but printing it buries
+ * every other field under it. Shortening says both things: the field exists,
+ * this is how big it is, and the raw JSON at the bottom of the row has all of
+ * it.
+ */
+const TRUNCATE_AT = 120
+
+const shorten = (text: string) =>
+  text.length <= TRUNCATE_AT ? text : `${text.slice(0, TRUNCATE_AT)}… (${text.length} chars)`
+
 const asText = (value: unknown): string =>
-  typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean'
-    ? String(value)
-    : JSON.stringify(value)
+  shorten(
+    typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean'
+      ? String(value)
+      : JSON.stringify(value),
+  )
 
 const signa = (planck: unknown) =>
   typeof planck === 'string' ? `${Amount.fromPlanck(planck).getSigna()} SIGNA` : asText(planck)
@@ -703,9 +730,10 @@ const KNOWN: Partial<Record<TxKind, Record<string, { label: string; format?: 'si
   subscriptionPayment: { subscriptionId: { label: 'subscription' } },
   addCommitment: { amountNQT: { label: 'amount', format: 'signa' } },
   removeCommitment: { amountNQT: { label: 'amount', format: 'signa' } },
-  // Unverified: the wallet reads no attachment fields for a contract
-  // creation at all, taking the hash from the transaction instead. These two
-  // are a guess, and the passthrough is what makes the guess safe.
+  // The name and the description are the whole of what a person can read
+  // here; the rest of the attachment is the compiled contract, which is
+  // bytecode. It still comes through — see `TRUNCATE_AT` — but as a stated
+  // size rather than a screenful of hex.
   contractCreate: { name: { label: 'contractName' }, description: { label: 'description' } },
   escrowCreate: {
     amountNQT: { label: 'amount', format: 'signa' },
