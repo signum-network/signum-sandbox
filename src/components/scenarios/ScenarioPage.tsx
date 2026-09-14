@@ -71,8 +71,9 @@ export function ScenarioPage() {
       <div className="flex min-h-0 flex-1 gap-3">
         <div className="flex min-h-0 min-w-0 flex-1 flex-col">
           <textarea
-            className="themed-scroll console-scroll min-h-0 w-full flex-1 resize-none border
-              bg-transparent p-3 font-mono text-[13px] leading-relaxed text-[var(--fg)] outline-none"
+            className="themed-scroll console-scroll min-h-0 w-full flex-1 resize-none
+              border bg-transparent p-3 font-mono text-[13px] leading-relaxed
+              text-[var(--fg)] outline-none"
             style={{ borderColor: 'var(--border2)' }}
             spellCheck={false}
             value={scenario.source}
