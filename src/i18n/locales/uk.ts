@@ -161,6 +161,7 @@ export default {
       deadlineAction: 'Після закінчення терміну',
       message: 'Повідомлення',
       encrypted: 'Зашифровано',
+      announcedKey: 'Оголошено відкритий ключ',
       recipients: 'Отримувачі',
       tokens: 'Токени',
       minimumHolding: 'Мінімальний баланс',

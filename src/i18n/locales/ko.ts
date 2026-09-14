@@ -161,6 +161,7 @@ export default {
       deadlineAction: '기한 도래 시',
       message: '메시지',
       encrypted: '암호화됨',
+      announcedKey: '공개 키 공지',
       recipients: '수신자',
       tokens: '토큰',
       minimumHolding: '최소 보유량',

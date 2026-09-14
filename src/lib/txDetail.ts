@@ -17,6 +17,23 @@ export interface DetailField {
 const isVersionMarker = (key: string) => key.startsWith('version.')
 
 /**
+ * Envelope, not content.
+ *
+ * `messageIsText` says the message is text, which is evident from the message
+ * being readable; it is a format flag for the decoder, and it appears on
+ * every message ever sent. Suppressing it is the same judgement as
+ * suppressing the version markers, and for the same reason — a field that is
+ * always there and never says anything is not information, it is furniture.
+ * The raw response at the bottom of the row still carries it.
+ *
+ * Note what is *not* here: `recipientPublicKey`. It is announced on every
+ * first payment to an account the chain has not seen, and that announcement
+ * is a real fact about the transaction — this sandbox has already had one bug
+ * from it going missing. It gets a label below instead of the axe.
+ */
+const ENVELOPE = new Set(['messageIsText'])
+
+/**
  * Where a value stops being worth reading in a table row.
  *
  * A contract's attachment carries its compiled bytecode, which is thousands
@@ -156,6 +173,10 @@ function present(field: KnownField, raw: unknown, tx: Transaction): DetailField[
 const COMMON: Record<string, KnownField> = {
   message: { label: 'message' },
   encryptedMessage: { label: 'encrypted', format: 'unreadable' },
+  // Carried by any send to an account the chain has never seen, which in a
+  // sandbox is most of them. Worth naming rather than showing as a raw key
+  // beside sixty-four characters of hex.
+  recipientPublicKey: { label: 'announcedKey' },
 }
 
 const ORDER: Record<string, KnownField> = {
@@ -303,7 +324,7 @@ export function detailFields(tx: Transaction): DetailField[] {
   }
 
   for (const [key, raw] of Object.entries(attachment)) {
-    if (taken.has(key) || isVersionMarker(key)) continue
+    if (taken.has(key) || isVersionMarker(key) || ENVELOPE.has(key)) continue
     fields.push({ label: key, value: asText(raw) })
   }
 

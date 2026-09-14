@@ -175,6 +175,7 @@ export default {
       deadlineAction: 'On deadline',
       message: 'Message',
       encrypted: 'Encrypted',
+      announcedKey: 'Public key announced',
       recipients: 'Recipients',
       tokens: 'Tokens',
       minimumHolding: 'Minimum holding',

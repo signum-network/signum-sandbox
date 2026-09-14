@@ -161,6 +161,7 @@ export default {
       deadlineAction: '期限到来時',
       message: 'メッセージ',
       encrypted: '暗号化済み',
+      announcedKey: '公開鍵を告知',
       recipients: '受取人',
       tokens: 'トークン',
       minimumHolding: '最低保有量',

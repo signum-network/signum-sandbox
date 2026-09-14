@@ -161,6 +161,7 @@ export default {
       deadlineAction: 'समय-सीमा पर',
       message: 'संदेश',
       encrypted: 'एन्क्रिप्टेड',
+      announcedKey: 'सार्वजनिक कुंजी घोषित',
       recipients: 'प्राप्तकर्ता',
       tokens: 'टोकन',
       minimumHolding: 'न्यूनतम होल्डिंग',

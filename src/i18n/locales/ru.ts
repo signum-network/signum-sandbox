@@ -161,6 +161,7 @@ export default {
       deadlineAction: 'По истечении срока',
       message: 'Сообщение',
       encrypted: 'Зашифровано',
+      announcedKey: 'Открытый ключ объявлен',
       recipients: 'Получатели',
       tokens: 'Токены',
       minimumHolding: 'Минимальный баланс',

@@ -161,6 +161,7 @@ export default {
       deadlineAction: 'Bei Fristablauf',
       message: 'Nachricht',
       encrypted: 'Verschlüsselt',
+      announcedKey: 'Public Key angekündigt',
       recipients: 'Empfänger',
       tokens: 'Token',
       minimumHolding: 'Mindestbestand',

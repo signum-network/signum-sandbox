@@ -161,6 +161,7 @@ export default {
       deadlineAction: 'Al vencer el plazo',
       message: 'Mensaje',
       encrypted: 'Cifrado',
+      announcedKey: 'Clave pública anunciada',
       recipients: 'Destinatarios',
       tokens: 'Tokens',
       minimumHolding: 'Tenencia mínima',

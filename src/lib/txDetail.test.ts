@@ -213,3 +213,23 @@ describe('detailFields', () => {
     expect(valueOf(fields, 'frequency')).toBe('3600 s')
   })
 })
+
+describe('detailFields, what a row should not be cluttered with', () => {
+  // Seen on every real transaction the sandbox produces: a format flag for
+  // the decoder that says the readable message is readable. Same judgement
+  // as the version markers — always present, never informative.
+  it('drops the message format flag, which every message carries', () => {
+    const fields = detailFields(
+      tx(TransactionType.Arbitrary, 0, { message: 'hello', messageIsText: true }),
+    )
+    expect(labels(fields)).toEqual(['message'])
+  })
+
+  // Not dropped: announcing a recipient's key is a real fact about the
+  // transaction, and this sandbox has already had one bug from it going
+  // missing. It gets a name instead of the axe.
+  it('names the announced public key rather than hiding or dumping it', () => {
+    const fields = detailFields(tx(TransactionType.Payment, 0, { recipientPublicKey: 'ab12' }))
+    expect(fields).toContainEqual({ label: 'announcedKey', value: 'ab12' })
+  })
+})

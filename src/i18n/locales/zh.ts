@@ -161,6 +161,7 @@ export default {
       deadlineAction: '到期处理',
       message: '消息',
       encrypted: '已加密',
+      announcedKey: '已公布公钥',
       recipients: '接收方',
       tokens: '代币',
       minimumHolding: '最低持有量',

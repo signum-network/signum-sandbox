@@ -161,6 +161,7 @@ export default {
       deadlineAction: 'No fim do prazo',
       message: 'Mensagem',
       encrypted: 'Encriptado',
+      announcedKey: 'Chave pública anunciada',
       recipients: 'Destinatários',
       tokens: 'Tokens',
       minimumHolding: 'Detenção mínima',
