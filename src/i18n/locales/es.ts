@@ -256,6 +256,36 @@ export default {
       freshNote: 'El nodo mantiene su base de datos abierta mientras se ejecuta, así que vaciar la cadena implica reiniciarlo. Detén el nodo y ejecuta:',
       height: 'Altura',
     },
+    scenario: {
+      section: 'Escenarios',
+      note: 'Un escenario describe una cadena, con una línea o dos por transacción. Carga uno, cámbialo a tu gusto y ejecútalo: se suma a la cadena que ya tienes.',
+      load: 'Cargar',
+      run: 'Ejecutar',
+      running: 'Línea {{line}} — paso {{index}} de {{total}}',
+      completed: 'Listo — {{count}} pasos',
+      failed: 'Detenido en la línea {{line}}: {{message}}',
+      problems: '{{count}} problemas',
+      empty: 'Carga uno arriba, o escribe el tuyo.',
+      firstSteps: {
+        title: 'Primeros pasos',
+        description: 'Tres cuentas, unos pagos y un mensaje. Lo justo para ver qué es un bloque.',
+      },
+      tokenLaunch: {
+        title: 'Lanzamiento de token',
+        description:
+          'Un token emitido y repartido entre cinco tenedores, con saldos que merece la pena mirar.',
+      },
+      fullHouse: {
+        title: 'Todo a la vez',
+        description:
+          'Perfiles, un token, alias, un mensaje cifrado, una multi-salida y una suscripción. Cada vista tiene algo que enseñar.',
+      },
+      busyChain: {
+        title: 'Cadena con movimiento',
+        description:
+          'Volumen, para probar qué hacen las listas, la paginación y la búsqueda cuando hay mucho.',
+      },
+    },
     src44: {
       name: 'Nombre',
       description: 'Descripción',

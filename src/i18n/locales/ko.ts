@@ -256,6 +256,35 @@ export default {
       freshNote: '노드는 실행 중 데이터베이스를 열어 두므로 체인을 비우려면 재시작해야 합니다. 노드를 멈추고 실행하세요:',
       height: '높이',
     },
+    scenario: {
+      section: '시나리오',
+      note: '시나리오는 거래 하나를 한두 줄로 적어 체인을 서술합니다. 하나 불러와 마음대로 고친 뒤 실행하세요. 지금 있는 체인 위에 더해집니다.',
+      load: '불러오기',
+      run: '실행',
+      running: '{{line}}번째 줄 — {{total}}단계 중 {{index}}단계',
+      completed: '완료 — {{count}}단계',
+      failed: '{{line}}번째 줄에서 멈췄습니다: {{message}}',
+      problems: '문제 {{count}}건',
+      empty: '위에서 하나 불러오거나 직접 작성하세요.',
+      firstSteps: {
+        title: '첫걸음',
+        description: '계정 세 개, 몇 건의 결제와 메시지 하나. 블록이 무엇인지 보기에 충분합니다.',
+      },
+      tokenLaunch: {
+        title: '토큰 발행',
+        description: '토큰 하나를 발행해 다섯 보유자에게 나눕니다. 잔액도 볼 만합니다.',
+      },
+      fullHouse: {
+        title: '한 번에 전부',
+        description:
+          '프로필, 토큰, 별칭, 암호화된 메시지, 멀티아웃, 구독. 모든 화면에 보여줄 것이 있습니다.',
+      },
+      busyChain: {
+        title: '붐비는 체인',
+        description:
+          '분량입니다. 데이터가 많을 때 목록과 페이지 넘김, 검색이 어떻게 되는지 시험합니다.',
+      },
+    },
     src44: {
       name: '이름',
       description: '설명',

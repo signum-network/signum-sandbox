@@ -267,6 +267,34 @@ export default {
       freshNote: 'The node holds its database open while it runs, so emptying the chain means restarting it. Stop the node and run:',
       height: 'Height',
     },
+    scenario: {
+      section: 'Scenarios',
+      note: 'A scenario describes a chain in a line or two per transaction. Load one, change it if you like, and run it — it adds to the chain you already have.',
+      load: 'Load',
+      run: 'Run',
+      running: 'Line {{line}} — step {{index}} of {{total}}',
+      completed: 'Done — {{count}} steps',
+      failed: 'Stopped at line {{line}}: {{message}}',
+      problems: '{{count}} problems',
+      empty: 'Load one above, or write your own.',
+      firstSteps: {
+        title: 'First steps',
+        description: 'Three accounts, a few payments and a message. Enough to see what a block is.',
+      },
+      tokenLaunch: {
+        title: 'Token launch',
+        description: 'One asset issued and spread across five holders, with balances worth looking at.',
+      },
+      fullHouse: {
+        title: 'Full house',
+        description:
+          'Profiles, a token, aliases, an encrypted message, a payroll and a standing order. Every view has something to show.',
+      },
+      busyChain: {
+        title: 'Busy chain',
+        description: 'Volume, for testing what lists, paging and search do when there is a lot.',
+      },
+    },
     src44: {
       name: 'Name',
       description: 'Description',

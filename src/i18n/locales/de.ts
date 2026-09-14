@@ -256,6 +256,37 @@ export default {
       freshNote: 'Der Node hält seine Datenbank offen, solange er läuft — die Chain zu leeren heißt also, ihn neu zu starten. Node beenden und ausführen:',
       height: 'Höhe',
     },
+    scenario: {
+      section: 'Szenarien',
+      note: 'Ein Szenario beschreibt eine Chain, eine Zeile oder zwei je Transaktion. Lade eins, ändere es nach Belieben und führ es aus — es kommt zur bestehenden Chain hinzu.',
+      load: 'Laden',
+      run: 'Ausführen',
+      running: 'Zeile {{line}} — Schritt {{index}} von {{total}}',
+      completed: 'Fertig — {{count}} Schritte',
+      failed: 'Bei Zeile {{line}} gestoppt: {{message}}',
+      problems: '{{count}} Probleme',
+      empty: 'Lade oben eins, oder schreib dein eigenes.',
+      firstSteps: {
+        title: 'Erste Schritte',
+        description:
+          'Drei Konten, ein paar Zahlungen und eine Nachricht. Genug, um zu sehen, was ein Block ist.',
+      },
+      tokenLaunch: {
+        title: 'Token-Start',
+        description:
+          'Ein Token ausgegeben und auf fünf Halter verteilt, mit Beständen, die sich anzusehen lohnen.',
+      },
+      fullHouse: {
+        title: 'Volles Haus',
+        description:
+          'Profile, ein Token, Aliasse, eine verschlüsselte Nachricht, eine Sammelzahlung und ein Dauerauftrag. Jede Ansicht hat etwas zu zeigen.',
+      },
+      busyChain: {
+        title: 'Volle Chain',
+        description:
+          'Menge — um zu sehen, was Listen, Blättern und Suche tun, wenn viel da ist.',
+      },
+    },
     src44: {
       name: 'Name',
       description: 'Beschreibung',

@@ -255,6 +255,33 @@ export default {
       freshNote: '节点运行时会占用数据库文件，清空链因此需要重启。停止节点后执行：',
       height: '高度',
     },
+    scenario: {
+      section: '场景',
+      note: '一个场景用一两行描述一笔交易，合起来就描述了一条链。载入一个，随意修改，然后运行——它会叠加到你现有的链上。',
+      load: '载入',
+      run: '运行',
+      running: '第 {{line}} 行 — 第 {{index}} / {{total}} 步',
+      completed: '完成 — 共 {{count}} 步',
+      failed: '在第 {{line}} 行停止：{{message}}',
+      problems: '{{count}} 个问题',
+      empty: '从上面载入一个，或者自己写一个。',
+      firstSteps: {
+        title: '入门第一步',
+        description: '三个账户、几笔付款和一条消息。足以看清区块是什么。',
+      },
+      tokenLaunch: {
+        title: '代币发行',
+        description: '发行一种代币并分给五位持有人，余额也值得一看。',
+      },
+      fullHouse: {
+        title: '样样俱全',
+        description: '资料、代币、别名、加密消息、多重支出和订阅。每个视图都有东西可看。',
+      },
+      busyChain: {
+        title: '繁忙的链',
+        description: '大量数据，用来试试列表、翻页和搜索在数据很多时的表现。',
+      },
+    },
     src44: {
       name: '名称',
       description: '描述',

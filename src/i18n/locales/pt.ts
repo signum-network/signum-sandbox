@@ -256,6 +256,37 @@ export default {
       freshNote: 'O nó mantém a base de dados aberta enquanto corre, portanto esvaziar a cadeia implica reiniciá-lo. Pare o nó e execute:',
       height: 'Altura',
     },
+    scenario: {
+      section: 'Cenários',
+      note: 'Um cenário descreve uma cadeia, com uma linha ou duas por transação. Carrega um, muda-o se quiseres e executa-o: junta-se à cadeia que já tens.',
+      load: 'Carregar',
+      run: 'Executar',
+      running: 'Linha {{line}} — passo {{index}} de {{total}}',
+      completed: 'Pronto — {{count}} passos',
+      failed: 'Parado na linha {{line}}: {{message}}',
+      problems: '{{count}} problemas',
+      empty: 'Carrega um acima, ou escreve o teu.',
+      firstSteps: {
+        title: 'Primeiros passos',
+        description:
+          'Três contas, alguns pagamentos e uma mensagem. O suficiente para ver o que é um bloco.',
+      },
+      tokenLaunch: {
+        title: 'Lançamento de token',
+        description:
+          'Um token emitido e repartido por cinco detentores, com saldos que vale a pena ver.',
+      },
+      fullHouse: {
+        title: 'Tudo de uma vez',
+        description:
+          'Perfis, um token, alias, uma mensagem encriptada, uma multi-saída e uma subscrição. Cada vista tem algo para mostrar.',
+      },
+      busyChain: {
+        title: 'Cadeia com movimento',
+        description:
+          'Volume, para testar o que fazem as listas, a paginação e a pesquisa quando há muito.',
+      },
+    },
     src44: {
       name: 'Nome',
       description: 'Descrição',
