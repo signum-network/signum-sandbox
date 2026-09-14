@@ -30,6 +30,28 @@ Poll, Vote and Hub Announcement are inherited from Burst and unusable on Signum.
 
 ---
 
+## Where the field names come from
+
+`signum-mobile-wallet` renders every one of these types in production, and
+`src/features/Dashboard/Deeplinking/Sign/utils/parseTransaction.ts` is the
+file that reads them. The table in Task 3 is taken from there rather than
+from the API documentation, which changes several things this plan originally
+got wrong — they are called out where they appear. Two findings are big
+enough to state up front.
+
+**Address `0` is the burn address.** A payment or token transfer to it is not
+a transfer to an account called 0; it is money destroyed. The wallet reads
+the recipient before the subtype for exactly this reason. Neither this plan
+nor the console currently knows it, and a row that says "Payment · 0" for a
+burn is telling a developer something false about their own transaction.
+
+**Multi-out has an SDK reader.** `getRecipientAmountsFromMultiOutPayment`
+handles both shapes — individual amounts and same-amount — and returns
+`{recipient, amountNQT}` pairs. `payload.ts` hand-rolls this today by
+sniffing whether the first element is an array, which is the code that once
+decoded a same-amount multi-out into fabricated SIGNA figures. The hand-rolled
+version goes.
+
 ## The one principle that makes this safe
 
 **An extractor must never hide a field it does not recognise.**
@@ -90,6 +112,16 @@ const tx = (type: number, subtype: number, extra: Partial<Transaction> = {}) =>
 describe('kindOf', () => {
   it('names a block reward, which has no sender', () => {
     expect(kindOf({ } as Transaction)).toBe('reward')
+  })
+
+  // Taken from the mobile wallet, which reads the recipient before the
+  // subtype. Address 0 destroys what is sent to it, and "Payment · 0" would
+  // be a false statement about a developer's own transaction.
+  it('names a burn, whatever kind of transfer carried it there', () => {
+    const burn = (type: number, subtype: number) =>
+      kindOf(tx(type, subtype, { recipient: '0' } as Partial<Transaction>))
+    expect(burn(TransactionType.Payment, TransactionPaymentSubtype.Ordinary)).toBe('burn')
+    expect(burn(TransactionType.Asset, TransactionAssetSubtype.AssetTransfer)).toBe('burn')
   })
 
   it('tells the three payment shapes apart', () => {
@@ -241,6 +273,7 @@ export const TX_KINDS = [
   'subscriptionPayment',
   'contractCreate',
   'contractPayment',
+  'burn',
   'reward',
   'other',
 ] as const
@@ -294,9 +327,19 @@ const CONTRACT: Record<number, TxKind> = {
   [TransactionSmartContractSubtype.SmartContractPayment]: 'contractPayment',
 }
 
+/**
+ * Signum's burn address. Anything sent here is destroyed rather than
+ * delivered, so the recipient has to be read before the subtype: a payment
+ * to `0` is not a payment to an account called zero, and a row that says so
+ * is telling a developer something false about their own transaction.
+ */
+const BURN_ADDRESS = '0'
+
 export function kindOf(tx: Transaction): TxKind {
   // A block reward has no sender: the chain itself credited the forger.
   if (!tx.senderRS) return 'reward'
+
+  if (tx.recipient === BURN_ADDRESS) return 'burn'
 
   switch (tx.type) {
     case TransactionType.Payment:
@@ -370,7 +413,7 @@ Replace the `kind` block in `en.ts` with:
       multiOutSame: 'Multi-out, same amount',
       message: 'Message',
       encryptedMessage: 'Encrypted message',
-      alias: 'Alias',
+      alias: 'Alias claimed',
       aliasSale: 'Alias offered',
       aliasBuy: 'Alias bought',
       tld: 'Top-level domain',
@@ -390,7 +433,7 @@ Replace the `kind` block in `en.ts` with:
       distributeToHolders: 'Distributed to holders',
       tokenOwnership: 'Token ownership transferred',
       leasing: 'Balance leased',
-      rewardRecipient: 'Reward recipient set',
+      rewardRecipient: 'Joined a pool',
       addCommitment: 'Commitment added',
       removeCommitment: 'Commitment removed',
       escrowCreate: 'Escrow created',
@@ -401,6 +444,7 @@ Replace the `kind` block in `en.ts` with:
       subscriptionPayment: 'Subscription payment',
       contractCreate: 'Contract deployed',
       contractPayment: 'Contract payment',
+      burn: 'Burned',
       reward: 'Block reward',
       other: 'Transaction',
     },
@@ -439,7 +483,7 @@ Note `aliasTransfer` is gone: the chain has no such subtype — an alias moves b
       distributeToHolders: 'An Halter ausgeschüttet',
       tokenOwnership: 'Token-Besitz übertragen',
       leasing: 'Guthaben verliehen',
-      rewardRecipient: 'Belohnungsempfänger gesetzt',
+      rewardRecipient: 'Pool beigetreten',
       addCommitment: 'Commitment hinzugefügt',
       removeCommitment: 'Commitment entfernt',
       escrowCreate: 'Treuhand angelegt',
@@ -450,6 +494,7 @@ Note `aliasTransfer` is gone: the chain has no such subtype — an alias moves b
       subscriptionPayment: 'Subscription-Zahlung',
       contractCreate: 'Vertrag ausgebracht',
       contractPayment: 'Vertragszahlung',
+      burn: 'Verbrannt',
       reward: 'Blockbelohnung',
       other: 'Transaktion',
     },
@@ -458,6 +503,8 @@ Note `aliasTransfer` is gone: the chain has no such subtype — an alias moves b
 - [ ] **Step 3: Translate the same thirty-eight into the remaining eight**
 
 `es`, `pt`, `uk`, `ru`, `zh`, `ja`, `ko`, `hi`. These are read by a developer inspecting their own transaction, so accuracy beats elegance — but keep each file's existing vocabulary: check `glossary.*` and the rest of `console.*` for how that locale already says token, alias, subscription, commitment. `locales.test.ts` fails on any key difference.
+
+Where `signum-mobile-wallet` already has a translation for one of these, prefer it over inventing a second — the same person may be reading both. Its keys are the `i18nKey` values in `parseTransaction.ts` (`joinPool`, `aliasClaim`, `tokenIssuance`, `createSaleOrder`, `distribution`, …), and its locale files are where those resolve.
 
 - [ ] **Step 4: Run the tests**
 
@@ -610,6 +657,22 @@ const KNOWN: Partial<Record<TxKind, Record<string, { label: string; format?: 'si
   },
   tokenTransfer: { asset: { label: 'token' }, quantityQNT: { label: 'quantity' } },
   mintAsset: { asset: { label: 'token' }, quantityQNT: { label: 'quantity' } },
+  // Parallel arrays, not pairs — `assetIds[i]` goes with `quantitiesQNT[i]`.
+  // This is the same shape that once made same-amount multi-out decode into
+  // invented SIGNA figures, so it gets a formatter rather than a label.
+  tokenMultiTransfer: {
+    assetIds: { label: 'tokens', format: 'multiTransfer' },
+    quantitiesQNT: { label: 'skip' },
+  },
+  // Two tokens in one transaction: the one whose holders are paid, and
+  // optionally the one they are paid in. `assetToDistribute` of "0" means
+  // they were paid in SIGNA.
+  distributeToHolders: {
+    asset: { label: 'token' },
+    quantityMinimumQNT: { label: 'minimumHolding' },
+    assetToDistribute: { label: 'paidIn' },
+    quantityQNT: { label: 'quantity' },
+  },
   askOrder: {
     asset: { label: 'token' },
     quantityQNT: { label: 'quantity' },
@@ -620,17 +683,29 @@ const KNOWN: Partial<Record<TxKind, Record<string, { label: string; format?: 'si
     quantityQNT: { label: 'quantity' },
     priceNQT: { label: 'price', format: 'signa' },
   },
-  askOrderCancel: { order: { label: 'order' } },
-  bidOrderCancel: { order: { label: 'order' } },
+  // The wallet reads `asset` here; an order id is presumably alongside it
+  // under `order`. Both are listed, and whichever the node actually sends
+  // shows up — that is what the passthrough is for.
+  askOrderCancel: { order: { label: 'order' }, asset: { label: 'token' } },
+  bidOrderCancel: { order: { label: 'order' }, asset: { label: 'token' } },
   alias: { alias: { label: 'aliasName' }, uri: { label: 'content' } },
-  aliasSale: { alias: { label: 'aliasName' }, priceNQT: { label: 'price', format: 'signa' } },
-  aliasBuy: { alias: { label: 'aliasName' } },
+  // The wallet reads `alias || uri` for both of these, so a sale or purchase
+  // may name the alias under either key.
+  aliasSale: {
+    alias: { label: 'aliasName' },
+    uri: { label: 'aliasName' },
+    priceNQT: { label: 'price', format: 'signa' },
+  },
+  aliasBuy: { alias: { label: 'aliasName' }, uri: { label: 'aliasName' } },
   accountInfo: { name: { label: 'infoName' }, description: { label: 'description' } },
   subscription: { frequency: { label: 'frequency' } },
   cancelSubscription: { subscriptionId: { label: 'subscription' } },
   subscriptionPayment: { subscriptionId: { label: 'subscription' } },
   addCommitment: { amountNQT: { label: 'amount', format: 'signa' } },
   removeCommitment: { amountNQT: { label: 'amount', format: 'signa' } },
+  // Unverified: the wallet reads no attachment fields for a contract
+  // creation at all, taking the hash from the transaction instead. These two
+  // are a guess, and the passthrough is what makes the guess safe.
   contractCreate: { name: { label: 'contractName' }, description: { label: 'description' } },
   escrowCreate: {
     amountNQT: { label: 'amount', format: 'signa' },
@@ -725,6 +800,9 @@ Inside `console`:
       message: 'Message',
       encrypted: 'Encrypted',
       recipients: 'Recipients',
+      tokens: 'Tokens',
+      minimumHolding: 'Minimum holding',
+      paidIn: 'Paid in',
     },
 ```
 
@@ -755,6 +833,9 @@ Inside `console`:
       message: 'Nachricht',
       encrypted: 'Verschlüsselt',
       recipients: 'Empfänger',
+      tokens: 'Token',
+      minimumHolding: 'Mindestbestand',
+      paidIn: 'Ausgezahlt in',
     },
 ```
 
@@ -811,7 +892,19 @@ the `message`/`encryptedMessage` entries in `KNOWN` with label `encrypted`
 and a null value, and check `decryptFor` in `payload.ts` still receives what
 it expects.
 
-- [ ] **Step 3: Check what still uses `payload.ts`**
+- [ ] **Step 3: Use the SDK's multi-out reader**
+
+`payload.ts` decides between the two multi-out shapes by checking whether the
+first element is an array. That is the code that once decoded a same-amount
+multi-out into invented SIGNA figures. `@signumjs/core` exports
+`getRecipientAmountsFromMultiOutPayment(tx)`, which handles both shapes and
+returns `{ recipient, amountNQT }` pairs — use it, and delete
+`recipientsSummary`.
+
+It throws on a transaction that is not a multi-out, so call it only for the
+`multiOut` and `multiOutSame` kinds.
+
+- [ ] **Step 4: Check what still uses `payload.ts`**
 
 Run: `grep -rn "decodePayload\|src44Fields" src/`
 
@@ -819,11 +912,11 @@ Run: `grep -rn "decodePayload\|src44Fields" src/`
 no callers left, delete it and its tests; if it has one, leave it. Do not
 leave a dead export.
 
-- [ ] **Step 4: Verify**
+- [ ] **Step 5: Verify**
 
 Run: `bun run test && bun run build`
 
-- [ ] **Step 5: Walk it against a running node**
+- [ ] **Step 6: Walk it against a running node**
 
 Load the "Full house" scenario and open one of each: a payment with a
 message, an encrypted message, a token issuance, a token transfer, an alias,
@@ -835,7 +928,7 @@ from this console, so use the API doc page (`/api-doc/`) to place one against
 a scenario token, and check the row names it "Sell order" and shows a price
 and a quantity.
 
-- [ ] **Step 6: Commit**
+- [ ] **Step 7: Commit**
 
 ```bash
 git add src/components/console src/lib/payload.ts
@@ -847,6 +940,11 @@ git commit -m "feat: the row shows the fields its kind of transaction carries"
 ## Notes for whoever executes this
 
 **Additive, never selective.** The one rule. Most of these transactions cannot be produced by this console, so `KNOWN` is written from documentation and some of it is wrong. A wrong guess costs a badly labelled row; a guess that hid the field would cost a developer the answer they opened the row for. If you find yourself writing `if (recognised)` around the output, stop.
+
+**The wallet is the reference, not this plan.** `signum-mobile-wallet`'s
+`parseTransaction.ts` renders all of these in production. Where it and this
+document disagree, it wins — and say so, so the next person knows which way
+the correction went.
 
 **Verify what you can, and say what you could not.** Payments, messages, tokens, aliases, multi-out and subscriptions can all be produced here and should be checked against real transactions. Orders, escrow, contracts, commitment and leasing cannot — say so in the commit rather than implying they were tested.
 
