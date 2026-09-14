@@ -7,6 +7,7 @@ import { Select } from '@/components/console/Select'
 import { AUTO_INTERVALS_S, MAINNET_INTERVAL_S, formatInterval } from '@/lib/autoForge'
 import { Countdown } from '@/components/console/Countdown'
 import { Toggle } from '@/components/console/Toggle'
+import { Identicon } from '@/components/console/Identicon'
 import { ConsoleButton } from '@/components/console/ConsoleButton'
 import { Term } from '@/components/console/Term'
 import { sfx, useAudio } from '@/audio'
@@ -143,7 +144,16 @@ export function Header({
             placeholder={t('console.forge.chooseForger')}
             emptyLabel={t('console.accounts.none')}
             onChange={accounts.setForger}
-            options={accounts.accounts.map((a) => ({ value: a.id, label: a.name }))}
+            // Address and identicon beside the name, as every other account
+            // picker has them. A local name is a label, not an identifier —
+            // nothing stops two accounts being called Bob — so a list that
+            // offers only the name cannot say which Bob you are choosing.
+            options={accounts.accounts.map((a) => ({
+              value: a.id,
+              label: a.name,
+              sublabel: a.address,
+              icon: <Identicon value={a.address} size={14} />,
+            }))}
           />
         </div>
 
