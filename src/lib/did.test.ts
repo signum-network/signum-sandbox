@@ -30,26 +30,29 @@ describe('accountDid', () => {
 
   it('is the shape the real resolver returns', () => {
     expect(full.didResolutionMetadata).toEqual({ contentType: 'application/did+ld+json' })
-    expect(full.didDocument.id).toBe(didFor('acc', ADDRESS))
     expect(full.didDocumentMetadata.immutable).toBe(false)
   })
 
-  // An id and an address name one account; a document mentioning only one of
-  // them leaves a reader to work out that the other is the same thing.
-  it('names the account by its other spelling too', () => {
-    expect(full.didDocument.alsoKnownAs).toEqual([didFor('acc', ID)])
+  // The numeric id is the account's own name on the chain — everything the
+  // node knows about an account hangs off it — and an identifier meant for
+  // machines should be the canonical spelling. The readable one is still in
+  // the document, because naming only one leaves a reader to work out that
+  // the two are the same account.
+  it('is named by the numeric id, with the address alongside', () => {
+    expect(full.didDocument.id).toBe(didFor('acc', ID))
+    expect(full.didDocument.alsoKnownAs).toEqual([didFor('acc', ADDRESS)])
   })
 
   it('carries the key as a verification method it can authenticate with', () => {
     expect(full.didDocument.verificationMethod).toEqual([
       {
-        id: `${didFor('acc', ADDRESS)}#key-1`,
+        id: `${didFor('acc', ID)}#key-1`,
         type: 'Ed25519VerificationKey2020',
-        controller: didFor('acc', ADDRESS),
+        controller: didFor('acc', ID),
         publicKeyMultibase: 'fab12cd34',
       },
     ])
-    expect(full.didDocument.authentication).toEqual([`${didFor('acc', ADDRESS)}#key-1`])
+    expect(full.didDocument.authentication).toEqual([`${didFor('acc', ID)}#key-1`])
     expect(full.didDocument['@context']).toContain(
       'https://w3id.org/security/suites/ed25519-2020/v1',
     )
@@ -90,9 +93,11 @@ describe('transactionDid', () => {
   // rather than by itself, and the key that verifies it is the sender's.
   it('is controlled by its sender, and verified with the sender key', () => {
     const doc = transactionDid(tx).didDocument
-    expect(doc.controller).toBe(didFor('acc', ADDRESS))
+    // By id, so this string and the sender's own account document agree
+    // rather than being two spellings of one account.
+    expect(doc.controller).toBe(didFor('acc', ID))
     expect(doc.verificationMethod?.[0].id).toBe(`${didFor('tx', tx.transaction)}#creator`)
-    expect(doc.verificationMethod?.[0].controller).toBe(didFor('acc', ADDRESS))
+    expect(doc.verificationMethod?.[0].controller).toBe(didFor('acc', ID))
   })
 
   // The property a verification application is built on.
@@ -118,7 +123,7 @@ describe('transactionDid', () => {
 })
 
 describe('aliasDid', () => {
-  const alias = aliasDid({ aliasId: '777', aliasName: 'vesuvio', accountRS: ADDRESS })
+  const alias = aliasDid({ aliasId: '777', aliasName: 'vesuvio', accountId: ID })
 
   it('names the alias under its top-level domain', () => {
     expect(alias.didDocument.id).toBe(didFor('alias', 'signum:vesuvio'))
@@ -126,7 +131,7 @@ describe('aliasDid', () => {
   })
 
   it('is controlled by its owner', () => {
-    expect(alias.didDocument.controller).toBe(didFor('acc', ADDRESS))
+    expect(alias.didDocument.controller).toBe(didFor('acc', ID))
   })
 
   // What an alias points at can be changed at any time and the alias itself

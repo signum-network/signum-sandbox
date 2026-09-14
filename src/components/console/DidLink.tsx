@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { DidResolution } from '@/lib/did'
 import { RowButton } from './ConsoleButton'
+import { Modal } from './Modal'
 
 /**
  * The decentralised identifier for whatever is on screen, and its document.
@@ -44,14 +45,18 @@ export function DidLink({ resolution }: { resolution: DidResolution }) {
           {open ? t('console.did.hide') : t('console.did.show')}
         </RowButton>
       </span>
+      {/*
+        A modal rather than an unfolding block. A DID document runs to thirty
+        lines, and unfolding one inside a transaction row pushed every row
+        below it down the page — so reading the document meant losing the
+        stream it belonged to.
+      */}
       {open && (
-        <pre
-          className="themed-scroll console-scroll max-h-64 overflow-auto border p-2 text-[11px]
-            leading-relaxed text-[var(--muted)]"
-          style={{ borderColor: 'var(--border2)' }}
-        >
-          {JSON.stringify(resolution, null, 2)}
-        </pre>
+        <Modal title={t('console.did.label')} onClose={() => setOpen(false)}>
+          <pre className="p-1 text-[12px] leading-relaxed text-[var(--muted)]">
+            {JSON.stringify(resolution, null, 2)}
+          </pre>
+        </Modal>
       )}
     </span>
   )

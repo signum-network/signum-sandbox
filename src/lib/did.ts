@@ -86,9 +86,15 @@ export interface AccountInput {
  *
  * Built from what the console already has — the id, the address, the public
  * key, the SRC44 profile — so resolving is a transformation rather than a
- * request. `alsoKnownAs` carries the other spelling of the same account,
- * because an id and an address name one thing and a document that mentions
- * only one of them leaves a reader to guess.
+ * request.
+ *
+ * Named by the numeric id, with the address as `alsoKnownAs`. The id is the
+ * account's own name on the chain — everything the node knows about an
+ * account hangs off it, and the address is that same number regrouped for
+ * people to read. An identifier meant to be resolved by machines should be
+ * the canonical one; the readable spelling is still in the document, because
+ * a document that mentions only one of the two leaves a reader to work out
+ * that they are the same thing.
  *
  * An account the chain has never seen has no public key, and then there is no
  * verification method and no authentication: nothing can be proven about a
@@ -96,11 +102,11 @@ export interface AccountInput {
  * lying about what the chain knows.
  */
 export function accountDid(account: AccountInput): DidResolution {
-  const did = didFor('acc', account.accountRS)
+  const did = didFor('acc', account.accountId)
   const doc: DidDocument = {
     '@context': [DID_CONTEXT],
     id: did,
-    alsoKnownAs: [didFor('acc', account.accountId)],
+    alsoKnownAs: [didFor('acc', account.accountRS)],
   }
 
   if (account.publicKey) {
@@ -136,7 +142,9 @@ export function transactionDid(
   src44?: Record<string, unknown>,
 ): DidResolution {
   const did = didFor('tx', tx.transaction)
-  const controller = didFor('acc', tx.senderRS ?? tx.sender)
+  // The sender by its id too, so a controller and the account document it
+  // points at are the same string rather than two spellings of one account.
+  const controller = didFor('acc', tx.sender)
   const doc: DidDocument = {
     '@context': [DID_CONTEXT, ED25519_CONTEXT],
     id: did,
@@ -172,7 +180,8 @@ export function transactionDid(
 export interface AliasInput {
   aliasId: string
   aliasName: string
-  accountRS: string
+  /** The owner's numeric id — a controller names the account the way the account does. */
+  accountId: string
   timestamp?: number
   tld?: string
   src44?: Record<string, unknown>
@@ -193,7 +202,7 @@ export function aliasDid(alias: AliasInput): DidResolution {
       '@context': [DID_CONTEXT],
       id: did,
       alsoKnownAs: [didFor('alias', alias.aliasId)],
-      controller: didFor('acc', alias.accountRS),
+      controller: didFor('acc', alias.accountId),
       ...(alias.src44 ? { src44: alias.src44 } : {}),
     },
     {
