@@ -117,6 +117,17 @@ const isAmount = (token: string | undefined) =>
 const isWhole = (token: string | undefined) => token !== undefined && /^\d+$/.test(token)
 
 /**
+ * The most blocks one `forge` line may ask for.
+ *
+ * Every block is a request to the node and a wait for the height to rise, so
+ * `forge 100000` is a well-formed scenario that runs until someone closes the
+ * tab. Refusing it here means the author is told on the line, while editing,
+ * rather than discovering it as a run that will not end. A thousand is far
+ * beyond any scenario that shipped and far below a hang.
+ */
+const MAX_FORGE = 1000
+
+/**
  * Source in, steps and problems out. Never throws: a scenario is edited in a
  * text box, so half of what this sees will be half-written, and the useful
  * answer is always a list of lines to look at.
@@ -343,6 +354,9 @@ export function parseScenario(source: string): ParseResult {
       case 'forge': {
         if (rest[0] !== undefined && !isWhole(rest[0])) {
           return fail(`"${rest[0]}" is not a whole number of blocks`)
+        }
+        if (Number(rest[0] ?? 1) > MAX_FORGE) {
+          return fail(`forge takes at most ${MAX_FORGE} blocks at a time`)
         }
         if (!noExtra(1)) return
         return void steps.push({ line, kind: 'forge', count: Number(rest[0] ?? 1) })

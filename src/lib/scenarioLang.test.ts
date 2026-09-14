@@ -196,3 +196,15 @@ describe('parseScenario, arguments it must not swallow', () => {
     ])
   })
 })
+
+describe('parseScenario, limits', () => {
+  // A well-formed scenario that never finishes is still a broken scenario,
+  // and the author should hear about it while editing rather than by watching
+  // a progress line that does not move.
+  it('refuses a forge count that would run forever', () => {
+    expect(parse('forge 100000').problems).toEqual([
+      { line: 1, message: 'forge takes at most 1000 blocks at a time' },
+    ])
+    expect(parse('forge 1000').problems).toEqual([])
+  })
+})

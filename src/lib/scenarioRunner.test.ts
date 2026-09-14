@@ -58,6 +58,56 @@ const run = (source: string, ops: ScenarioOps, onProgress?: Parameters<typeof ru
   runScenario(parseScenario(source).steps, ops, onProgress)
 
 describe('runScenario', () => {
+  // The runner checks rather than trusting that someone else did. A caller
+  // who skips checkScenario used to get the symbol table's throw partway
+  // through, indistinguishable from a node error, on a half-written chain.
+  it('refuses steps that do not check out, before touching the chain', async () => {
+    const { ops, calls } = fakeOps()
+    const outcome = await run('pay Ghost -> Nobody 1', ops)
+    expect(outcome.kind).toBe('invalid')
+    expect(calls).toEqual([])
+  })
+
+  it('stops between steps when asked to', async () => {
+    const { ops, calls } = fakeOps()
+    const controller = new AbortController()
+    const outcome = await runScenario(
+      parseScenario('miner M\nforge\nforge').steps,
+      { ...ops, forge: vi.fn(async () => {
+        calls.push('forge')
+        controller.abort()
+      }) },
+      undefined,
+      controller.signal,
+    )
+    expect(outcome).toEqual({ kind: 'failed', line: 3, message: 'stopped' })
+  })
+
+  it('reports the step that failed, so nothing is left spinning', async () => {
+    const { ops } = fakeOps({
+      pay: vi.fn(async () => {
+        throw new Error('nope')
+      }),
+    })
+    const progress = vi.fn()
+    await run('miner M\npay M -> M 1', ops, progress)
+    expect(progress).toHaveBeenCalledWith({ index: 1, total: 2, line: 2, state: 'failed' })
+  })
+
+  // The fee comes out on top of the amount, so forging only to the amount
+  // leaves the miner short at the boundary.
+  it('forges past the amount so the fee on the payment is covered too', async () => {
+    let balance = 0
+    const { ops } = fakeOps({
+      balanceSigna: vi.fn(async () => String(balance)),
+      forge: vi.fn(async () => {
+        balance += 100
+      }),
+    })
+    await run('miner M\naccount A\nfund A 200', ops)
+    expect(ops.forge).toHaveBeenCalledTimes(4)
+  })
+
   it('runs the steps in order and settles each one', async () => {
     const { ops, calls } = fakeOps()
     await run('miner M\naccount Alice\npay Alice -> M 5', ops)

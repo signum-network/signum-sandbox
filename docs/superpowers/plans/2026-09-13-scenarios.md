@@ -1518,6 +1518,8 @@ git commit -m "feat: four scenarios, written in the language"
 
 No test: every decision this could get wrong lives in the runner, which is tested. What it must get right is the mapping onto `send.ts`, and the way to get that right is to read `send.ts` rather than trust this plan.
 
+**`forge()` is the one operation with a contract the type cannot express.** It must not return until the chain has actually grown — see the doc comment on `ScenarioOps.forge` in `src/lib/scenarioRunner.ts`. The runner's fake satisfies the signature trivially, so nothing in the test suite will catch an implementation that only submits; the failure appears as a transfer rejected for an unknown asset, reported against a line that is not at fault.
+
 - [ ] **Step 1: Read the real signatures**
 
 Open `src/lib/send.ts` and note the exact argument names of `sendPayment`, `sendMultiOut`, `sendPlainMessage`, `sendEncryptedMessage`, `setAccountInfo`, `issueToken`, `transferToken`, `setAlias`, `createSubscription`, and what `issueToken` returns — the asset id is the issuance transaction's id, and the field it arrives in decides one line below. Also `feeFor` in `src/lib/fees.ts` and `forge` in `src/lib/chainAdmin.ts`.
@@ -1554,6 +1556,11 @@ import type { ScenarioOps } from './scenarioRunner'
  * and `addAccount` replaces by id, so running the same scenario twice yields
  * the same accounts rather than duplicates.
  */
+/** How long to wait between asking the node whether the block arrived. */
+const FORGE_POLL_MS = 250
+/** Give up after this many, so a node that stops forging fails rather than hangs. */
+const FORGE_ATTEMPTS = 40
+
 export function createScenarioOps({
   addressPrefix,
   onAccount,
@@ -1575,7 +1582,20 @@ export function createScenarioOps({
     },
 
     async forge() {
+      // Submitting is not forging. `submitNonce` answers success for the
+      // request, not for a block — two calls close together compete for the
+      // same height and the node answers both while producing one. The runner
+      // forges back to back with no delay, so without this wait a transaction
+      // would be broadcast before its predecessor settled, and `token` then
+      // `transfer` would fail with "Unknown asset" on the transfer line, which
+      // is not the guilty one.
+      const before = (await ledger.block.getBlockchainStatus()).numberOfBlocks
       await forgeBlock(minerPassphrase)
+      for (let attempt = 0; attempt < FORGE_ATTEMPTS; attempt += 1) {
+        await new Promise((resolve) => setTimeout(resolve, FORGE_POLL_MS))
+        if ((await ledger.block.getBlockchainStatus()).numberOfBlocks > before) return
+      }
+      throw new Error('the node accepted the request but produced no block')
     },
 
     async balanceSigna(accountId) {
@@ -2020,6 +2040,10 @@ git commit -m "docs: the scenario language, and the addresses it always produces
 **There is no undo.** The console cannot empty a chain, so a scenario that fails halfway leaves what it already wrote. That is why parsing and checking both happen before the run and why the runner stops at the first failure. Do not add a "continue anyway" path.
 
 **One way to run a scenario.** What executes is what is in the text box. If you find yourself adding a code path that runs a built-in scenario without loading it into the editor, stop — that is the second interpretation of the language that the editor mode was designed to avoid.
+
+**"Stopped at line N" is the honest phrasing, not "line N failed".** A step whose transaction was broadcast and whose settling block then failed is reported against that line, but the chain accepted it. There is no undo, so the wording is the only place this can be told truthfully.
+
+**A scenario is reproducible in its addresses, not in its chain.** Accounts derive from fixed passphrases, so the same text always names the same accounts — that is what makes them publishable as fixtures. Heights and balances depend on what was already there, because scenarios load cumulatively and nothing resets first.
 
 **Errors carry lines, all the way through.** The parser, the checker and the runner all report a line number, because all three are read by someone looking at a text box. A message without one is a bug.
 
