@@ -261,6 +261,7 @@ export default {
       goto: 'シナリオへ',
       builtIn: '同梱',
       reference: '命令',
+      docs: '言語リファレンス全文',
       nameIt: 'このシナリオに名前を',
       save: '保存',
       download: 'ダウンロード',

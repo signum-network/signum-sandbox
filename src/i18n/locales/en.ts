@@ -272,6 +272,7 @@ export default {
       goto: 'Go to scenarios',
       builtIn: 'Built-in',
       reference: 'Instructions',
+      docs: 'Full language reference',
       nameIt: 'Name this scenario',
       save: 'Save',
       download: 'Download',

@@ -261,6 +261,7 @@ export default {
       goto: 'Ir a los escenarios',
       builtIn: 'Incluidos',
       reference: 'Instrucciones',
+      docs: 'Referencia completa del lenguaje',
       nameIt: 'Nombra este escenario',
       save: 'Guardar',
       download: 'Descargar',

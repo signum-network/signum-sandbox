@@ -261,6 +261,7 @@ export default {
       goto: 'परिदृश्यों पर जाएँ',
       builtIn: 'शामिल',
       reference: 'निर्देश',
+      docs: 'पूरा भाषा संदर्भ',
       nameIt: 'इस परिदृश्य को नाम दें',
       save: 'सहेजें',
       download: 'डाउनलोड',

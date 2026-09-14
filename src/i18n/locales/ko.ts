@@ -261,6 +261,7 @@ export default {
       goto: '시나리오로',
       builtIn: '기본 제공',
       reference: '명령',
+      docs: '전체 언어 레퍼런스',
       nameIt: '이 시나리오에 이름 붙이기',
       save: '저장',
       download: '다운로드',

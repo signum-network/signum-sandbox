@@ -260,6 +260,7 @@ export default {
       goto: '前往场景',
       builtIn: '内置',
       reference: '指令',
+      docs: '完整语言参考',
       nameIt: '为这个场景命名',
       save: '保存',
       download: '下载',

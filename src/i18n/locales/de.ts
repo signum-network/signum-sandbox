@@ -261,6 +261,7 @@ export default {
       goto: 'Zu den Szenarien',
       builtIn: 'Mitgeliefert',
       reference: 'Anweisungen',
+      docs: 'Vollständige Sprachreferenz',
       nameIt: 'Diesem Szenario einen Namen geben',
       save: 'Speichern',
       download: 'Herunterladen',

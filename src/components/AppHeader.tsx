@@ -5,6 +5,7 @@ import type { Connection } from '@/lib/nodeState'
 import { AudioToggle } from '@/components/controls/AudioToggle'
 import { ThemeSwitcher } from '@/components/controls/ThemeSwitcher'
 import { LanguageSelect } from '@/components/controls/LanguageSelect'
+import { Logomark } from '@/components/Logomark'
 
 /**
  * The one header both the start page and the console wear.
@@ -36,15 +37,16 @@ export function AppHeader({
 
   const wordmark = (
     <h1
-      className="text-[22px] font-black tracking-[3px] text-[var(--blue3)]"
+      className="flex items-center gap-3 text-[22px] font-black tracking-[3px] text-[var(--blue3)]"
       style={{ fontFamily: 'Orbitron, ui-monospace, monospace' }}
     >
+      <Logomark />
       SIGNUM SANDBOX
     </h1>
   )
 
   return (
-    <header className="mb-6 flex shrink-0 flex-wrap items-baseline justify-between gap-3">
+    <header className="mb-6 flex shrink-0 flex-wrap items-center justify-between gap-3">
       <div>
         {homeLink ? (
           <Link to="/" title={t('console.back')}>

@@ -86,6 +86,16 @@ chain. The forger receives 10,000 SIGNA per block. Calls fired in rapid
 succession all report success but yield a single block, since they compete
 for the same height.
 
+## Writing scenarios
+
+A scenario describes a chain — accounts, payments, tokens, aliases, messages,
+standing orders — as plain text, one instruction per line. The console has an
+editor for them at `/#/scenarios`, with four written ones to load and change.
+
+The language is documented in [`public/scenarios_doc.md`](public/scenarios_doc.md),
+which the node also serves at `/scenarios_doc.md` so the reference is there on
+a machine with no internet.
+
 ## Licence
 
 This repository is MIT licensed. Released deliverables additionally contain the

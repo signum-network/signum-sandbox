@@ -315,6 +315,19 @@ export function ScenarioPage() {
           >
             {t('console.scenario.reference')}
           </p>
+          {/*
+            Served from the node alongside the app, so the reference is there
+            on a machine with no internet — which is most of the machines this
+            is built for.
+          */}
+          <a
+            className="mb-2 block text-[12px] text-[var(--blue3)] underline"
+            href="/scenarios_doc.md"
+            target="_blank"
+            rel="noreferrer"
+          >
+            ↗ {t('console.scenario.docs')}
+          </a>
           {INSTRUCTIONS.map((instruction) => (
             <RowButton
               key={instruction.verb}
