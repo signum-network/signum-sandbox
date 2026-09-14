@@ -2,6 +2,8 @@ import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from '@tanstack/react-router'
 import { INSTRUCTIONS, instructionAt } from '@/lib/scenarioHelp'
+import { scenarioFilename } from '@/lib/savedScenarios'
+import { useSavedScenarios } from '@/hooks/useSavedScenarios'
 import { SCENARIOS } from '@/scenarios'
 import { AppHeader } from '@/components/AppHeader'
 import { Unreachable } from '@/components/startpage'
@@ -28,9 +30,37 @@ export function ScenarioPage() {
   const { state, nodeAddress } = useNodeState()
   const accounts = useAccounts()
   const scenario = useScenario(accounts)
+  const library = useSavedScenarios()
   const editor = useRef<HTMLTextAreaElement>(null)
+  const importer = useRef<HTMLInputElement>(null)
+  const [name, setName] = useState('')
   const [caret, setCaret] = useState(0)
   const here = instructionAt(scenario.source, caret)
+
+  /**
+   * Hands the scenario to the browser as a file.
+   *
+   * A download rather than a copy button: a scenario is a document, and the
+   * point of having one on disk is that it outlives this browser's storage
+   * and can be handed to someone else.
+   */
+  const download = () => {
+    const blob = new Blob([scenario.source], { type: 'text/plain' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = scenarioFilename(name)
+    link.click()
+    URL.revokeObjectURL(url)
+  }
+
+  /** Reads a file back into the editor, which is the other half of download. */
+  const importFile = async (file: File | undefined) => {
+    if (!file) return
+    scenario.setSource(await file.text())
+    // The file's own name is the obvious name to save it back under.
+    setName(file.name.replace(/\.scenario$/, ''))
+  }
 
   /**
    * Drops a line in at the caret, on a line of its own, and leaves the caret
@@ -181,6 +211,76 @@ export function ScenarioPage() {
           className="themed-scroll console-scroll w-[34%] shrink-0 overflow-y-auto border p-3"
           style={{ borderColor: 'var(--border2)' }}
         >
+          {/*
+            Saving, downloading and importing sit above the lists rather than
+            below them: they act on what is in the editor right now, and a
+            control that acts on the editor belongs nearer the editor than the
+            things that would replace it.
+          */}
+          <div className="mb-4">
+            <input
+              className="mb-1 w-full border bg-transparent px-2 py-1 text-[13px]
+                text-[var(--fg)] outline-none"
+              style={{ borderColor: 'var(--border2)' }}
+              value={name}
+              placeholder={t('console.scenario.nameIt')}
+              onChange={(event) => setName(event.target.value)}
+            />
+            <div className="flex flex-wrap items-center gap-2">
+              <ConsoleButton
+                disabled={name.trim() === '' || scenario.source === ''}
+                onClick={() => library.save(name, scenario.source)}
+              >
+                {t('console.scenario.save')}
+              </ConsoleButton>
+              <ConsoleButton disabled={scenario.source === ''} onClick={download}>
+                {t('console.scenario.download')}
+              </ConsoleButton>
+              <ConsoleButton onClick={() => importer.current?.click()}>
+                {t('console.scenario.import')}
+              </ConsoleButton>
+              <input
+                ref={importer}
+                type="file"
+                accept=".scenario,text/plain"
+                className="hidden"
+                onChange={(event) => {
+                  void importFile(event.target.files?.[0])
+                  // Cleared so importing the same file twice fires again.
+                  event.target.value = ''
+                }}
+              />
+            </div>
+          </div>
+
+          {library.saved.length > 0 && (
+            <div className="mb-4">
+              <p className="mb-2 text-[12px] uppercase tracking-[1px] text-[var(--blue3)]">
+                {t('console.scenario.yours')}
+              </p>
+              {library.saved.map((entry) => (
+                <div key={entry.name} className="flex items-baseline justify-between gap-2">
+                  <RowButton
+                    className="min-w-0 flex-1 truncate text-left text-[13px] text-[var(--fg)]
+                      hover:text-[var(--blue3)]"
+                    onClick={() => {
+                      scenario.setSource(entry.source)
+                      setName(entry.name)
+                    }}
+                  >
+                    {entry.name}
+                  </RowButton>
+                  <RowButton
+                    className="shrink-0 text-[12px] text-[var(--muted)]"
+                    onClick={() => library.remove(entry.name)}
+                  >
+                    ✕
+                  </RowButton>
+                </div>
+              ))}
+            </div>
+          )}
+
           <p className="mb-2 text-[12px] uppercase tracking-[1px] text-[var(--blue3)]">
             {t('console.scenario.builtIn')}
           </p>
