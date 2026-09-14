@@ -1,0 +1,38 @@
+# Full house — a chain that looks lived-in. Every view has something to show.
+
+miner   Miner
+account Alice
+account Bob
+account Carol
+account Pizzeria
+
+# Issuing a token costs 150 SIGNA, so Pizzeria is funded well clear of it.
+fund Alice    5000
+fund Bob      2000
+fund Carol    2000
+fund Pizzeria 3000
+
+info Alice    "Alice"            "Builds things on Signum"
+info Bob      "Bob"              "Reads the docs"
+info Carol    "Carol"            "Runs the numbers"
+info Pizzeria "Pizzeria Vesuvio" "Wood-fired since 1998"
+
+# SLICE has 0 decimals, so a quantity here is a whole slice: 10,000 of them,
+# of which 63 go out and Pizzeria keeps the rest behind the counter.
+token    Pizzeria SLICE 10000 0 "One SLICE, one slice. Redeemable at the counter."
+transfer Pizzeria -> Alice SLICE 40
+transfer Pizzeria -> Bob   SLICE 15
+transfer Pizzeria -> Carol SLICE 8
+
+alias Pizzeria vesuvio "https://example.invalid/vesuvio"
+alias Alice    alice   "Alice on Signum"
+
+multi Alice -> Bob 250, Carol 250, Pizzeria 60
+
+secret Alice -> Bob   "The keys are under the mat. Do not tell Carol."
+msg    Carol -> Alice "I can read the block list, you know."
+pay    Bob   -> Pizzeria 24 "Two margheritas, no anchovies"
+
+subscribe Alice -> Pizzeria 12 every 3600
+
+forge 3

@@ -1,0 +1,29 @@
+# Busy chain — volume, for testing lists, paging and search.
+
+miner   Miner
+account Ada
+account Bo
+account Cy
+
+fund Ada 3000
+fund Bo  3000
+fund Cy  3000
+
+pay Ada -> Bo 11
+pay Bo  -> Cy 12
+pay Cy  -> Ada 13
+pay Ada -> Cy 14
+pay Bo  -> Ada 15
+pay Cy  -> Bo 16
+pay Ada -> Bo 17 "again"
+pay Bo  -> Cy 18 "and again"
+pay Cy  -> Ada 19
+pay Ada -> Bo 20
+pay Bo  -> Cy 21
+pay Cy  -> Ada 22
+
+multi Ada -> Bo 5, Cy 5
+multi Bo  -> Ada 5, Cy 5
+multi Cy  -> Ada 5, Bo 5
+
+forge 40

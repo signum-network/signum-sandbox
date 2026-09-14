@@ -1,0 +1,15 @@
+# First steps — enough to see what a block is.
+
+miner   Miner
+account Alice
+account Bob
+
+fund Alice 1000
+fund Bob    500
+
+pay Alice -> Bob   120
+pay Bob   -> Alice 35
+pay Alice -> Bob   10 "Thanks for lunch"
+msg Bob   -> Alice "Any time. Same again Friday?"
+
+forge 2
