@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { Address } from '@signumjs/core'
 import { Crypto, generateSignKeys } from '@signumjs/crypto'
 import { NodeJSCryptoAdapter } from '@signumjs/crypto/adapters'
-import { knownPublicKey } from './recipient'
+import { addressPrefixOf, knownPublicKey, toAddress, toComparableId } from './recipient'
 import type { SandboxAccount } from './accounts'
 
 // Vitest evaluates a describe body during collection, before any beforeAll hook
@@ -74,5 +74,42 @@ describe('knownPublicKey', () => {
 
   it('falls back to raw comparison for a value Address.create cannot parse', () => {
     expect(knownPublicKey('not-an-address-at-all', accounts)).toBeUndefined()
+  })
+})
+
+describe('toAddress', () => {
+  const alice = account('Alice', 'sandbox-alice')
+
+  it('turns a stored id back into the address a person reads', () => {
+    expect(toAddress(alice.id, 'TS')).toBe(alice.address)
+  })
+
+  it('uses the prefix it is given, since that is the network', () => {
+    expect(toAddress(alice.id, 'S').startsWith('S-')).toBe(true)
+    expect(toAddress(alice.id, 'TS').startsWith('TS-')).toBe(true)
+  })
+
+  // Storage can be hand-edited, and a book with one odd entry should still
+  // render rather than taking the list down with it.
+  it('hands back anything that is not an id', () => {
+    expect(toAddress('not-an-id', 'TS')).toBe('not-an-id')
+  })
+
+  // The round trip is the point: a contact keyed by id and the same account
+  // seen anywhere else have to be the same string, or hashicon draws them as
+  // two different accounts.
+  it('round-trips with toComparableId', () => {
+    expect(toComparableId(toAddress(alice.id, 'TS'))).toBe(alice.id)
+  })
+})
+
+describe('addressPrefixOf', () => {
+  it('reads the prefix off an owned account', () => {
+    expect(addressPrefixOf([{ address: 'TS-ABCD-EFGH-IJKL-MNOPQ' }])).toBe('TS')
+    expect(addressPrefixOf([{ address: 'S-ABCD-EFGH-IJKL-MNOPQ' }])).toBe('S')
+  })
+
+  it('falls back when there are no accounts, which is when nothing can be sent anyway', () => {
+    expect(addressPrefixOf([])).toBe('S')
   })
 })

@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { feePresets, type SendAction } from '@/lib/fees'
 import type { SandboxAccount } from '@/lib/accounts'
 import type { Contacts } from '@/lib/contacts'
+import { addressPrefixOf, toAddress } from '@/lib/recipient'
 import { ConsoleButton } from '@/components/console/ConsoleButton'
 import { Identicon } from '@/components/console/Identicon'
 import { Select } from '@/components/console/Select'
@@ -29,10 +30,17 @@ export interface KnownRecipient {
  */
 export function knownRecipients(accounts: SandboxAccount[], contacts: Contacts): KnownRecipient[] {
   const seen = new Set(accounts.map((a) => a.id))
+  // Contacts are stored by numeric id, so the address has to be derived here.
+  // Handing back the id instead was wrong three times over: the suggestion
+  // read as a run of digits, choosing it put digits in the field where an
+  // owned account puts an address, and the identicon — which hashes whatever
+  // string it is given — drew the same account as two different pictures
+  // depending on which list you were looking at.
+  const prefix = addressPrefixOf(accounts)
   const owned = accounts.map((a) => ({ id: a.id, address: a.address, name: a.name }))
   const fromContacts = Object.entries(contacts)
     .filter(([id]) => !seen.has(id))
-    .map(([id, name]) => ({ id, address: id, name }))
+    .map(([id, name]) => ({ id, address: toAddress(id, prefix), name }))
   return [...owned, ...fromContacts]
 }
 

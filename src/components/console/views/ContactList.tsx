@@ -1,26 +1,12 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Address } from '@signumjs/core'
 import type { Contacts } from '@/lib/contacts'
 import { matchesAccountQuery, type Query } from '@/lib/search'
 import { Identicon } from '../Identicon'
 import { ConsoleButton } from '../ConsoleButton'
 import { Term } from '../Term'
+import { toAddress } from '@/lib/recipient'
 
-/**
- * A contact only ever stores an id (see Contacts in src/lib/contacts.ts); the
- * address shown is derived from it on the fly with the node's own prefix,
- * rather than stored a second time, so there is exactly one place that could
- * ever go stale if a node's prefix changed. Falls back to the bare id on the
- * off chance a stored key isn't a valid numeric id (hand-edited storage).
- */
-function addressFromId(id: string, addressPrefix: string): string {
-  try {
-    return Address.fromNumericId(id, addressPrefix).getReedSolomonAddress(true)
-  } catch {
-    return id
-  }
-}
 
 export function ContactList({
   contacts,
@@ -47,7 +33,7 @@ export function ContactList({
   const border = { borderColor: 'var(--border2)' }
 
   const entries = Object.entries(contacts)
-    .map(([id, contactName]) => ({ id, name: contactName, address: addressFromId(id, addressPrefix) }))
+    .map(([id, contactName]) => ({ id, name: contactName, address: toAddress(id, addressPrefix) }))
     .filter((c) => matchesAccountQuery(c.name, c.address, query))
 
   return (

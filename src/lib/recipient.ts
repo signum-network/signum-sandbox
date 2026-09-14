@@ -51,3 +51,36 @@ export function knownPublicKey(
   const match = accounts.find((a) => a.id === normalizedTo || a.address === to)
   return match ? generateSignKeys(match.passphrase).publicKey : undefined
 }
+
+/**
+ * The Reed-Solomon address for an account id.
+ *
+ * Contacts are stored by numeric id — the one spelling every on-chain
+ * reference agrees on — so anywhere a contact is shown, this is what turns
+ * the key back into the address a person reads. Derived rather than stored
+ * alongside: the address is a function of the id and the network prefix, and
+ * a saved copy is a second answer free to disagree with the first.
+ *
+ * An id that is not one comes back unchanged. Storage can be hand-edited,
+ * and a book with one odd entry should still render.
+ */
+export function toAddress(id: string, addressPrefix: string): string {
+  try {
+    return Address.fromNumericId(id, addressPrefix).getReedSolomonAddress(true)
+  } catch {
+    return id
+  }
+}
+
+/**
+ * The network's address prefix, read off the accounts the sandbox owns.
+ *
+ * Every address on a network carries the same prefix, so any owned account
+ * answers for all of them. Taken from the accounts rather than passed down
+ * because the alternative is threading one argument through a dozen forms
+ * that have no other use for it. With no accounts at all there is nothing to
+ * send from either, so the fallback is never the interesting case.
+ */
+export function addressPrefixOf(accounts: { address: string }[]): string {
+  return accounts[0]?.address.split('-')[0] ?? 'S'
+}
