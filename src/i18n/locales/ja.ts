@@ -165,7 +165,7 @@ export default {
       distributeToHolders: '保有者へ分配',
       tokenOwnership: 'トークン所有権の移転',
       leasing: '残高のリース',
-      rewardRecipient: 'プールに参加',
+      rewardRecipient: '報酬受取先を設定',
       addCommitment: 'コミットメント追加',
       removeCommitment: 'コミットメント解除',
       escrowCreate: 'エスクロー作成',

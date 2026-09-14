@@ -165,7 +165,7 @@ export default {
       distributeToHolders: 'धारकों को वितरित',
       tokenOwnership: 'टोकन स्वामित्व हस्तांतरित',
       leasing: 'शेष राशि पट्टे पर',
-      rewardRecipient: 'पूल में शामिल हुए',
+      rewardRecipient: 'पुरस्कार प्राप्तकर्ता सेट किया',
       addCommitment: 'कमिटमेंट जोड़ा गया',
       removeCommitment: 'कमिटमेंट हटाया गया',
       escrowCreate: 'एस्क्रो बनाया गया',

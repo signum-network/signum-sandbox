@@ -165,7 +165,7 @@ export default {
       distributeToHolders: '向持有者分发',
       tokenOwnership: '代币所有权转移',
       leasing: '余额出租',
-      rewardRecipient: '加入矿池',
+      rewardRecipient: '已设置奖励接收者',
       addCommitment: '添加承诺',
       removeCommitment: '移除承诺',
       escrowCreate: '创建托管',

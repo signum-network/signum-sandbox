@@ -165,7 +165,7 @@ export default {
       distributeToHolders: 'Распределено держателям',
       tokenOwnership: 'Право собственности на токен передано',
       leasing: 'Баланс сдан в аренду',
-      rewardRecipient: 'Присоединение к пулу',
+      rewardRecipient: 'Получатель вознаграждения задан',
       addCommitment: 'Обязательство добавлено',
       removeCommitment: 'Обязательство снято',
       escrowCreate: 'Эскроу создан',

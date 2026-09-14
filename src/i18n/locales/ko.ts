@@ -165,7 +165,7 @@ export default {
       distributeToHolders: '보유자에게 분배',
       tokenOwnership: '토큰 소유권 이전',
       leasing: '잔액 리스',
-      rewardRecipient: '풀 참여',
+      rewardRecipient: '보상 수령 계정 설정',
       addCommitment: '커밋먼트 추가',
       removeCommitment: '커밋먼트 해제',
       escrowCreate: '에스크로 생성',

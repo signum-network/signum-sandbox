@@ -181,7 +181,7 @@ export default {
       distributeToHolders: 'Distributed to holders',
       tokenOwnership: 'Token ownership transferred',
       leasing: 'Balance leased',
-      rewardRecipient: 'Joined a pool',
+      rewardRecipient: 'Reward recipient set',
       addCommitment: 'Commitment added',
       removeCommitment: 'Commitment removed',
       escrowCreate: 'Escrow created',

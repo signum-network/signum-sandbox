@@ -165,7 +165,7 @@ export default {
       distributeToHolders: 'Розподілено між власниками',
       tokenOwnership: 'Право власності на токен передано',
       leasing: 'Баланс передано в оренду',
-      rewardRecipient: 'Приєднання до пулу',
+      rewardRecipient: 'Отримувача винагороди встановлено',
       addCommitment: 'Коміт додано',
       removeCommitment: 'Коміт видалено',
       escrowCreate: 'Умовне депонування створено',

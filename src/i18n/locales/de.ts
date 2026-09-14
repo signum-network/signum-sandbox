@@ -165,7 +165,7 @@ export default {
       distributeToHolders: 'An Halter ausgeschüttet',
       tokenOwnership: 'Token-Besitz übertragen',
       leasing: 'Guthaben verliehen',
-      rewardRecipient: 'Pool beigetreten',
+      rewardRecipient: 'Belohnungsempfänger gesetzt',
       addCommitment: 'Commitment hinzugefügt',
       removeCommitment: 'Commitment entfernt',
       escrowCreate: 'Treuhand angelegt',

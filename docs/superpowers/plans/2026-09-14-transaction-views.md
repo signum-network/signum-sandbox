@@ -400,7 +400,7 @@ git commit -m "feat: a name for every transaction the chain can make"
 **Files:**
 - Modify: `src/i18n/locales/*.ts` (all ten)
 
-The existing `console.kind` block has eleven entries. It grows to thirty-eight.
+The existing `console.kind` block has eleven entries. It grows to forty — thirty-nine kinds plus `aliasTransfer`, which `kindOf` never returns but the Send drawer uses as the label for its transfer-alias action.
 
 - [ ] **Step 1: Add the English names**
 
@@ -966,6 +966,25 @@ git commit -m "feat: the row shows the fields its kind of transaction carries"
 ---
 
 ## Notes for whoever executes this
+
+**A burn must still say what was burned.** `kindOf` names a transfer to
+address `0` a burn whatever carried it there — but a *token* burn has
+`amountNQT: '0'`, because the quantity is in the attachment. Between naming
+and extraction, such a row says something was destroyed and refuses to say
+what. `KNOWN` therefore needs a `burn` entry covering both vehicles: `asset`
+and `quantityQNT` when a token went, nothing extra when SIGNA did. Do not
+leave this one to the passthrough — an unlabelled `quantityQNT` beside the
+word "Burned" is not an answer.
+
+**Alias assignment is a claim and an edit, and the row cannot tell them
+apart.** The mobile wallet says "Alias Claim or Update" for that reason. If
+the extractor can reach the alias's history cheaply, say which; if not, leave
+the neutral name rather than guessing.
+
+**An encrypted message is not only a message.** A payment or a token transfer
+can carry one too. `kindOf` correctly calls those `payment` and
+`tokenTransfer`, so the `encrypted` field has to come from the attachment for
+every kind, not only for `encryptedMessage`.
 
 **Additive, never selective.** The one rule. Most of these transactions cannot be produced by this console, so `KNOWN` is written from documentation and some of it is wrong. A wrong guess costs a badly labelled row; a guess that hid the field would cost a developer the answer they opened the row for. If you find yourself writing `if (recognised)` around the output, stop.
 

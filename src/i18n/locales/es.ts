@@ -165,7 +165,7 @@ export default {
       distributeToHolders: 'Distribuido a los titulares',
       tokenOwnership: 'Propiedad del token transferida',
       leasing: 'Saldo arrendado',
-      rewardRecipient: 'Se unió a un pool',
+      rewardRecipient: 'Destinatario de recompensas fijado',
       addCommitment: 'Compromiso añadido',
       removeCommitment: 'Compromiso retirado',
       escrowCreate: 'Depósito en garantía creado',
