@@ -81,3 +81,21 @@ describe('checkScenario', () => {
     expect(check('miner M\npay A -> B 1\ntransfer M -> M X 1')).toHaveLength(3)
   })
 })
+
+describe('checkScenario, token precision', () => {
+  it('refuses an amount finer than the token can hold', () => {
+    expect(check('miner M\ntoken M ORBIT 100 2\ntransfer M -> M ORBIT 0.001')).toEqual([
+      { line: 3, message: 'ORBIT has 2 decimals, so 0.001 is too fine' },
+    ])
+  })
+
+  it('allows an amount the token can hold', () => {
+    expect(check('miner M\ntoken M ORBIT 100 2\ntransfer M -> M ORBIT 0.25')).toEqual([])
+  })
+
+  it('refuses a supply finer than its own decimals', () => {
+    expect(check('miner M\ntoken M SLICE 10.5 0')).toEqual([
+      { line: 2, message: '10.5 is finer than 0 decimals can hold' },
+    ])
+  })
+})

@@ -10,10 +10,13 @@ describe('Names', () => {
     expect(names.account('Alice').id).toBe('1')
   })
 
-  it('remembers a token by the symbol the scenario used', () => {
+  // Decimals travel with the id because the runner needs both: the id to
+  // address the asset, the decimals to turn a written amount into the
+  // smallest units the chain counts in.
+  it('remembers a token by the symbol the scenario used, decimals and all', () => {
     const names = new Names()
-    names.rememberToken('SLICE', '99')
-    expect(names.token('SLICE')).toBe('99')
+    names.rememberToken('SLICE', '99', 2)
+    expect(names.token('SLICE')).toEqual({ assetId: '99', decimals: 2 })
   })
 
   // checkScenario rejects a scenario that could reach these, which is why

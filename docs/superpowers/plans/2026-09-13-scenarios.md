@@ -36,6 +36,8 @@ forge     [count]
 
 **`decimals` is required on `token`** even though nearly every scenario wants `0`. With it optional, `token P SLICE 10000 "…"` and `token P SLICE 10000 2` would need the parser to guess from the argument's shape, and a language that guesses is a language that guesses wrong in front of a newcomer.
 
+**Quantities are written the way they are read.** `token T ORBIT 10000 2` issues ten thousand ORBIT and `transfer T -> A ORBIT 250.5` moves two hundred and fifty and a half of them. The chain counts in the token's smallest unit — a hundredth here — and the runner converts before it speaks to the node. An earlier draft of this plan had the scenario write smallest units directly, and every worked example in its own prose miscounted them by a factor of a hundred, which is the argument. An amount finer than the token can hold is refused by the checker, on its line, rather than rounded away.
+
 ---
 
 ## File Structure

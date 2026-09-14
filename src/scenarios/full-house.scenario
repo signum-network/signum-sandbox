@@ -17,8 +17,8 @@ info Bob      "Bob"              "Reads the docs"
 info Carol    "Carol"            "Runs the numbers"
 info Pizzeria "Pizzeria Vesuvio" "Wood-fired since 1998"
 
-# SLICE has 0 decimals, so a quantity here is a whole slice: 10,000 of them,
-# of which 63 go out and Pizzeria keeps the rest behind the counter.
+# 10,000 slices, of which 63 go out and Pizzeria keeps the rest behind the
+# counter. SLICE has no decimals, because half a slice is not a thing.
 token    Pizzeria SLICE 10000 0 "One SLICE, one slice. Redeemable at the counter."
 transfer Pizzeria -> Alice SLICE 40
 transfer Pizzeria -> Bob   SLICE 15

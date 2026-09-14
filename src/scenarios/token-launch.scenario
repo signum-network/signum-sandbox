@@ -1,9 +1,8 @@
 # Token launch — one asset, spread across five holders.
 #
-# ORBIT has 2 decimals, and a token quantity always counts in the token's
-# smallest unit — so every number on the token lines below is hundredths of an
-# ORBIT. The supply is ten thousand ORBIT, not a million, the four opening
-# transfers hand out 450 of them, and Treasury keeps the other 9,550.
+# Amounts are written the way you read them: ORBIT has 2 decimals, so 10000
+# below is ten thousand ORBIT and 2500 is two and a half thousand. The chain
+# counts in hundredths underneath; the scenario does not make you do that.
 #
 # Issuing a token costs 150 SIGNA. That is why Treasury is funded with 4000
 # and the holders, who only ever pay a transfer fee, with 200 each.
@@ -22,15 +21,18 @@ fund Cleo 200
 fund Dev 200
 
 info  Treasury "Orbit Labs" "Issuer of ORBIT"
-token Treasury ORBIT 1000000 2 "Governance token for the Orbit network"   # 10,000.00 ORBIT
+token Treasury ORBIT 10000 2 "Governance token for the Orbit network"
 
-transfer Treasury -> Ana  ORBIT 25000   # 250.00 ORBIT
-transfer Treasury -> Ben  ORBIT 12500   # 125.00 ORBIT
-transfer Treasury -> Cleo ORBIT 6000    #  60.00 ORBIT
-transfer Treasury -> Dev  ORBIT 1500    #  15.00 ORBIT
+# Most of the supply goes out, so the holdings are worth opening. Treasury
+# keeps a fifth of it back.
+transfer Treasury -> Ana  ORBIT 2500
+transfer Treasury -> Ben  ORBIT 2000
+transfer Treasury -> Cleo ORBIT 2000
+transfer Treasury -> Dev  ORBIT 1500
 
-transfer Ana -> Ben  ORBIT 500          #   5.00 ORBIT
-transfer Ben -> Cleo ORBIT 250          #   2.50 ORBIT
+# And a fraction, because a token with decimals should be seen using them.
+transfer Ana -> Ben  ORBIT 125.5
+transfer Ben -> Cleo ORBIT 62.25
 
 alias Treasury orbit "Orbit Labs — ORBIT token"
 

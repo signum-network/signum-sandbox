@@ -1,3 +1,4 @@
+import { finerThanToken } from './token'
 import type { Problem, ScenarioStep } from './scenarioLang'
 
 /**
@@ -11,7 +12,7 @@ import type { Problem, ScenarioStep } from './scenarioLang'
 export function checkScenario(steps: ScenarioStep[]): Problem[] {
   const problems: Problem[] = []
   const accounts = new Set<string>()
-  const tokens = new Set<string>()
+  const tokens = new Map<string, number>()
   let miner: string | null = null
 
   const account = (line: number, name: string) => {
@@ -57,13 +58,30 @@ export function checkScenario(steps: ScenarioStep[]): Problem[] {
         if (tokens.has(step.token)) {
           problems.push({ line: step.line, message: `token "${step.token}" is already issued` })
         }
-        tokens.add(step.token)
+        if (finerThanToken(step.quantity, step.decimals)) {
+          problems.push({
+            line: step.line,
+            message: `${step.quantity} is finer than ${step.decimals} decimals can hold`,
+          })
+        }
+        tokens.set(step.token, step.decimals)
         break
       case 'transfer':
         account(step.line, step.from)
         account(step.line, step.to)
-        if (!tokens.has(step.token)) {
-          problems.push({ line: step.line, message: `unknown token "${step.token}"` })
+        {
+          const decimals = tokens.get(step.token)
+          if (decimals === undefined) {
+            problems.push({ line: step.line, message: `unknown token "${step.token}"` })
+          } else if (finerThanToken(step.quantity, decimals)) {
+            // Amounts are written the way people read them, so this is the
+            // one place that can tell a hundredth from a thousandth — the
+            // token line is in the same file, a few lines up.
+            problems.push({
+              line: step.line,
+              message: `${step.token} has ${decimals} decimals, so ${step.quantity} is too fine`,
+            })
+          }
         }
         break
       case 'forge':

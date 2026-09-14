@@ -2,6 +2,7 @@ import type { SandboxAccount } from './accounts'
 import type { Problem, ScenarioStep } from './scenarioLang'
 import { checkScenario } from './scenarioCheck'
 import { Names } from './scenarioNames'
+import { toSmallestUnit } from './token'
 
 /**
  * Everything the runner needs from a chain, and nothing about how to reach
@@ -252,27 +253,32 @@ async function perform(
       })
       break
 
-    case 'token':
-      names.rememberToken(
-        step.token,
-        await ops.issueToken({
-          issuer: names.account(step.issuer),
-          symbol: step.token,
-          quantity: step.quantity,
-          decimals: step.decimals,
-          description: step.description,
-        }),
-      )
+    case 'token': {
+      // Written the way a person reads it, stored the way the chain counts
+      // it. "10000" with two decimals is ten thousand tokens and a million
+      // smallest units, and the scenario says the first while the node is
+      // told the second.
+      const assetId = await ops.issueToken({
+        issuer: names.account(step.issuer),
+        symbol: step.token,
+        quantity: toSmallestUnit(step.quantity, step.decimals),
+        decimals: step.decimals,
+        description: step.description,
+      })
+      names.rememberToken(step.token, assetId, step.decimals)
       break
+    }
 
-    case 'transfer':
+    case 'transfer': {
+      const { assetId, decimals } = names.token(step.token)
       await ops.transferToken({
         from: names.account(step.from),
         to: names.account(step.to),
-        assetId: names.token(step.token),
-        quantity: step.quantity,
+        assetId,
+        quantity: toSmallestUnit(step.quantity, decimals),
       })
       break
+    }
 
     case 'alias':
       await ops.alias({

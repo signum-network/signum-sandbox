@@ -151,6 +151,20 @@ describe('runScenario', () => {
     )
   })
 
+  // A scenario says what a person means; the chain is told what it counts in.
+  // Writing the smallest unit in the file was the one place this language
+  // made the most-read numbers on the page mean something other than they say.
+  it('scales a written amount by the token decimals', async () => {
+    const { ops } = fakeOps()
+    await run('miner M\ntoken M ORBIT 10000 2\ntransfer M -> M ORBIT 250.5', ops)
+    expect(ops.issueToken).toHaveBeenCalledWith(
+      expect.objectContaining({ quantity: '1000000', decimals: 2 }),
+    )
+    expect(ops.transferToken).toHaveBeenCalledWith(
+      expect.objectContaining({ quantity: '25050' }),
+    )
+  })
+
   // The miner earns its funds by forging, so funding is forge-and-check.
   it('forges until the miner can cover a funding step', async () => {
     let balance = 0

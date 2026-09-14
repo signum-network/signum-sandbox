@@ -9,14 +9,14 @@ import type { SandboxAccount } from './accounts'
  */
 export class Names {
   private readonly accounts = new Map<string, SandboxAccount>()
-  private readonly tokens = new Map<string, string>()
+  private readonly tokens = new Map<string, { assetId: string; decimals: number }>()
 
   rememberAccount(name: string, account: SandboxAccount) {
     this.accounts.set(name, account)
   }
 
-  rememberToken(symbol: string, assetId: string) {
-    this.tokens.set(symbol, assetId)
+  rememberToken(symbol: string, assetId: string, decimals: number) {
+    this.tokens.set(symbol, { assetId, decimals })
   }
 
   account(name: string): SandboxAccount {
@@ -25,7 +25,7 @@ export class Names {
     return found
   }
 
-  token(symbol: string): string {
+  token(symbol: string): { assetId: string; decimals: number } {
     const found = this.tokens.get(symbol)
     if (!found) throw new Error(`unknown token "${symbol}"`)
     return found
