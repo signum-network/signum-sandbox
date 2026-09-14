@@ -12,6 +12,8 @@ LICENSE-signum-node.txt
 db/
 node.log
 node.log.lck
+# the logger rotates, and a rotation is as unwelcome in the repo as the original
+node.log.*
 
 # Build
 build/
