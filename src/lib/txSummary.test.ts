@@ -20,9 +20,9 @@ describe('summarize', () => {
     expect(summarize(tx(0, 0)).kind).toBe('payment')
   })
 
-  it('recognises both multi-out flavours', () => {
+  it('recognises both multi-out flavours, and keeps them apart', () => {
     expect(summarize(tx(0, 1)).kind).toBe('multiOut')
-    expect(summarize(tx(0, 2)).kind).toBe('multiOut')
+    expect(summarize(tx(0, 2)).kind).toBe('multiOutSame')
   })
 
   it('separates a plain message from an encrypted one', () => {
