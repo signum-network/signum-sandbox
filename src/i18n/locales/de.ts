@@ -260,6 +260,7 @@ export default {
       section: 'Szenarien',
       goto: 'Zu den Szenarien',
       builtIn: 'Mitgeliefert',
+      reference: 'Anweisungen',
       stop: 'Stoppen',
       toConsole: 'Zur Konsole',
       note: 'Ein Szenario beschreibt eine Chain, eine Zeile oder zwei je Transaktion. Lade eins, ändere es nach Belieben und führ es aus — es kommt zur bestehenden Chain hinzu.',

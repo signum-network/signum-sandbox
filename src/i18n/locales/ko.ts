@@ -260,6 +260,7 @@ export default {
       section: '시나리오',
       goto: '시나리오로',
       builtIn: '기본 제공',
+      reference: '명령',
       stop: '중지',
       toConsole: '콘솔로',
       note: '시나리오는 거래 하나를 한두 줄로 적어 체인을 서술합니다. 하나 불러와 마음대로 고친 뒤 실행하세요. 지금 있는 체인 위에 더해집니다.',

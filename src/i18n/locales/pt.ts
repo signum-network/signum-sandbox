@@ -260,6 +260,7 @@ export default {
       section: 'Cenários',
       goto: 'Ir para os cenários',
       builtIn: 'Incluídos',
+      reference: 'Instruções',
       stop: 'Parar',
       toConsole: 'Para a consola',
       note: 'Um cenário descreve uma cadeia, com uma linha ou duas por transação. Carrega um, muda-o se quiseres e executa-o: junta-se à cadeia que já tens.',
