@@ -129,6 +129,11 @@ export default {
       send: 'Todos los tipos de transacción que Signum puede llevar. Elige uno y la línea de debajo dice lo que hace.',
       chain: 'Deshaz lo que has hecho. Rebobinar quita bloques; vaciar la cadena no puede — eso solo lo consigue reiniciar el nodo.',
     },
+    did: {
+      label: 'Identificador descentralizado',
+      show: 'Ver documento',
+      hide: 'Ocultar documento',
+    },
     tx: {
       fee: 'Comisión',
       andMore: '+{{count}} más',

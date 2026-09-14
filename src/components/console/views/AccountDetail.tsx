@@ -5,6 +5,8 @@ import type { SandboxAccount } from '@/lib/accounts'
 import { ledger, nodeHost } from '@/lib/ledger'
 import { isUnknownAccount } from '@/lib/accountStatus'
 import { src44Fields } from '@/lib/payload'
+import { accountDid } from '@/lib/did'
+import { DidLink } from '@/components/console/DidLink'
 import { summarize } from '@/lib/txSummary'
 import { displayName, type Contacts } from '@/lib/contacts'
 import { PassphraseField, Row, Holding } from './AccountFields'
@@ -72,6 +74,23 @@ export function AccountDetail({
   const notOnChain = details.isError && isUnknownAccount(details.error)
   const chain = details.data
   const description = chain?.description ? src44Fields(chain.description) : null
+  /**
+   * The descriptor itself, not the rows it renders as. `src44Fields` answers
+   * "what should this look like on screen"; a DID document carries the record
+   * the account actually published, so it is parsed again here rather than
+   * reassembled from display rows.
+   */
+  const descriptor = ((): Record<string, unknown> | null => {
+    if (!chain?.description) return null
+    try {
+      const parsed: unknown = JSON.parse(chain.description)
+      return typeof parsed === 'object' && parsed !== null
+        ? (parsed as Record<string, unknown>)
+        : null
+    } catch {
+      return null
+    }
+  })()
   const unconfirmed = chain && chain.unconfirmedBalanceNQT !== chain.balanceNQT
 
   return (
@@ -170,6 +189,23 @@ export function AccountDetail({
           </Row>
         </>
       )}
+
+      {/*
+        Beside the raw response, not instead of it. One is what the node said;
+        the other is the same facts in the shape a verification application
+        expects, derived rather than fetched — which is the property that makes
+        a chain worth building verification on at all.
+      */}
+      <Row label={<Term id="did">{t('console.did.label')}</Term>}>
+        <DidLink
+          resolution={accountDid({
+            accountId: account.id,
+            accountRS: account.address,
+            publicKey: chain?.publicKey || undefined,
+            src44: descriptor ?? undefined,
+          })}
+        />
+      </Row>
 
       <Row label={t('console.tx.raw')}>
         <a

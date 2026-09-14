@@ -9,6 +9,9 @@ import { ConsoleButton, RowButton } from '../ConsoleButton'
 import { displayName, type Contacts } from '@/lib/contacts'
 import { addressPrefixOf, toAddress, toComparableId } from '@/lib/recipient'
 import { summarize } from '@/lib/txSummary'
+import { transactionDid } from '@/lib/did'
+import { DidLink } from '@/components/console/DidLink'
+import { Term } from '@/components/console/Term'
 import type { Payee } from '@/lib/txDetail'
 import type { FeedItem } from '@/lib/chainFeed'
 import { Amount } from '@signumjs/util'
@@ -59,7 +62,7 @@ function SaveContactField({
 }
 
 /** One labelled line of the opened row, so every line lines up with the rest. */
-function Detail({ label, children }: { label: string; children: ReactNode }) {
+function Detail({ label, children }: { label: ReactNode; children: ReactNode }) {
   return (
     <div className="flex gap-3">
       <span className="min-w-[100px] shrink-0 text-[var(--muted)]">{label}</span>
@@ -286,6 +289,16 @@ export function TransactionRow({
               onSave={onAddContact}
             />
           )}
+
+          {/*
+            The same transaction named the way a verification application
+            names things, derived from what the node already said rather than
+            fetched from anywhere. Immutable is the interesting line in it:
+            that is the property anything built on this chain is relying on.
+          */}
+          <Detail label={<Term id="did">{t('console.did.label')}</Term>}>
+            <DidLink resolution={transactionDid(item.tx)} />
+          </Detail>
 
           {/*
             Last, because it leads off the page. Everything above answers the

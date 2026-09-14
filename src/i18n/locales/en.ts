@@ -140,6 +140,11 @@ export default {
       send: 'Every kind of transaction Signum can carry. Pick one and the line beneath says what it does.',
       chain: 'Undo what you did. Winding back removes blocks; it cannot empty the chain — only restarting the node can.',
     },
+    did: {
+      label: 'Decentralised identifier',
+      show: 'Show document',
+      hide: 'Hide document',
+    },
     tx: {
       fee: 'Fee',
       andMore: '+{{count}} more',

@@ -202,9 +202,10 @@ console links these alongside the raw JSON response it already offers.
 exists as a hosted Vercel service, and self-hosting it would mean a Node
 runtime next to the JVM, a second process, a second port and a second thing to
 package — for a project whose deliverable is one jar and one script. It also
-recognises exactly three networks (`mainnet`, `testnet`, `stagenet`) with no
-mechanism for registering another, so running it against a mock chain would
-mean maintaining a fork. Resolution is a pure transformation of data the
+recognises exactly two networks — its parser's regex admits `mainnet` and
+`testnet` and nothing else, the README's mention of `stagenet`
+notwithstanding — with no mechanism for registering another, so running it
+against a mock chain would mean maintaining a fork. Resolution is a pure transformation of data the
 console has already loaded — account id, public key, SRC44 profile — so it is
 a function in `src/lib/`, tested the way everything else there is, and it works
 offline.
@@ -221,7 +222,9 @@ The documents the console produces match the shape the real resolver returns —
 `verificationMethod` and `src44`, and `didDocumentMetadata` — so what a
 newcomer learns here is what they will meet outside.
 
-Delivered after the scenarios, with its own plan.
+The console resolves accounts, transactions and aliases. Tokens and contracts
+are types the method defines and the console has no page for, so they are left
+until there is somewhere to put them.
 
 ## Architecture
 

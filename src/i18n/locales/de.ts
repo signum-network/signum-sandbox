@@ -129,6 +129,11 @@ export default {
       send: 'Jede Transaktionsart, die Signum kennt. Wähle eine, die Zeile darunter sagt, was sie tut.',
       chain: 'Mach rückgängig, was du getan hast. Zurückspulen entfernt Blöcke; leeren kann es die Chain nicht — das kann nur ein Neustart des Nodes.',
     },
+    did: {
+      label: 'Dezentraler Identifikator',
+      show: 'Dokument zeigen',
+      hide: 'Dokument verbergen',
+    },
     tx: {
       fee: 'Gebühr',
       andMore: '+{{count}} weitere',
