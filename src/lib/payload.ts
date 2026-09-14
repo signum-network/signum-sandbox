@@ -1,5 +1,4 @@
 import type { Transaction } from '@signumjs/core'
-import { Amount } from '@signumjs/util'
 import { src44 } from '@signumjs/standards'
 import { decryptMessage, generateSignKeys } from '@signumjs/crypto'
 import type { SandboxAccount } from './accounts'
@@ -29,58 +28,6 @@ export function src44Fields(description: string): PayloadField[] | null {
   } catch {
     return null
   }
-}
-
-/**
- * `recipients` is shared by two attachments the node tells apart, not this
- * decoder: sendMoneyMulti puts `[id, planck]` pairs (per
- * Attachment$PaymentMultiOutCreation.putMyJson), sendMoneyMultiSame puts a flat
- * list of id strings (per Attachment$PaymentMultiSameOutCreation.putMyJson,
- * whose backing field is an `ArrayList<Long>` serialised one string per
- * recipient — confirmed by decompiling the pinned node jar). Destructuring the
- * flat form as a pair would read an id's first two characters as an id and
- * invent an amount from the rest, so the shape is checked before anything is
- * unpacked. The flat form carries no per-recipient amount — the transaction's
- * own amount is split between the ids, and that split isn't in the attachment
- * — so only ids are listed for it, never a number.
- */
-function recipientsSummary(recipients: unknown[]): string {
-  if (recipients.length > 0 && Array.isArray(recipients[0])) {
-    return (recipients as [string, string][])
-      .map(([id, planck]) => `${id}: ${Amount.fromPlanck(planck).getSigna()} SIGNA`)
-      .join(', ')
-  }
-  return (recipients as string[]).join(', ')
-}
-
-export function decodePayload(tx: Transaction): PayloadField[] {
-  const a = asRecord(tx)
-  const fields: PayloadField[] = []
-
-  if (typeof a.message === 'string') {
-    fields.push({ label: 'message', value: a.message })
-  }
-
-  if (a.encryptedMessage) {
-    // Decryption needs one of the two agreement keys plus the counterpart's
-    // public key. The console only has that for its own accounts, and the
-    // caller has not offered them here, so the honest answer is "not readable".
-    fields.push({ label: 'encrypted', value: null })
-  }
-
-  if (typeof a.description === 'string') {
-    fields.push(...(src44Fields(a.description) ?? [{ label: 'description', value: a.description }]))
-  }
-
-  if (Array.isArray(a.recipients)) {
-    fields.push({ label: 'recipients', value: recipientsSummary(a.recipients) })
-  }
-
-  if (typeof a.frequency === 'number') {
-    fields.push({ label: 'frequency', value: `every ${a.frequency} s` })
-  }
-
-  return fields
 }
 
 interface EncryptedRef {

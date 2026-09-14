@@ -2,7 +2,8 @@ import { useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { nodeHost } from '@/lib/ledger'
 import { useQuery } from '@tanstack/react-query'
-import { decodePayload, decryptFor } from '@/lib/payload'
+import { decryptFor } from '@/lib/payload'
+import { detailFields } from '@/lib/txDetail'
 import type { SandboxAccount } from '@/lib/accounts'
 import { ConsoleButton, RowButton } from '../ConsoleButton'
 import { displayName, type Contacts } from '@/lib/contacts'
@@ -104,7 +105,7 @@ export function TransactionRow({
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const summary = summarize(item.tx)
-  const fields = decodePayload(item.tx)
+  const fields = detailFields(item.tx)
 
   // Resolution stops at owned-account → contact → shortened address here,
   // deliberately: a per-row getAccount for the on-chain name would be an N+1
@@ -176,8 +177,19 @@ export function TransactionRow({
             {Amount.fromPlanck(item.tx.feeNQT ?? '0').getSigna()} SIGNA
           </Detail>
 
-          {fields.map((field) => (
-            <Detail key={field.label} label={field.label}>
+          {/*
+            The label is a translation key where the console knows the field
+            and the attachment's own key where it does not, and i18next's
+            second argument is the default — so a field nobody has ever named
+            renders as itself rather than as a missing-key marker. Two fields
+            can share a label (an alias arrives under `alias` or under `uri`),
+            so the position is what identifies a line, not the name.
+          */}
+          {fields.map((field, index) => (
+            <Detail
+              key={`${field.label}-${index}`}
+              label={t(`console.field.${field.label}`, field.label)}
+            >
               {field.value ??
                 (field.label === 'encrypted' && decrypted.data
                   ? decrypted.data
