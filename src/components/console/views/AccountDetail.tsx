@@ -196,7 +196,7 @@ export function AccountDetail({
         expects, derived rather than fetched — which is the property that makes
         a chain worth building verification on at all.
       */}
-      <Row label={<Term id="did">{t('console.did.label')}</Term>}>
+      <Row label={<Term id="did" />}>
         <DidLink
           resolution={accountDid({
             accountId: account.id,

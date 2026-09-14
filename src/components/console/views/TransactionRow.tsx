@@ -296,7 +296,7 @@ export function TransactionRow({
             fetched from anywhere. Immutable is the interesting line in it:
             that is the property anything built on this chain is relying on.
           */}
-          <Detail label={<Term id="did">{t('console.did.label')}</Term>}>
+          <Detail label={<Term id="did" />}>
             <DidLink resolution={transactionDid(item.tx)} />
           </Detail>
 

@@ -130,7 +130,6 @@ export default {
       chain: 'Desfaz o que fizeste. Rebobinar remove blocos; esvaziar a cadeia não consegue — só reiniciar o nó o faz.',
     },
     did: {
-      label: 'Identificador descentralizado',
       show: 'Ver documento',
       hide: 'Ocultar documento',
     },

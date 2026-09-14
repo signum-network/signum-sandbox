@@ -130,7 +130,6 @@ export default {
       chain: 'Mach rückgängig, was du getan hast. Zurückspulen entfernt Blöcke; leeren kann es die Chain nicht — das kann nur ein Neustart des Nodes.',
     },
     did: {
-      label: 'Dezentraler Identifikator',
       show: 'Dokument zeigen',
       hide: 'Dokument verbergen',
     },
