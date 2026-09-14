@@ -2039,6 +2039,15 @@ git commit -m "docs: the scenario language, and the addresses it always produces
 
 ## Notes for whoever executes this
 
+**No pre-flight simulation of money.** It is tempting to have the checker add
+up what each account will spend and warn that an issuer funded 100 cannot pay
+a 150 SIGNA issuance fee. Deliberately not done: it would be a second,
+approximate model of fees and block rewards sitting beside the node's real
+one, and a model that disagrees with the node is worse than no model. If a
+transaction cannot be made, the node says so and the scenario stops on that
+line with what the node said. Beginners are given scenarios that work; an
+author writing their own is responsible for it.
+
 **There is no undo.** The console cannot empty a chain, so a scenario that fails halfway leaves what it already wrote. That is why parsing and checking both happen before the run and why the runner stops at the first failure. Do not add a "continue anyway" path.
 
 **One way to run a scenario.** What executes is what is in the text box. If you find yourself adding a code path that runs a built-in scenario without loading it into the editor, stop — that is the second interpretation of the language that the editor mode was designed to avoid.
