@@ -130,6 +130,7 @@ export default {
       chain: 'Mach rückgängig, was du getan hast. Zurückspulen entfernt Blöcke; leeren kann es die Chain nicht — das kann nur ein Neustart des Nodes.',
     },
     tx: {
+      fee: 'Gebühr',
       unconfirmed: 'unbestätigt',
       block: 'Block {{height}}',
       raw: 'Rohantwort',

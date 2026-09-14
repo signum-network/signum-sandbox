@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { nodeHost } from '@/lib/ledger'
 import { useQuery } from '@tanstack/react-query'
@@ -9,6 +9,8 @@ import { displayName, type Contacts } from '@/lib/contacts'
 import { toComparableId } from '@/lib/recipient'
 import { summarize } from '@/lib/txSummary'
 import type { FeedItem } from '@/lib/chainFeed'
+import { Amount } from '@signumjs/util'
+import { Identicon } from '@/components/console/Identicon'
 
 // Whether an address already resolves to something other than a shortened
 // form of itself — an owned account or a contact — which is exactly the
@@ -51,6 +53,40 @@ function SaveContactField({
         {t('console.tx.saveContact')}
       </ConsoleButton>
     </div>
+  )
+}
+
+/** One labelled line of the opened row, so every line lines up with the rest. */
+function Detail({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div className="flex gap-3">
+      <span className="min-w-[100px] shrink-0 text-[var(--muted)]">{label}</span>
+      <span className="min-w-0 break-all">{children}</span>
+    </div>
+  )
+}
+
+/**
+ * An account on one of those lines: the picture, the address, and the name if
+ * the console has one for it.
+ */
+function Party({
+  label,
+  address,
+  name,
+}: {
+  label: string
+  address: string
+  name: string | null
+}) {
+  return (
+    <Detail label={label}>
+      <span className="flex items-center gap-2">
+        <Identicon value={address} size={16} />
+        <span className="break-all">{address}</span>
+        {name && name !== address && <span className="text-[var(--muted)]">· {name}</span>}
+      </span>
+    </Detail>
   )
 }
 
@@ -114,28 +150,40 @@ export function TransactionRow({
           className="mb-2 border-l-2 py-2 pl-3 text-[13px]"
           style={{ borderColor: 'var(--blue2)', background: 'rgba(0,102,255,.06)' }}
         >
+          {/*
+            The basics first, and named rather than abbreviated: the summary
+            line above has to fit on one row and squeezes the parties into
+            whatever space is left, which is exactly what makes opening a row
+            worth doing. Here there is room to say who, to whom and how much
+            in full, with the identicon that tells two accounts apart at a
+            glance — the one place it fits, since a stream of fifty rows
+            cannot carry two pictures each.
+          */}
+          {summary.senderRS && (
+            <Party label={t('console.send.from')} address={summary.senderRS} name={senderName} />
+          )}
+          {summary.recipientRS && (
+            <Party
+              label={t('console.send.to')}
+              address={summary.recipientRS}
+              name={recipientName}
+            />
+          )}
+          {summary.amountSigna && (
+            <Detail label={t('console.send.amount')}>{summary.amountSigna} SIGNA</Detail>
+          )}
+          <Detail label={t('console.tx.fee')}>
+            {Amount.fromPlanck(item.tx.feeNQT ?? '0').getSigna()} SIGNA
+          </Detail>
+
           {fields.map((field) => (
-            <div key={field.label} className="flex gap-3">
-              <span className="min-w-[100px] text-[var(--muted)]">{field.label}</span>
-              <span>
-                {field.value ??
-                  (field.label === 'encrypted' && decrypted.data
-                    ? decrypted.data
-                    : t('console.tx.undecryptable'))}
-              </span>
-            </div>
+            <Detail key={field.label} label={field.label}>
+              {field.value ??
+                (field.label === 'encrypted' && decrypted.data
+                  ? decrypted.data
+                  : t('console.tx.undecryptable'))}
+            </Detail>
           ))}
-          <div className="flex gap-3">
-            <span className="min-w-[100px] text-[var(--muted)]">{t('console.tx.raw')}</span>
-            <a
-              className="text-[var(--blue3)] underline"
-              target="_blank"
-              rel="noreferrer"
-              href={`${nodeHost}/api?requestType=getTransaction&transaction=${item.tx.transaction}`}
-            >
-              ↗ getTransaction
-            </a>
-          </div>
 
           {/*
             Offered only for a party the console cannot already name: an
@@ -156,6 +204,22 @@ export function TransactionRow({
               onSave={onAddContact}
             />
           )}
+
+          {/*
+            Last, because it leads off the page. Everything above answers the
+            question the row was opened to ask; this is for when the answer
+            was not enough.
+          */}
+          <Detail label={t('console.tx.raw')}>
+            <a
+              className="text-[var(--blue3)] underline"
+              target="_blank"
+              rel="noreferrer"
+              href={`${nodeHost}/api?requestType=getTransaction&transaction=${item.tx.transaction}`}
+            >
+              ↗ getTransaction
+            </a>
+          </Detail>
         </div>
       )}
     </li>

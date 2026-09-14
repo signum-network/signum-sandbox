@@ -130,6 +130,7 @@ export default {
       chain: 'Desfaz o que fizeste. Rebobinar remove blocos; esvaziar a cadeia não consegue — só reiniciar o nó o faz.',
     },
     tx: {
+      fee: 'Taxa',
       unconfirmed: 'não confirmada',
       block: 'Bloco {{height}}',
       raw: 'resposta bruta',

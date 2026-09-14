@@ -130,6 +130,7 @@ export default {
       chain: 'Deshaz lo que has hecho. Rebobinar quita bloques; vaciar la cadena no puede — eso solo lo consigue reiniciar el nodo.',
     },
     tx: {
+      fee: 'Comisión',
       unconfirmed: 'sin confirmar',
       block: 'Bloque {{height}}',
       raw: 'respuesta sin procesar',

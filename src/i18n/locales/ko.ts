@@ -130,6 +130,7 @@ export default {
       chain: '한 일을 되돌립니다. 되감기는 블록을 없애지만 체인을 비우지는 못합니다 — 그것은 노드를 다시 시작해야만 가능합니다.',
     },
     tx: {
+      fee: '수수료',
       unconfirmed: '미확인',
       block: '블록 {{height}}',
       raw: '원시 응답',

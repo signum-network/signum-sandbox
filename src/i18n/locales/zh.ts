@@ -130,6 +130,7 @@ export default {
       chain: '撤销你做过的事。回退会移除区块，但清空不了链——只有重启节点才行。',
     },
     tx: {
+      fee: '手续费',
       unconfirmed: '未确认',
       block: '区块 {{height}}',
       raw: '原始响应',

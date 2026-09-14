@@ -141,6 +141,7 @@ export default {
       chain: 'Undo what you did. Winding back removes blocks; it cannot empty the chain — only restarting the node can.',
     },
     tx: {
+      fee: 'Fee',
       unconfirmed: 'unconfirmed',
       block: 'Block {{height}}',
       raw: 'raw response',
