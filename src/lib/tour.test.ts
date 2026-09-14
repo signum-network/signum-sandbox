@@ -17,8 +17,8 @@ import {
 
 const base: Observation = {
   height: 10,
-  accountCount: 0,
-  forgerChosen: false,
+  accountIds: new Set<string>(),
+  forgerId: null,
   ownedSent: new Set<string>(),
   ownedUnconfirmed: new Set<string>(),
   tab: 'transactions',
@@ -52,16 +52,31 @@ describe('isStepComplete', () => {
     expect(isStepComplete(forging, { ...base, height: 11 }, baseline, false)).toBe(false)
   })
 
-  it('completes an account step at the required count', () => {
-    const creating = step({ completion: { kind: 'accountsAtLeast', count: 2 } })
-    expect(isStepComplete(creating, { ...base, accountCount: 1 }, base, false)).toBe(false)
-    expect(isStepComplete(creating, { ...base, accountCount: 2 }, base, false)).toBe(true)
+  it('completes an account step when an account appears', () => {
+    const creating = step({ completion: { kind: 'accountCreated' } })
+    expect(isStepComplete(creating, base, base, false)).toBe(false)
+    expect(isStepComplete(creating, { ...base, accountIds: new Set(['a']) }, base, false)).toBe(true)
   })
 
-  it('completes when a forger has been picked', () => {
+  // The bug a real tour found. Someone who already has accounts had "create
+  // an account" completed for them before they read it, and the three steps
+  // that follow explain a passphrase they were never shown.
+  it('is not satisfied by accounts that were already there', () => {
+    const creating = step({ completion: { kind: 'accountCreated' } })
+    const had = { ...base, accountIds: new Set(['a', 'b']) }
+    expect(isStepComplete(creating, had, had, false)).toBe(false)
+    expect(
+      isStepComplete(creating, { ...had, accountIds: new Set(['a', 'b', 'c']) }, had, false),
+    ).toBe(true)
+  })
+
+  it('completes when a forger is picked, and not when one was already set', () => {
     const picking = step({ completion: { kind: 'forgerChosen' } })
     expect(isStepComplete(picking, base, base, false)).toBe(false)
-    expect(isStepComplete(picking, { ...base, forgerChosen: true }, base, false)).toBe(true)
+    expect(isStepComplete(picking, { ...base, forgerId: 'a' }, base, false)).toBe(true)
+    const had = { ...base, forgerId: 'old' }
+    expect(isStepComplete(picking, had, had, false)).toBe(false)
+    expect(isStepComplete(picking, { ...had, forgerId: 'new' }, had, false)).toBe(true)
   })
 
   const sending = step({ completion: { kind: 'sentSomething' } })

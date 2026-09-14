@@ -26,7 +26,7 @@ export type TourTarget =
  */
 export type Completion =
   | { kind: 'acknowledge' }
-  | { kind: 'accountsAtLeast'; count: number }
+  | { kind: 'accountCreated' }
   | { kind: 'forgerChosen' }
   | { kind: 'heightRose' }
   | { kind: 'sentSomething' }
@@ -77,8 +77,18 @@ export const TOUR_USE_CASES = [
 /** Everything the tour needs to know about the console, at one moment. */
 export interface Observation {
   height: number
-  accountCount: number
-  forgerChosen: boolean
+  /**
+   * The ids of the accounts this browser holds, not how many there are.
+   *
+   * Counting was wrong for the same reason it was wrong for transactions: the
+   * tour can be started at any time, and someone who already has an account
+   * satisfied "you now have at least one" before reading the step that asked
+   * for it. The account chapter then explained a passphrase they had never
+   * been shown.
+   */
+  accountIds: ReadonlySet<string>
+  /** Null when none is set. Compared against the baseline, never merely to null. */
+  forgerId: string | null
   /**
    * The ids of the transactions in the stream this browser sent — identified,
    * not counted.
@@ -147,10 +157,13 @@ export function isStepComplete(
   switch (step.completion.kind) {
     case 'acknowledge':
       return acknowledged
-    case 'accountsAtLeast':
-      return now.accountCount >= step.completion.count
+    case 'accountCreated':
+      return [...now.accountIds].some((id) => !baseline.accountIds.has(id))
     case 'forgerChosen':
-      return now.forgerChosen
+      // Changed during this step, not merely set. A forger left over from
+      // earlier would otherwise complete "pick the one you just created"
+      // before the user had picked anything.
+      return now.forgerId !== baseline.forgerId
     case 'heightRose':
       return now.height > baseline.height
     case 'sentSomething':
@@ -200,7 +213,7 @@ export const TOUR_STEPS: TourStep[] = [
   {
     id: 'createAccount',
     target: 'create-account',
-    completion: { kind: 'accountsAtLeast', count: 1 },
+    completion: { kind: 'accountCreated' },
   },
   { id: 'passphraseIsTheAccount', target: null, completion: { kind: 'acknowledge' } },
   { id: 'passphraseIsForever', target: null, completion: { kind: 'acknowledge' } },
@@ -222,7 +235,7 @@ export const TOUR_STEPS: TourStep[] = [
   {
     id: 'secondAccount',
     target: 'create-account',
-    completion: { kind: 'accountsAtLeast', count: 2 },
+    completion: { kind: 'accountCreated' },
   },
   {
     id: 'openSend',

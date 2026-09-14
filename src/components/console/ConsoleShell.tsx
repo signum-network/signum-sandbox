@@ -83,8 +83,8 @@ export function ConsoleShell() {
     // Assembled above the unreachable guard, like every other hook here, so
     // the height has to be read the same defensive way the feed reads it.
     height: state.kind === 'ready' ? (state.height ?? 0) : 0,
-    accountCount: accounts.accounts.length,
-    forgerChosen: accounts.forgerId !== null,
+    accountIds: ownedIds,
+    forgerId: accounts.forgerId,
     ...observeFeed(feed.items, ownedIds),
     tab,
     drawer,
