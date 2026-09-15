@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:launcher": "sh scripts/launcher.test.sh",
     "bootstrap": "./scripts/bootstrap.sh",
     "start": "./scripts/start.sh",
     "smoke": "./scripts/smoke.sh",

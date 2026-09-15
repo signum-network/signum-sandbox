@@ -1,0 +1,132 @@
+#!/bin/sh
+# The Signum Sandbox launcher.
+#
+# It installs what the sandbox needs — a private Java among it — and runs the
+# node. One file on purpose: the alternative was a library plus a front end,
+# and this is small enough that splitting it would only make it harder to read
+# in one sitting.
+#
+# POSIX sh, strictly. macOS ships bash 3.2 and Debian's /bin/sh is dash, so
+# no arrays, no [[, no local, no pipefail.
+#
+# Every decision in here takes its inputs as arguments and returns a string,
+# rather than reading the world itself. That is what lets
+# scripts/launcher.test.sh call them without mocking anything.
+set -eu
+
+# ── where everything lives ─────────────────────────────────────
+HOME_DIR="${SIGNUM_SANDBOX_HOME:-$HOME/.signum-sandbox}"
+APP_DIR="$HOME_DIR/app"
+JRE_DIR_BASE="$HOME_DIR/jre"
+CONF_DIR="$HOME_DIR/conf"
+HTML_DIR="$HOME_DIR/html"
+LOG_FILE="$HOME_DIR/logs/node.log"
+PID_FILE="$HOME_DIR/run/node.pid"
+INSTALLED_FILE="$HOME_DIR/installed"
+
+# SIGNUM_SANDBOX_HOME is not advertised in --help: it exists so the tests and
+# the container run can work somewhere other than a real home directory.
+
+REPO='signum-network/signum-sandbox'
+DEFAULT_PORT=6876
+
+say()  { printf '%s\n' "$*"; }
+warn() { printf '%s\n' "$*" >&2; }
+die()  { printf '%s\n' "$*" >&2; exit 1; }
+
+# ── the pinned JRE ─────────────────────────────────────────────
+# Beside this script when it is run from a checkout or a release, and in the
+# app directory once installed.
+#
+# SIGNUM_SANDBOX_PINNED comes first because of a limit of the language: a
+# sourced sh script cannot know its own path — $0 is the caller's — and there
+# is no $BASH_SOURCE to fall back on. So whoever sources this file says where
+# the pinned data is, and the test script does. When the launcher is executed,
+# which is every real use, $0 is right and nobody has to say anything.
+load_pinned() {
+  for candidate in \
+    "${SIGNUM_SANDBOX_PINNED:-}" \
+    "$(dirname -- "$0")/jre.pinned" \
+    "$APP_DIR/$(cat "$INSTALLED_FILE" 2>/dev/null || echo none)/scripts/jre.pinned"
+  do
+    [ -n "$candidate" ] || continue
+    if [ -f "$candidate" ]; then
+      . "$candidate"
+      return 0
+    fi
+  done
+  die 'launcher: cannot find jre.pinned — the installation is incomplete'
+}
+load_pinned
+
+# ── decisions ──────────────────────────────────────────────────
+
+# platform_id <uname -s> <uname -m> -> mac_aarch64 | mac_x64 | linux_x64 | linux_aarch64
+#
+# Prints nothing and fails for anything else, so the caller can say what it
+# found rather than building a URL that 404s much later for a reason nobody
+# can read.
+platform_id() {
+  case "$1" in
+    Darwin) os=mac ;;
+    Linux)  os=linux ;;
+    *)      return 1 ;;
+  esac
+  case "$2" in
+    arm64|aarch64) arch=aarch64 ;;
+    x86_64|amd64)  arch=x64 ;;
+    *)             return 1 ;;
+  esac
+  printf '%s_%s' "$os" "$arch"
+}
+
+# jre_url <platform_id> -> the Adoptium download for the pinned version.
+#
+# The `version` endpoint rather than `latest`, so the checksum beside it in
+# jre.pinned stays true. "+" has to be percent-encoded or the API answers 404.
+jre_url() {
+  encoded=$(printf '%s' "$JRE_VERSION" | sed 's/+/%2B/')
+  case "$1" in
+    mac_aarch64)   printf 'https://api.adoptium.net/v3/binary/version/jdk-%s/mac/aarch64/jre/hotspot/normal/eclipse' "$encoded" ;;
+    mac_x64)       printf 'https://api.adoptium.net/v3/binary/version/jdk-%s/mac/x64/jre/hotspot/normal/eclipse' "$encoded" ;;
+    linux_x64)     printf 'https://api.adoptium.net/v3/binary/version/jdk-%s/linux/x64/jre/hotspot/normal/eclipse' "$encoded" ;;
+    linux_aarch64) printf 'https://api.adoptium.net/v3/binary/version/jdk-%s/linux/aarch64/jre/hotspot/normal/eclipse' "$encoded" ;;
+    *)             return 1 ;;
+  esac
+}
+
+# jre_sha <platform_id> -> the pinned checksum.
+#
+# A case rather than indirect expansion, because ${!var} is a bashism and
+# eval for this would be a sharp tool for no gain.
+jre_sha() {
+  case "$1" in
+    mac_aarch64)   printf '%s' "$JRE_SHA_mac_aarch64" ;;
+    mac_x64)       printf '%s' "$JRE_SHA_mac_x64" ;;
+    linux_x64)     printf '%s' "$JRE_SHA_linux_x64" ;;
+    linux_aarch64) printf '%s' "$JRE_SHA_linux_aarch64" ;;
+    *)             return 1 ;;
+  esac
+}
+
+# java_binary <platform_id> <jre base dir> -> the java to run.
+#
+# The layout difference is Temurin's: a macOS JRE is an app bundle with
+# Contents/Home, a Linux one is not.
+java_binary() {
+  case "$1" in
+    mac_*)   printf '%s/%s/Contents/Home/bin/java' "$2" "$JRE_DIR" ;;
+    linux_*) printf '%s/%s/bin/java' "$2" "$JRE_DIR" ;;
+    *)       return 1 ;;
+  esac
+}
+
+# ── entry point ────────────────────────────────────────────────
+main() {
+  die 'launcher: not implemented yet'
+}
+
+# Sourced by the test script, which wants the functions and not the program.
+if [ "${LAUNCHER_LIB_ONLY:-0}" != "1" ]; then
+  main "$@"
+fi
