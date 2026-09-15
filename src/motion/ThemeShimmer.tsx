@@ -34,11 +34,24 @@ export function ThemeShimmer() {
           key={flash}
           className="pointer-events-none fixed inset-0 z-20"
           style={{ background: 'var(--blue2)' }}
-          initial={{ opacity: 0.22 }}
-          animate={{ opacity: 0 }}
+          initial={{ opacity: 0 }}
+          /*
+            An envelope, not a fade: up in about 60ms, then the rest of the
+            half second spent coming down. It used to start at full strength
+            and only fall, which is why it read as a blink however long the
+            fall was — there was no arrival to see, just a departure.
+
+            Two segments, two curves: the accent rises with the same ease-out
+            an arriving row uses, and the long way down is eased at both ends
+            so it never looks like a linear dimmer being turned.
+          */
+          animate={{ opacity: [0, 0.22, 0] }}
           exit={{ opacity: 0 }}
-          // 350ms rather than the 200 it started at, which read as a blink.
-          transition={{ duration: seconds('base'), ease: EASINGS.out }}
+          transition={{
+            duration: seconds('calm'),
+            times: [0, 0.12, 1],
+            ease: [EASINGS.out, EASINGS.inOut],
+          }}
           onAnimationComplete={() => setFlash(0)}
         />
       )}
