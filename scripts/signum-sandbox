@@ -121,6 +121,40 @@ java_binary() {
   esac
 }
 
+# installed_version <path to the installed file> -> the active version, or ''.
+#
+# The active version is a plain file and not a symlink, so that the later
+# Windows variant needs no privileges and so that looking at the directory
+# tells you the truth without interpreting a link.
+installed_version() {
+  [ -f "$1" ] || return 0
+  tr -d '\n' < "$1"
+}
+
+# html_needs_copy <wanted version> <path to html/.version> -> yes | no
+#
+# The node resolves API.UI_Dir relatively, so the html it serves has to sit at
+# $HOME_DIR/html under exactly that name — which is why it is a copy of the
+# active release's rather than a link into it. 2MB, about 84ms, and only when
+# the version changed.
+html_needs_copy() {
+  [ -f "$2" ] || { printf 'yes'; return 0; }
+  if [ "$(tr -d '\n' < "$2")" = "$1" ]; then printf 'no'; else printf 'yes'; fi
+}
+
+# prune_list <app dir> <how many to keep> -> the versions to delete, newest
+# kept, one per line.
+#
+# Each release is about 64MB, almost all of it the node jar, so without this
+# ~/.signum-sandbox grows into the gigabytes and nobody notices. Sorted by
+# modification time rather than by version string: comparing versions in sh
+# means writing a version comparator, and the directory we just wrote is by
+# definition the newest.
+prune_list() {
+  # shellcheck disable=SC2012  # ls -t is the point; these names have no spaces
+  ls -1t "$1" 2>/dev/null | tail -n +"$(( $2 + 1 ))"
+}
+
 # ── entry point ────────────────────────────────────────────────
 main() {
   die 'launcher: not implemented yet'

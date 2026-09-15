@@ -59,6 +59,28 @@ check 'java on linux' \
   '/tmp/jre/jdk-21.0.12.1+1-jre/bin/java' \
   "$(java_binary linux_x64 /tmp/jre)"
 
+# ── installed_version / html_needs_copy / prune_list ──────────
+TMP=$(mktemp -d)
+trap 'rm -rf "$TMP"' EXIT
+
+check 'no installed file means nothing is installed' '' "$(installed_version "$TMP/installed")"
+printf '0.1.0\n' > "$TMP/installed"
+check 'installed file is read, newline stripped' '0.1.0' "$(installed_version "$TMP/installed")"
+
+check 'html must be copied when it is absent' 'yes' "$(html_needs_copy 0.1.0 "$TMP/absent/.version")"
+mkdir -p "$TMP/html"
+printf '0.1.0\n' > "$TMP/html/.version"
+check 'html is current' 'no' "$(html_needs_copy 0.1.0 "$TMP/html/.version")"
+check 'html is stale after an update' 'yes' "$(html_needs_copy 0.2.0 "$TMP/html/.version")"
+
+# prune_list keeps the two newest by mtime and names the rest.
+mkdir -p "$TMP/app/0.1.0" "$TMP/app/0.2.0" "$TMP/app/0.3.0"
+touch -t 202601010000 "$TMP/app/0.1.0"
+touch -t 202602010000 "$TMP/app/0.2.0"
+touch -t 202603010000 "$TMP/app/0.3.0"
+check 'prune names only the oldest' '0.1.0' "$(prune_list "$TMP/app" 2)"
+check 'prune names nothing when two remain' '' "$(prune_list "$TMP/app" 3)"
+
 printf '\n'
 if [ "$fails" -eq 0 ]; then
   printf 'all checks passed\n'
