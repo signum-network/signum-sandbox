@@ -335,13 +335,120 @@ cmd_start() {
   fi
 }
 
+cmd_stop() {
+  if ! is_running; then
+    say 'launcher: not running'
+    return 0
+  fi
+  pid=$(cat "$PID_FILE")
+  kill "$pid" 2>/dev/null || true
+  # The node closes its database on SIGTERM, so "stopped" must not be printed
+  # over a process that is still writing one.
+  i=0
+  while [ "$i" -lt 50 ] && kill -0 "$pid" 2>/dev/null; do
+    sleep 0.2
+    i=$((i + 1))
+  done
+  if kill -0 "$pid" 2>/dev/null; then
+    warn "launcher: pid $pid has not stopped after ten seconds."
+    warn 'launcher: leaving it alone rather than forcing it — an interrupted'
+    warn 'launcher: database write is worse than a process that lingers.'
+    return 1
+  fi
+  rm -f "$PID_FILE"
+  say 'launcher: stopped'
+}
+
+cmd_status() {
+  version=$(installed_version "$INSTALLED_FILE")
+  [ -n "$version" ] || { say 'launcher: nothing installed'; return 0; }
+  say "version: $version"
+
+  port=$(node_port)
+  if is_running; then
+    say "process: running in the background (pid $(cat "$PID_FILE"))"
+  else
+    say 'process: no background node (one may be running in the foreground)'
+  fi
+
+  # Asked of the node rather than inferred from the pid: a process that is
+  # alive but not answering is the failure worth seeing, and it is the one a
+  # pidfile cannot tell you about.
+  answer=$(curl -fsS -m 3 "http://localhost:$port/api?requestType=getBlockchainStatus" 2>/dev/null || true)
+  if [ -n "$answer" ]; then
+    height=$(printf '%s' "$answer" | sed -n 's/.*"numberOfBlocks":[[:space:]]*\([0-9]\{1,\}\).*/\1/p')
+    say "node:    answering on port $port, height ${height:-unknown}"
+  else
+    say "node:    nothing answering on port $port"
+  fi
+}
+
+cmd_logs() {
+  if [ -f "$NODE_LOG" ]; then
+    # The node's own log is the operational one and is what anyone asking for
+    # logs wants. Our capture of stdout largely duplicates it — once the node
+    # has configured logging it prints to the console as well — so following
+    # both would show nearly every line twice. What the capture has that this
+    # does not is whatever the JVM said before logging existed, which is where
+    # a failure to start lands, so it gets named rather than followed.
+    [ -f "$LOG_FILE" ] && say "launcher: startup output, if you need it: $LOG_FILE"
+    tail -f "$NODE_LOG"
+  elif [ -f "$LOG_FILE" ]; then
+    warn 'launcher: the node kept no log of its own — it may not have got that far.'
+    tail -f "$LOG_FILE"
+  else
+    die 'launcher: no log yet — has it ever started?'
+  fi
+}
+
+# reset_verdict <running: yes|no> <confirmed: yes|no> -> delete | refuse | cancelled
+#
+# A running node holds its database open, and deleting it underneath is how a
+# chain becomes half a chain. Before there was a pidfile this was a warning in
+# a comment. Running beats confirmation deliberately: somebody who typed yes
+# to a prompt has not thereby stopped the node.
+reset_verdict() {
+  if [ "$1" = 'yes' ]; then printf 'refuse'; return 0; fi
+  if [ "$2" = 'yes' ]; then printf 'delete'; else printf 'cancelled'; fi
+}
+
+cmd_reset() {
+  if is_running; then running=yes; else running=no; fi
+
+  # Not asked at all when the answer cannot be acted on, so the prompt never
+  # collects a yes that is then refused.
+  confirmed=no
+  if [ "$running" = 'no' ]; then
+    printf 'launcher: delete the chain in %s/db and start from empty? [y/N] ' "$HOME_DIR"
+    read -r answer || answer=''
+    case "$answer" in y|Y|yes|YES) confirmed=yes ;; esac
+  fi
+
+  case "$(reset_verdict "$running" "$confirmed")" in
+    refuse)
+      die 'launcher: the node is running and holds the chain open. Run "signum-sandbox stop" first.'
+      ;;
+    delete)
+      rm -rf "$HOME_DIR/db"
+      say 'launcher: chain deleted'
+      ;;
+    cancelled)
+      say 'launcher: kept the existing chain'
+      ;;
+  esac
+}
+
 # ── entry point ────────────────────────────────────────────────
 main() {
   command=${1:-start}
   [ $# -gt 0 ] && shift
   case "$command" in
-    start) cmd_start "$@" ;;
-    *)     die "launcher: unknown command $command" ;;
+    start)  cmd_start "$@" ;;
+    stop)   cmd_stop ;;
+    status) cmd_status ;;
+    logs)   cmd_logs ;;
+    reset)  cmd_reset ;;
+    *)      die "launcher: unknown command $command" ;;
   esac
 }
 

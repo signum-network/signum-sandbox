@@ -88,6 +88,13 @@ check 'sha256 of a known file' \
   '0a8abc637f4f2641c3dd39b93fa078ea42b6f988c57f621d93f20b1b594b1149' \
   "$(sha256_of "$TMP/known.txt")"
 
+# ── reset must refuse while a node is running ─────────────────
+# reset_verdict <running: yes|no> <confirmed: yes|no> -> delete | refuse | cancelled
+check 'refuses while running'              'refuse'    "$(reset_verdict yes yes)"
+check 'refuses even unconfirmed'           'refuse'    "$(reset_verdict yes no)"
+check 'deletes when stopped and confirmed' 'delete'    "$(reset_verdict no yes)"
+check 'cancels when not confirmed'         'cancelled' "$(reset_verdict no no)"
+
 printf '\n'
 if [ "$fails" -eq 0 ]; then
   printf 'all checks passed\n'
