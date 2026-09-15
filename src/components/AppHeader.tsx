@@ -53,8 +53,8 @@ export function AppHeader({
         for the node's, which is exactly the confusion the status line had
         while this number was missing from it.
       */}
-      <span className="text-[11px] font-normal tracking-[2px] text-[var(--muted)]">
-        {__SANDBOX_VERSION__}
+      <span className="text-[8px] font-normal tracking-[2px] text-[var(--muted)]">
+        v{__SANDBOX_VERSION__}
       </span>
     </h1>
   )
