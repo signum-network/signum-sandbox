@@ -1,4 +1,6 @@
 import { useNodeState } from '@/hooks/useNodeState'
+import { cn } from '@/lib/utils'
+import { START_PAGE_WIDTH } from '@/components/pageShell'
 import { useBlockChime } from '@/hooks/useBlockChime'
 import { useChainPulse } from '@/motion'
 import { StatusHeader } from './StatusHeader'
@@ -13,14 +15,14 @@ export function StartPage() {
 
   if (state.kind === 'unreachable') {
     return (
-      <div className="mx-auto max-w-5xl p-6">
+      <div className={cn('mx-auto p-6', START_PAGE_WIDTH)}>
         <Unreachable nodeAddress={nodeAddress} />
       </div>
     )
   }
 
   return (
-    <div className="mx-auto max-w-5xl p-6">
+    <div className={cn('mx-auto p-6', START_PAGE_WIDTH)}>
       <StatusHeader
         networkName={state.networkName}
         version={state.version}

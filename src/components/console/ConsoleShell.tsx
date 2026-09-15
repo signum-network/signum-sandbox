@@ -12,6 +12,7 @@ import { AppHeader } from '@/components/AppHeader'
 import { ConsoleButton, RowButton } from './ConsoleButton'
 import { interpret, resolveQuery } from '@/lib/search'
 import { displayName } from '@/lib/contacts'
+import { cn } from '@/lib/utils'
 import { useNameLookup } from '@/hooks/useNameLookup'
 import { Header } from './Header'
 import { AccountsView } from './views/AccountsView'
@@ -29,6 +30,7 @@ import { TourOverlay } from './tour/TourOverlay'
 import { useTour } from '@/hooks/useTour'
 import { useBlockChime } from '@/hooks/useBlockChime'
 import { useChainPulse, SPRINGS, EASINGS, seconds } from '@/motion'
+import { PAGE_WIDTH } from '@/components/pageShell'
 import { observeFeed, type Observation } from '@/lib/tour'
 
 import type { ConsoleTab, DrawerName } from '@/lib/consoleNav'
@@ -113,7 +115,7 @@ export function ConsoleShell() {
 
   if (state.kind === 'unreachable') {
     return (
-      <div className="mx-auto max-w-6xl p-6">
+      <div className={cn('mx-auto p-6', PAGE_WIDTH)}>
         <Unreachable nodeAddress={nodeAddress} />
       </div>
     )
@@ -121,7 +123,7 @@ export function ConsoleShell() {
 
   return (
     <BeginnerMode on={beginner.beginner}>
-      <div className="mx-auto flex h-screen max-w-6xl flex-col p-6">
+      <div className={cn('mx-auto flex h-screen flex-col p-6', PAGE_WIDTH)}>
         <AppHeader
           networkName={state.networkName}
           version={state.version}

@@ -6,6 +6,8 @@ import { scenarioFilename } from '@/lib/savedScenarios'
 import { useSavedScenarios } from '@/hooks/useSavedScenarios'
 import { SCENARIOS } from '@/scenarios'
 import { AppHeader } from '@/components/AppHeader'
+import { PAGE_WIDTH } from '@/components/pageShell'
+import { cn } from '@/lib/utils'
 import { Unreachable } from '@/components/startpage'
 import { ConsoleButton, RowButton } from '@/components/console/ConsoleButton'
 import { useNodeState } from '@/hooks/useNodeState'
@@ -86,14 +88,14 @@ export function ScenarioPage() {
 
   if (state.kind === 'unreachable') {
     return (
-      <div className="mx-auto max-w-6xl p-6">
+      <div className={cn('mx-auto p-6', PAGE_WIDTH)}>
         <Unreachable nodeAddress={nodeAddress} />
       </div>
     )
   }
 
   return (
-    <div className="mx-auto flex h-screen max-w-6xl flex-col p-6">
+    <div className={cn('mx-auto flex h-screen flex-col p-6', PAGE_WIDTH)}>
       <AppHeader
         networkName={state.networkName}
         version={state.version}
