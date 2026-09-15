@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useAnimate } from 'framer-motion'
+import { AnimatePresence, motion, useAnimate } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import type { NodeState } from '@/lib/nodeState'
 import type { AccountStore } from '@/hooks/useAccounts'
@@ -159,14 +159,35 @@ export function Header({
           </ConsoleButton>
         </span>
 
-        {requested && (
-          <span className="text-[12px] text-[var(--muted)]">{t('console.forge.requested')}</span>
-        )}
-        {!requested && error && (
-          <span className="text-[12px] text-[var(--mag)]">
-            {t('console.forge.failed', { message: error })}
-          </span>
-        )}
+        <AnimatePresence initial={false} mode="wait">
+          {requested && (
+            <motion.span
+              key="requested"
+              className="text-[12px] text-[var(--muted)]"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: seconds('quick') }}
+            >
+              {t('console.forge.requested')}
+            </motion.span>
+          )}
+          {!requested && error && (
+            <motion.span
+              key="error"
+              className="text-[12px] text-[var(--mag)]"
+              initial={{ opacity: 0, x: 0 }}
+              // A forge you asked for and did not get earns a nudge, to go
+              // with the sfx.warn already played for it. Two pixels, once —
+              // enough to be noticed beside a button, not a tantrum.
+              animate={{ opacity: 1, x: [0, -2, 2, 0] }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: seconds('quick') }}
+            >
+              {t('console.forge.failed', { message: error })}
+            </motion.span>
+          )}
+        </AnimatePresence>
 
         <div className="w-44" data-tour="forger-select">
           <Select

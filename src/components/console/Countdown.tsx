@@ -1,5 +1,10 @@
 import { useEffect, useState } from 'react'
+import { useAnimate } from 'framer-motion'
 import { formatCountdown } from '@/lib/autoForge'
+import { useMotion, seconds } from '@/motion'
+
+/** Below this many milliseconds the clock starts pulsing with each tick. */
+const IMMINENT_MS = 3_500
 
 /**
  * Seconds until the next automatic block.
@@ -11,6 +16,8 @@ import { formatCountdown } from '@/lib/autoForge'
  */
 export function Countdown({ at }: { at: number }) {
   const [remaining, setRemaining] = useState(() => at - Date.now())
+  const [clock, animate] = useAnimate<HTMLSpanElement>()
+  const { enabled } = useMotion()
 
   useEffect(() => {
     setRemaining(at - Date.now())
@@ -18,5 +25,19 @@ export function Countdown({ at }: { at: number }) {
     return () => clearInterval(id)
   }, [at])
 
-  return <span className="tabular-nums">{formatCountdown(remaining)}</span>
+  // The last three seconds are the ones worth watching, so those tick
+  // visibly. Pulsing for the whole interval would be a metronome nobody asked
+  // for, and the rest of the countdown is a number you read, not a rhythm you
+  // feel.
+  useEffect(() => {
+    if (!enabled || !clock.current) return
+    if (remaining > IMMINENT_MS || remaining < 0) return
+    void animate(clock.current, { opacity: [0.45, 1] }, { duration: seconds('quick') })
+  }, [remaining, enabled, animate, clock])
+
+  return (
+    <span ref={clock} className="tabular-nums">
+      {formatCountdown(remaining)}
+    </span>
+  )
 }
