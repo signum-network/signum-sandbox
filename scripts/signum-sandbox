@@ -29,6 +29,11 @@ LOG_FILE="$HOME_DIR/logs/stdout.log"
 NODE_LOG="$HOME_DIR/node.log"
 PID_FILE="$HOME_DIR/run/node.pid"
 INSTALLED_FILE="$HOME_DIR/installed"
+PREVIOUS_FILE="$HOME_DIR/previous"
+# Where the launcher itself is placed. Overridable for the same reason
+# SIGNUM_SANDBOX_HOME is: so a test run does not have to fake $HOME, which
+# would move far more than this one directory.
+BIN_DIR="${SIGNUM_SANDBOX_BIN:-$HOME/.local/bin}"
 
 # SIGNUM_SANDBOX_HOME is not advertised in --help: it exists so the tests and
 # the container run can work somewhere other than a real home directory.
@@ -50,6 +55,7 @@ die()  { printf '%s\n' "$*" >&2; exit 1; }
 # the pinned data is, and the test script does. When the launcher is executed,
 # which is every real use, $0 is right and nobody has to say anything.
 load_pinned() {
+  tried=''
   for candidate in \
     "${SIGNUM_SANDBOX_PINNED:-}" \
     "$(dirname -- "$0")/jre.pinned" \
@@ -60,8 +66,13 @@ load_pinned() {
       . "$candidate"
       return 0
     fi
+    tried="$tried
+  $candidate"
   done
-  die 'launcher: cannot find jre.pinned — the installation is incomplete'
+  warn 'launcher: cannot find jre.pinned, so it does not know which Java to use.'
+  warn 'launcher: looked in:'
+  warn "$tried"
+  die  'launcher: the installation is incomplete — reinstall, or run the launcher from its own directory.'
 }
 load_pinned
 
@@ -148,17 +159,30 @@ html_needs_copy() {
   if [ "$(tr -d '\n' < "$2")" = "$1" ]; then printf 'no'; else printf 'yes'; fi
 }
 
-# prune_list <app dir> <how many to keep> -> the versions to delete, newest
-# kept, one per line.
+# prune_list <app dir> <version to keep>... -> the releases to delete, one
+# per line.
 #
 # Each release is about 64MB, almost all of it the node jar, so without this
-# ~/.signum-sandbox grows into the gigabytes and nobody notices. Sorted by
-# modification time rather than by version string: comparing versions in sh
-# means writing a version comparator, and the directory we just wrote is by
-# definition the newest.
+# ~/.signum-sandbox grows into the gigabytes and nobody notices.
+#
+# The versions to keep are named, not derived from modification time. The
+# first draft sorted by mtime and kept the two newest — and deleted the
+# release it had just installed, because mv preserves the mtime the archive
+# carried, so "newest on disk" is not "installed last". The real rule is
+# "keep what is live and what a rollback would return to", and stating it
+# means nothing in use can be deleted by construction.
 prune_list() {
-  # shellcheck disable=SC2012  # ls -t is the point; these names have no spaces
-  ls -1t "$1" 2>/dev/null | tail -n +"$(( $2 + 1 ))"
+  dir=$1
+  shift
+  # shellcheck disable=SC2045  # these names are versions; no spaces to fear
+  for existing in $(ls -1 "$dir" 2>/dev/null); do
+    keep=no
+    for wanted in "$@"; do
+      if [ "$existing" = "$wanted" ]; then keep=yes; fi
+    done
+    if [ "$keep" = 'no' ]; then printf '%s\n' "$existing"; fi
+  done
+  return 0
 }
 
 # sha256_of <file> -> the hex sum.
@@ -438,17 +462,154 @@ cmd_reset() {
   esac
 }
 
+# ── moving between releases ────────────────────────────────────
+
+# latest_tag <the releases/latest JSON> -> the version, or ''.
+#
+# sed rather than jq, which cannot be assumed to exist. It reads one field out
+# of one object, which is the whole reason this is tolerable: anything more
+# structured than that belongs in a language with a JSON parser. The leading
+# v is optional so a tag written either way works.
+latest_tag() {
+  printf '%s' "$1" \
+    | sed -n 's/.*"tag_name"[[:space:]]*:[[:space:]]*"v\{0,1\}\([^"]*\)".*/\1/p' \
+    | head -1
+}
+
+# release_url <version> -> where that release's zip lives.
+release_url() {
+  printf 'https://github.com/%s/releases/download/v%s/signum-sandbox-%s.zip' \
+    "$REPO" "$1" "$1"
+}
+
+# install_release <version> <zip>
+#
+# Unpacks beside whatever is live and only then writes the version file, so an
+# interrupted download leaves a directory nobody uses rather than a broken
+# installation. package.sh zips a single top-level directory named
+# signum-sandbox-<version>, which is why the contents are moved up a level.
+install_release() {
+  mkdir -p "$APP_DIR"
+  staging="$APP_DIR/.staging-$1"
+  rm -rf "$staging" "$APP_DIR/$1"
+  mkdir -p "$staging"
+  command -v unzip >/dev/null 2>&1 || die 'launcher: unzip is required'
+  unzip -q "$2" -d "$staging"
+  [ -d "$staging/signum-sandbox-$1" ] \
+    || die "launcher: the archive does not contain signum-sandbox-$1"
+  mv "$staging/signum-sandbox-$1" "$APP_DIR/$1"
+  rm -rf "$staging"
+
+  # The launcher ships with the release, so an update updates it too. Written
+  # under a temporary name and renamed over the old one, because sh reads a
+  # script as it goes: overwriting the file that is running is how an update
+  # corrupts itself halfway through. A rename swaps the directory entry and
+  # leaves the running process on the inode it started with.
+  if [ -f "$APP_DIR/$1/scripts/signum-sandbox" ]; then
+    mkdir -p "$BIN_DIR"
+    cp "$APP_DIR/$1/scripts/signum-sandbox" "$BIN_DIR/.signum-sandbox.new"
+    chmod +x "$BIN_DIR/.signum-sandbox.new"
+    mv "$BIN_DIR/.signum-sandbox.new" "$BIN_DIR/signum-sandbox"
+  fi
+
+  previous=$(installed_version "$INSTALLED_FILE")
+  [ -n "$previous" ] && printf '%s\n' "$previous" > "$PREVIOUS_FILE"
+  printf '%s\n' "$1" > "$INSTALLED_FILE"
+
+  # What is live, and what a rollback would return to. Everything else goes.
+  prune_list "$APP_DIR" "$1" "$previous" | while read -r stale; do
+    [ -n "$stale" ] || continue
+    rm -rf "$APP_DIR/$stale"
+    say "launcher: removed the old release $stale"
+  done
+}
+
+cmd_update() {
+  answer=$(curl -fsS -m 20 "https://api.github.com/repos/$REPO/releases/latest" 2>/dev/null || true)
+  wanted=$(latest_tag "$answer")
+  [ -n "$wanted" ] \
+    || die "launcher: could not find out what the newest release is. Is $REPO public, and has it been released?"
+
+  current=$(installed_version "$INSTALLED_FILE")
+  if [ "$wanted" = "$current" ]; then
+    say "launcher: $current is already the newest release"
+    return 0
+  fi
+
+  is_running && die 'launcher: stop the node before updating'
+
+  say "launcher: updating ${current:-nothing} to $wanted"
+  tmp=$(mktemp -d)
+  fetch "$(release_url "$wanted")" "$tmp/release.zip"
+  # Verified when the release publishes a sum beside it, and said plainly when
+  # it does not — a check that silently does nothing is worse than no check.
+  sum=$(curl -fsS -m 20 "$(release_url "$wanted").sha256" 2>/dev/null | cut -d' ' -f1 || true)
+  if [ -n "$sum" ]; then
+    verify "$tmp/release.zip" "$sum" "the $wanted release"
+  else
+    warn "launcher: $wanted publishes no .sha256 beside it — installing unverified"
+  fi
+  install_release "$wanted" "$tmp/release.zip"
+  rm -rf "$tmp"
+  say "launcher: now on $wanted"
+}
+
+cmd_rollback() {
+  previous=$(installed_version "$PREVIOUS_FILE")
+  [ -n "$previous" ] || die 'launcher: no previous release recorded'
+  [ -d "$APP_DIR/$previous" ] \
+    || die "launcher: $previous was recorded but $APP_DIR/$previous is gone"
+  is_running && die 'launcher: stop the node before rolling back'
+
+  current=$(installed_version "$INSTALLED_FILE")
+  [ -n "$current" ] && printf '%s\n' "$current" > "$PREVIOUS_FILE"
+  printf '%s\n' "$previous" > "$INSTALLED_FILE"
+
+  # The launcher belongs to the release it came from, so going back means
+  # going back to its launcher too. Same rename, same reason.
+  if [ -f "$APP_DIR/$previous/scripts/signum-sandbox" ]; then
+    mkdir -p "$BIN_DIR"
+    cp "$APP_DIR/$previous/scripts/signum-sandbox" "$BIN_DIR/.signum-sandbox.new"
+    chmod +x "$BIN_DIR/.signum-sandbox.new"
+    mv "$BIN_DIR/.signum-sandbox.new" "$BIN_DIR/signum-sandbox"
+  fi
+  say "launcher: back on $previous"
+}
+
+cmd_help() {
+  cat <<'EOF'
+signum-sandbox — a throwaway Signum chain on your own machine
+
+  signum-sandbox                  start it, here, until Ctrl-C
+  signum-sandbox start --daemon   start it in the background
+  signum-sandbox stop             stop a background node
+  signum-sandbox status           version, process, and what the node says
+  signum-sandbox logs             follow the node's log
+  signum-sandbox update           move to the newest release
+  signum-sandbox rollback         move back to the previous one
+  signum-sandbox reset            delete the chain and start from empty
+
+A background node does not survive a logout or a reboot, on purpose: a
+sandbox should not keep running unnoticed.
+
+  SIGNUM_SANDBOX_JAVA   use this java instead of the private one
+EOF
+}
+
 # ── entry point ────────────────────────────────────────────────
 main() {
   command=${1:-start}
   [ $# -gt 0 ] && shift
   case "$command" in
-    start)  cmd_start "$@" ;;
-    stop)   cmd_stop ;;
-    status) cmd_status ;;
-    logs)   cmd_logs ;;
-    reset)  cmd_reset ;;
-    *)      die "launcher: unknown command $command" ;;
+    start)          cmd_start "$@" ;;
+    stop)           cmd_stop ;;
+    status)         cmd_status ;;
+    logs)           cmd_logs ;;
+    reset)          cmd_reset ;;
+    update)         cmd_update ;;
+    rollback)       cmd_rollback ;;
+    -h|--help|help) cmd_help ;;
+    *)              die "launcher: unknown command $command (try --help)" ;;
   esac
 }
 

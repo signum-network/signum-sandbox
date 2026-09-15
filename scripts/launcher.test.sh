@@ -73,13 +73,13 @@ printf '0.1.0\n' > "$TMP/html/.version"
 check 'html is current' 'no' "$(html_needs_copy 0.1.0 "$TMP/html/.version")"
 check 'html is stale after an update' 'yes' "$(html_needs_copy 0.2.0 "$TMP/html/.version")"
 
-# prune_list keeps the two newest by mtime and names the rest.
+# prune_list keeps what it is told to keep and names the rest. Deliberately
+# not by mtime: mv preserves the archive's timestamps, so the release just
+# installed is not reliably the newest on disk — the first draft deleted it.
 mkdir -p "$TMP/app/0.1.0" "$TMP/app/0.2.0" "$TMP/app/0.3.0"
-touch -t 202601010000 "$TMP/app/0.1.0"
-touch -t 202602010000 "$TMP/app/0.2.0"
-touch -t 202603010000 "$TMP/app/0.3.0"
-check 'prune names only the oldest' '0.1.0' "$(prune_list "$TMP/app" 2)"
-check 'prune names nothing when two remain' '' "$(prune_list "$TMP/app" 3)"
+check 'prune names what is kept by nobody' '0.1.0' "$(prune_list "$TMP/app" 0.3.0 0.2.0)"
+check 'prune names nothing when all are kept' '' "$(prune_list "$TMP/app" 0.3.0 0.2.0 0.1.0)"
+check 'prune never names the active release' '' "$(prune_list "$TMP/app" 0.1.0 0.2.0 0.3.0 | grep -c 0.3.0 | tr -d '0')"
 
 # ── sha256_of, against a file whose sum is known ──────────────
 printf 'signum\n' > "$TMP/known.txt"
@@ -94,6 +94,18 @@ check 'refuses while running'              'refuse'    "$(reset_verdict yes yes)
 check 'refuses even unconfirmed'           'refuse'    "$(reset_verdict yes no)"
 check 'deletes when stopped and confirmed' 'delete'    "$(reset_verdict no yes)"
 check 'cancels when not confirmed'         'cancelled' "$(reset_verdict no no)"
+
+# ── latest_tag reads a version out of the releases API answer ─
+api='{"tag_name":"v0.2.0","name":"0.2.0","draft":false}'
+check 'tag without the v'          '0.2.0' "$(latest_tag "$api")"
+check 'tag that has no v'          '0.2.0' "$(latest_tag '{"tag_name":"0.2.0"}')"
+check 'no answer means no version' ''      "$(latest_tag '')"
+check 'an error answer means none' ''      "$(latest_tag '{"message":"Not Found"}')"
+
+# ── release_url builds the asset address ──────────────────────
+check 'release asset url' \
+  'https://github.com/signum-network/signum-sandbox/releases/download/v0.2.0/signum-sandbox-0.2.0.zip' \
+  "$(release_url 0.2.0)"
 
 printf '\n'
 if [ "$fails" -eq 0 ]; then
