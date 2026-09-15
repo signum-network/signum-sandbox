@@ -327,6 +327,8 @@ export function ConsoleShell() {
                     tourActive={tour.active}
                     onStartTour={tour.start}
                     onStopTour={tour.stop}
+                    accounts={accounts.accounts}
+                    forger={accounts.forger}
                   />
                 )}
               </motion.div>

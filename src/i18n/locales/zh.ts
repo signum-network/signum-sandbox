@@ -108,6 +108,18 @@ export default {
       oldHandNote: '直接进入控制台',
     },
     drawer: { send: '发送', chain: '链', help: '帮助', close: '关闭' },
+    apiDoc: {
+      open: '自己发一笔交易',
+      note: '同一笔付款，但直接对节点的 API 发出，而不是经由这个控制台。',
+      title: '通过 API 发送 Signa',
+      lead: '这个控制台只是节点 API 上的一层盖子，它做的每件事都是你可以手动发出的一个请求。文档会帮你发出——无需安装任何东西，而且只有沙盒这条链在听。',
+      needAccounts: '这需要两个账户。在账户页创建，或运行一个场景。',
+      fields: '粘贴这些：{{sender}} 向 {{recipient}} 付 1 Signa',
+      amountNote: '是 Planck，不是 Signa：1 Signa 等于 100000000 Planck。侧边条的 Quantity Converter 能换算任意金额。',
+      passphraseNote: '在这个沙盒之外一文不值——正因如此，它才能粘贴进表单。',
+      goto: '打开 Send Signa',
+      thenWhat: '按 EXECUTE，然后回到交易页。你发出的交易会像链上其他一切一样出现在那里。',
+    },
     help: {
       beginner: '新手模式',
       beginnerNote: '在每个专业术语旁加上解释，并在每个视图上方加一句说明。',

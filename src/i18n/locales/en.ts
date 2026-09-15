@@ -122,6 +122,18 @@ export default {
       oldHandNote: 'Straight to the console',
     },
     drawer: { send: 'Send', chain: 'Chain', help: 'Help', close: 'Close' },
+    apiDoc: {
+      open: 'Send a transaction yourself',
+      note: 'The same payment, made against the node’s own API instead of through this console.',
+      title: 'Sending Signa through the API',
+      lead: 'This console is a lid on the node’s API, and everything it does is a request you can make by hand. The documentation makes them for you — nothing to install, and the sandbox is the only chain listening.',
+      needAccounts: 'This needs two accounts. Create them in the Accounts tab, or run a scenario.',
+      fields: 'Paste these: {{sender}} pays {{recipient}} one Signa',
+      amountNote: 'Planck, not Signa: one Signa is 100000000 Planck. The Quantity Converter in the sidebar does that arithmetic for any amount.',
+      passphraseNote: 'Worth nothing outside this sandbox, which is the only reason it can be pasted into a form.',
+      goto: 'Open Send Signa',
+      thenWhat: 'Press EXECUTE, then come back to the Transactions tab. What you sent arrives there like anything else on the chain.',
+    },
     help: {
       beginner: 'Beginner mode',
       beginnerNote: 'Adds an explanation beside every domain word, and a sentence of context above every view.',

@@ -108,6 +108,18 @@ export default {
       oldHandNote: 'Directo a la consola',
     },
     drawer: { send: 'Enviar', chain: 'Cadena', help: 'Ayuda', close: 'Cerrar' },
+    apiDoc: {
+      open: 'Envía una transacción tú mismo',
+      note: 'El mismo pago, hecho contra la propia API del nodo en lugar de esta consola.',
+      title: 'Enviar Signa a través de la API',
+      lead: 'Esta consola es una tapa sobre la API del nodo, y todo lo que hace es una petición que puedes hacer a mano. La documentación las hace por ti: nada que instalar, y la sandbox es la única cadena que escucha.',
+      needAccounts: 'Esto necesita dos cuentas. Créalas en la pestaña Cuentas o ejecuta un escenario.',
+      fields: 'Pega esto: {{sender}} paga un Signa a {{recipient}}',
+      amountNote: 'Planck, no Signa: un Signa son 100000000 Planck. El Quantity Converter de la barra lateral hace ese cálculo para cualquier cantidad.',
+      passphraseNote: 'No vale nada fuera de esta sandbox, y solo por eso puede pegarse en un formulario.',
+      goto: 'Abrir Send Signa',
+      thenWhat: 'Pulsa EXECUTE y vuelve a la pestaña Transacciones. Lo que enviaste llega ahí como cualquier otra cosa en la cadena.',
+    },
     help: {
       beginner: 'Modo principiante',
       beginnerNote: 'Pone una explicación junto a cada término técnico y una frase de contexto encima de cada vista.',

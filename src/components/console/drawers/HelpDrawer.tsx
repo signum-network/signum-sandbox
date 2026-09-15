@@ -2,6 +2,8 @@ import { useTranslation } from 'react-i18next'
 import { Toggle } from '@/components/console/Toggle'
 import { ConsoleButton } from '@/components/console/ConsoleButton'
 import { Glossary } from './Glossary'
+import { ApiDocGuide } from './ApiDocGuide'
+import type { SandboxAccount } from '@/lib/accounts'
 
 /**
  * Sound, theme and language moved into the app header, where they sit on
@@ -9,6 +11,10 @@ import { Glossary } from './Glossary'
  * to the API documentation, and the two controls the first-visit question
  * sets by proxy — both reachable here forever after, because an answer given
  * once should never be a decision you are stuck with.
+ *
+ * The way out to the API documentation is no longer a bare link: a newcomer
+ * who has understood the console needs the next step spelled out, not a door
+ * pointed at. ApiDocGuide is that step.
  */
 export function HelpDrawer({
   beginner,
@@ -16,12 +22,17 @@ export function HelpDrawer({
   tourActive,
   onStartTour,
   onStopTour,
+  accounts,
+  forger,
 }: {
   beginner: boolean
   onBeginner: (on: boolean) => void
   tourActive: boolean
   onStartTour: () => void
   onStopTour: () => void
+  /** For the API guide, which quotes real accounts rather than placeholders. */
+  accounts: SandboxAccount[]
+  forger: SandboxAccount | undefined
 }) {
   const { t } = useTranslation()
 
@@ -42,6 +53,8 @@ export function HelpDrawer({
           {t('console.help.tourNote')}
         </p>
       </div>
+
+      <ApiDocGuide accounts={accounts} forger={forger} />
 
       <Glossary />
 

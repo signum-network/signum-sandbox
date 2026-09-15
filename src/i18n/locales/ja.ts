@@ -108,6 +108,18 @@ export default {
       oldHandNote: 'そのままコンソールへ',
     },
     drawer: { send: '送信', chain: 'チェーン', help: 'ヘルプ', close: '閉じる' },
+    apiDoc: {
+      open: '自分でトランザクションを送る',
+      note: '同じ支払いを、このコンソールでなくノードの API に向けて。',
+      title: 'API で Signa を送る',
+      lead: 'このコンソールはノードの API の上にかぶせた蓋であり、ここで起こることはすべて自分で送れるリクエストです。ドキュメントが代わりに送ってくれます — インストールは不要で、聞いているチェーンはこのサンドパックスだけです。',
+      needAccounts: 'これにはアカウントが二つ必要です。アカウントタブで作るか、シナリオを実行してください。',
+      fields: '貫り付ける値：{{sender}} から {{recipient}} へ 1 Signa',
+      amountNote: 'Signa ではなく Planck：1 Signa は 100000000 Planck です。サイドバーの Quantity Converter がどの金額でも換算します。',
+      passphraseNote: 'このサンドパックスの外では何の価値もなく、だからこそフォームに貫り付けられます。',
+      goto: 'Send Signa を開く',
+      thenWhat: 'EXECUTE を押して、トランザクションタブに戻ってください。送ったものが、チェーン上の他のすべてと同じように届きます。',
+    },
     help: {
       beginner: '初心者モード',
       beginnerNote: '専門用語のそれぞれに説明を添え、各ビューの上に一文の説明を表示します。',

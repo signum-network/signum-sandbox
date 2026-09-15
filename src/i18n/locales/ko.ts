@@ -108,6 +108,18 @@ export default {
       oldHandNote: '바로 콘솔로',
     },
     drawer: { send: '보내기', chain: '체인', help: '도움말', close: '닫기' },
+    apiDoc: {
+      open: '직접 트랜잭션을 보내기',
+      note: '같은 지급을 이 콘소이 아니라 노드의 API에 직접.',
+      title: 'API로 Signa 보내기',
+      lead: '이 콘소은 노드 API 역에 얼어진 덮개이며, 여기서 일어나는 모든 일은 직접 보럴 수 있는 요직하나입니다. 바로 그 요을 문서가 대습 보내줍니다 — 설치할 것은 없고, 듣고 있는 체인은 이 샘드박스뿐입니다.',
+      needAccounts: '계정이 둘 필요합니다. 계정 탭에서 만들거나 시나리오를 실행하세요.',
+      fields: '이 것을 붙여넣으세요: {{sender}} → {{recipient}}, 1 Signa',
+      amountNote: 'Signa가 아니라 Planck: 1 Signa는 100000000 Planck입니다. 사이드바의 Quantity Converter가 어떤 금액이든 환산해 줍니다.',
+      passphraseNote: '이 샘드박스 밖에서는 아무런 가지가 없으며, 그래서만 양식에 붙여넣을 수 있습니다.',
+      goto: 'Send Signa 여기',
+      thenWhat: 'EXECUTE를 눌러고 트랜잭션 탭으로 돌아오세요. 보낸 것이 체인의 다른 모든 것처럼 그곳에 도달합니다.',
+    },
     help: {
       beginner: '초보자 모드',
       beginnerNote: '전문 용어마다 옆에 설명을 붙이고, 각 화면 위에 한 줄짜리 안내를 표시합니다.',

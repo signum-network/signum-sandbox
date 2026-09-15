@@ -108,6 +108,18 @@ export default {
       oldHandNote: 'Direkt in die Konsole',
     },
     drawer: { send: 'Senden', chain: 'Chain', help: 'Hilfe', close: 'Schließen' },
+    apiDoc: {
+      open: 'Eine Transaktion selbst senden',
+      note: 'Dieselbe Zahlung, gegen die API des Nodes statt durch diese Konsole.',
+      title: 'Signa über die API senden',
+      lead: 'Diese Konsole ist ein Deckel auf der API des Nodes, und alles, was sie tut, ist eine Anfrage, die du selbst stellen kannst. Die Dokumentation stellt sie für dich — nichts zu installieren, und die Sandbox ist die einzige Chain, die zuhört.',
+      needAccounts: 'Dafür braucht es zwei Konten. Erstelle sie im Konten-Tab oder lass ein Szenario laufen.',
+      fields: 'Zum Einfügen: {{sender}} zahlt {{recipient}} ein Signa',
+      amountNote: 'Planck, nicht Signa: ein Signa sind 100000000 Planck. Der Quantity Converter in der Seitenleiste rechnet das für jeden Betrag.',
+      passphraseNote: 'Außerhalb dieser Sandbox nichts wert — nur deshalb darf sie in ein Formular.',
+      goto: 'Send Signa öffnen',
+      thenWhat: 'Drücke EXECUTE und komm zurück zum Transaktionen-Tab. Was du gesendet hast, kommt dort an wie alles andere auf der Chain.',
+    },
     help: {
       beginner: 'Einsteiger-Modus',
       beginnerNote: 'Setzt neben jedes Fachwort eine Erklärung und über jede Ansicht einen Satz Kontext.',
