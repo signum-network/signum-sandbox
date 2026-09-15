@@ -81,6 +81,13 @@ touch -t 202603010000 "$TMP/app/0.3.0"
 check 'prune names only the oldest' '0.1.0' "$(prune_list "$TMP/app" 2)"
 check 'prune names nothing when two remain' '' "$(prune_list "$TMP/app" 3)"
 
+# ── sha256_of, against a file whose sum is known ──────────────
+printf 'signum\n' > "$TMP/known.txt"
+# Produced with: printf 'signum\n' | shasum -a 256 | cut -d' ' -f1
+check 'sha256 of a known file' \
+  '0a8abc637f4f2641c3dd39b93fa078ea42b6f988c57f621d93f20b1b594b1149' \
+  "$(sha256_of "$TMP/known.txt")"
+
 printf '\n'
 if [ "$fails" -eq 0 ]; then
   printf 'all checks passed\n'

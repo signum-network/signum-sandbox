@@ -155,6 +155,42 @@ prune_list() {
   ls -1t "$1" 2>/dev/null | tail -n +"$(( $2 + 1 ))"
 }
 
+# sha256_of <file> -> the hex sum.
+#
+# macOS has shasum, most Linux distributions have sha256sum, and a few have
+# both. Checking for each is cheaper than depending on one and being wrong on
+# somebody's machine.
+sha256_of() {
+  if command -v shasum >/dev/null 2>&1; then
+    shasum -a 256 "$1" | cut -d' ' -f1
+  elif command -v sha256sum >/dev/null 2>&1; then
+    sha256sum "$1" | cut -d' ' -f1
+  else
+    die 'launcher: no shasum or sha256sum on this machine, cannot verify a download'
+  fi
+}
+
+# fetch <url> <destination>
+#
+# -f so a 404 is a failure rather than a file containing an error page, -L
+# because both GitHub and Adoptium redirect, and --retry because a download of
+# 50MB deserves one.
+fetch() {
+  command -v curl >/dev/null 2>&1 || die 'launcher: curl is required'
+  curl -fL --retry 2 --progress-bar -o "$2" "$1" \
+    || die "launcher: could not download $1"
+}
+
+# verify <file> <expected sum> <what it is, for the message>
+verify() {
+  actual=$(sha256_of "$1")
+  [ "$actual" = "$2" ] && return 0
+  warn "launcher: $3 does not match its checksum."
+  warn "  expected $2"
+  warn "  got      $actual"
+  die  'launcher: refusing to install it'
+}
+
 # ── entry point ────────────────────────────────────────────────
 main() {
   die 'launcher: not implemented yet'
