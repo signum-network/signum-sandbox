@@ -24,6 +24,12 @@ explanations now, not just a hint on a card.
 — unlike the `motion.*` components — does not read `MotionConfig`, so it is
 the one place that would keep moving after the app's motion switch says stop.
 
+`components/ui/Card.tsx` and `components/controls/{AudioToggle,ThemeSwitcher}.tsx`
+take their spring settings from `src/motion/tokens.ts` instead of declaring
+them inline. The numbers are unchanged — upstream's values are what the tokens
+were named after — so re-copying these files means re-applying the import, not
+re-deciding anything.
+
 They are vendored rather than shared so that the sandbox cannot be broken by
 upstream changes. Keep local edits minimal: the cheaper these files are to
 re-copy, the longer picking up upstream improvements stays practical.

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { SPRINGS, seconds } from '@/motion'
 import { sfx, useAudio } from '@/audio'
 
 export interface SelectOption {
@@ -109,7 +110,7 @@ export function Select({
             initial={{ opacity: 0, y: -6, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -6, scale: 0.97 }}
-            transition={{ type: 'spring', stiffness: 420, damping: 28 }}
+            transition={SPRINGS.panel}
             className="themed-scroll absolute left-0 top-full z-50 mt-1 max-h-56 w-full overflow-y-auto"
             style={{
               background: 'var(--bg2)',
@@ -165,7 +166,7 @@ function Chevron({ open }: { open: boolean }) {
     <motion.svg
       width="8" height="8" viewBox="0 0 8 8" fill="none"
       animate={{ rotate: open ? 180 : 0 }}
-      transition={{ duration: 0.18 }}
+      transition={{ duration: seconds('quick') }}
       style={{ flexShrink: 0 }}
     >
       <path d="M1.5 3L4 5.5L6.5 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />

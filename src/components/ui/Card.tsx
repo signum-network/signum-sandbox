@@ -1,8 +1,7 @@
 import { motion, type HTMLMotionProps } from 'framer-motion'
 import { cn } from '@/lib/utils'
+import { SPRINGS } from '@/motion'
 import { InfoTooltip } from '@/components/ui/InfoTooltip'
-
-const SPRING = { type: 'spring' as const, stiffness: 300, damping: 20 }
 
 interface CardProps extends Omit<HTMLMotionProps<'div'>, 'children'> {
   padding?: boolean
@@ -30,7 +29,7 @@ export function Card({
           ? { y: -2, boxShadow: 'var(--card-hover)' }
           : undefined
       }
-      transition={SPRING}
+      transition={SPRINGS.lift}
       {...props}
     >
       {/* Tactical accent — only TL + BR per Horizon mockup spec */}

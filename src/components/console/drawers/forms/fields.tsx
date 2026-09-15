@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
+import { SPRINGS } from '@/motion'
 import { sfx, useAudio } from '@/audio'
 import { useTranslation } from 'react-i18next'
 import { feePresets, type SendAction } from '@/lib/fees'
@@ -212,7 +213,7 @@ export function SuggestInput({
             initial={{ opacity: 0, y: -6, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -6, scale: 0.97 }}
-            transition={{ type: 'spring', stiffness: 420, damping: 28 }}
+            transition={SPRINGS.panel}
             className="themed-scroll console-scroll absolute left-0 top-full z-50 mt-1 max-h-56 w-full overflow-y-auto"
             style={{
               background: 'var(--bg2)',

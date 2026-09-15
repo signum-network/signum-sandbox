@@ -1,4 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion'
+import { SPRINGS, seconds } from '@/motion'
 import { sfx, useAudio } from '@/audio'
 
 export function AudioToggle() {
@@ -27,7 +28,7 @@ export function AudioToggle() {
       }}
       whileHover={{ borderColor: 'var(--border2)', scale: 1.05 }}
       whileTap={{ scale: 0.92 }}
-      transition={{ type: 'spring', stiffness: 420, damping: 22 }}
+      transition={SPRINGS.snap}
     >
       <AnimatePresence mode="wait" initial={false}>
         {muted ? (
@@ -37,7 +38,7 @@ export function AudioToggle() {
             initial={{ opacity: 0, scale: 0.6 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.6 }}
-            transition={{ duration: 0.12 }}
+            transition={{ duration: seconds('instant') }}
           >
             <path d="M3 5.5h2L8 3v10L5 10.5H3z" fill="currentColor" />
             <path d="M11 6l3 4M14 6l-3 4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
@@ -49,7 +50,7 @@ export function AudioToggle() {
             initial={{ opacity: 0, scale: 0.6 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.6 }}
-            transition={{ duration: 0.12 }}
+            transition={{ duration: seconds('instant') }}
           >
             <path d="M3 5.5h2L8 3v10L5 10.5H3z" fill="currentColor" />
             <path d="M10.5 5.5C11.4 6.1 12 7 12 8s-.6 1.9-1.5 2.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" fill="none" />
