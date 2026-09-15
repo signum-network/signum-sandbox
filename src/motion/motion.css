@@ -1,0 +1,20 @@
+/*
+  Our keyframes. Deliberately not in index.css: that file is copied from
+  signum-node/web and should stay cheap to re-copy, which it does not if it
+  grows our animations. Everything here is expressed in the --motion-*
+  variables MotionProvider publishes, so durations are declared once, in
+  TypeScript.
+
+  Imported from main.tsx after index.css.
+*/
+
+/*
+  The off switch for this half of the split. Framer Motion is turned off
+  through MotionConfig in the same provider; between the two there is no
+  animation left to run.
+*/
+[data-motion='off'] *,
+[data-motion='off'] *::before,
+[data-motion='off'] *::after {
+  animation: none !important;
+}

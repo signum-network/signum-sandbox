@@ -260,11 +260,18 @@ body {
 }
 
 /* Not from upstream: the spec requires honouring reduced-motion preferences.
-   Keep this block when re-copying index.css from signum-node/web. */
+   Keep this block when re-copying index.css from signum-node/web.
+
+   Scoped to :root:not([data-motion="on"]) rather than applying to everything:
+   these declarations use !important, and a person who switched motion on in
+   the app despite their system preference would otherwise be overruled —
+   the switch would be dead in exactly the case it exists for. MotionProvider
+   sets data-motion on first render, so what is left for this block is the
+   system default and the milliseconds before React mounts. */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  :root:not([data-motion='on']) *,
+  :root:not([data-motion='on']) *::before,
+  :root:not([data-motion='on']) *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;

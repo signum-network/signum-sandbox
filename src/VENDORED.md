@@ -6,7 +6,11 @@
 `components/layout/topbar/components/`.
 
 The `prefers-reduced-motion` block at the end of `index.css` is ours, not
-upstream's — keep it when re-copying that file.
+upstream's — keep it when re-copying that file. It is scoped to
+`:root:not([data-motion="on"])`: its declarations use `!important`, and the
+app's own motion switch (`src/motion/`) has to be able to turn movement *on*
+for someone whose system asks for less. Everything else we animate lives in
+`src/motion/motion.css`, which upstream knows nothing about.
 
 `components/ui/InfoTooltip.tsx` has two local changes to re-apply. Its panel
 renders through a portal into the document body: absolutely positioned beside

@@ -6,9 +6,11 @@ import { Crypto } from '@signumjs/crypto'
 import { WebCryptoAdapter } from '@signumjs/crypto/adapters'
 import { ThemeProvider } from '@/theme/ThemeProvider'
 import { AudioProvider } from '@/audio'
+import { MotionProvider } from '@/motion'
 import { router } from './router'
 import './i18n'
 import './index.css'
+import './motion/motion.css'
 
 // Signing and message encryption go through this adapter; it must be set once,
 // before any crypto function runs.
@@ -21,7 +23,9 @@ createRoot(document.getElementById('root')!).render(
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <AudioProvider>
-          <RouterProvider router={router} />
+          <MotionProvider>
+            <RouterProvider router={router} />
+          </MotionProvider>
         </AudioProvider>
       </ThemeProvider>
     </QueryClientProvider>
