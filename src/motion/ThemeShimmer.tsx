@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useTheme } from '@/theme/ThemeProvider'
-import { seconds } from './tokens'
+import { seconds, EASINGS } from './tokens'
 
 /**
  * The flash that covers a theme swap.
@@ -37,9 +37,8 @@ export function ThemeShimmer() {
           initial={{ opacity: 0.22 }}
           animate={{ opacity: 0 }}
           exit={{ opacity: 0 }}
-          // The same shape as before, just a longer way down: quick was 200ms
-          // and read as a blink.
-          transition={{ duration: seconds('base') }}
+          // 350ms rather than the 200 it started at, which read as a blink.
+          transition={{ duration: seconds('base'), ease: EASINGS.out }}
           onAnimationComplete={() => setFlash(0)}
         />
       )}
