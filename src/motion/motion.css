@@ -61,3 +61,27 @@
     background: transparent;
   }
 }
+
+/*
+  The background grid drifts by exactly one cell, so the loop is seamless —
+  40px is the backgroundSize in __root.tsx. Transform only, which means the
+  compositor does the work and no layout is recomputed for 90 seconds at a
+  time.
+
+  Scoped to [data-motion="on"] rather than relying on the blanket off rule
+  above: this is the only endless animation in the app, and endless movement
+  is exactly what causes trouble for vestibular sensitivity, so it should
+  never be started rather than started and then cancelled.
+*/
+[data-motion='on'] .motion-grid {
+  animation: motion-grid var(--motion-ambient, 90000ms) linear infinite;
+}
+
+@keyframes motion-grid {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(40px, 40px, 0);
+  }
+}
