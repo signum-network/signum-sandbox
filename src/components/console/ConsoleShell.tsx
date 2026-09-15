@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import { useNodeState } from '@/hooks/useNodeState'
 import { useAccounts } from '@/hooks/useAccounts'
@@ -27,7 +28,7 @@ import { ViewNote } from './ViewNote'
 import { TourOverlay } from './tour/TourOverlay'
 import { useTour } from '@/hooks/useTour'
 import { useBlockChime } from '@/hooks/useBlockChime'
-import { useChainPulse } from '@/motion'
+import { useChainPulse, SPRINGS, EASINGS, seconds } from '@/motion'
 import { observeFeed, type Observation } from '@/lib/tour'
 
 import type { ConsoleTab, DrawerName } from '@/lib/consoleNav'
@@ -137,7 +138,7 @@ export function ConsoleShell() {
             {[...TABS, ...(watched.watchedId ? (['watch'] as const) : [])].map((name) => (
               <span
                 key={name}
-                className="flex"
+                className="relative flex"
                 data-tour={
                   name === 'accounts'
                     ? 'accounts-tab'
@@ -146,11 +147,26 @@ export function ConsoleShell() {
                       : undefined
                 }
               >
+                {/*
+                  One marker for the whole row: layoutId makes Framer treat the
+                  instance under the old tab and the one under the new tab as
+                  the same object, so it travels between them instead of
+                  disappearing here and appearing there. Behind the button, so
+                  the label is never painted over.
+                */}
+                {tab === name && (
+                  <motion.span
+                    layoutId="console-tab-marker"
+                    className="absolute inset-0"
+                    style={{ background: 'rgba(0,102,255,.18)', zIndex: -1 }}
+                    transition={SPRINGS.panel}
+                  />
+                )}
                 <ConsoleButton
                   active={tab === name}
                   onClick={() => setTab(name)}
                   style={{
-                    background: tab === name ? 'rgba(0,102,255,.18)' : 'transparent',
+                    background: 'transparent',
                     color: tab === name ? 'var(--blue3)' : 'var(--muted)',
                   }}
                 >
@@ -184,116 +200,136 @@ export function ConsoleShell() {
                 }}
               />
             )}
-            {beginner.answered && tab === 'transactions' && (
-              <>
-                <ViewNote id="transactions" terms={['block', 'unconfirmed']} />
-                <TransactionsView
-                  items={feed.items}
-                  accounts={accounts.accounts}
-                  contacts={contacts.contacts}
-                  onAddContact={contacts.add}
-                  query={resolved}
-                  page={txPage}
-                  onPage={setTxPage}
-                />
-              </>
-            )}
-            {beginner.answered && tab === 'blocks' && (
-              <>
-                <ViewNote id="blocks" terms={['block', 'forger']} />
-                <BlocksView
-                  blocks={blocks.data ?? []}
-                  accounts={accounts.accounts}
-                  contacts={contacts.contacts}
-                  query={resolved}
-                  page={blockPage}
-                  onPage={setBlockPage}
-                  chainLength={state.height ?? 0}
-                  hideEmpty={hideEmptyBlocks}
-                  onHideEmpty={setHideEmptyBlocks}
-                  // The block row itself only expands in place; leaving this tab
-                  // is the consequence of clicking one of the transactions inside
-                  // it, not of clicking the block.
-                  onSelectTransaction={showTransaction}
-                />
-              </>
-            )}
-            {beginner.answered && tab === 'watch' && watched.watchedId && (
-              <>
-                <ViewNote id="watch" />
-                <div className="themed-scroll console-scroll min-h-0 flex-1 overflow-y-auto pr-2">
-                  <WatchView
-                  accountId={watched.watchedId}
-                  accounts={accounts.accounts}
-                  contacts={contacts.contacts}
-                  onUnwatch={() => {
-                    watched.unwatch()
-                    setTab('accounts')
-                  }}
-                    onSelectTransaction={showTransaction}
-                  />
-                </div>
-              </>
-            )}
-            {beginner.answered && tab === 'accounts' && (
-              <>
-                <ViewNote id="accounts" />
-                <div className="themed-scroll console-scroll min-h-0 flex-1 overflow-y-auto pr-2">
-                  <AccountsView
-                  store={accounts}
-                  contacts={contacts}
-                  query={query}
-                    watchedId={watched.watchedId}
-                    onWatch={watched.watch}
-                    onSelectTransaction={showTransaction}
-                  />
-                </div>
-              </>
+            {beginner.answered && (
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.div
+                  key={tab}
+                  className="flex min-h-0 flex-1 flex-col"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: seconds('instant') }}
+                >
+                  {tab === 'transactions' && (
+                    <>
+                      <ViewNote id="transactions" terms={['block', 'unconfirmed']} />
+                      <TransactionsView
+                        items={feed.items}
+                        accounts={accounts.accounts}
+                        contacts={contacts.contacts}
+                        onAddContact={contacts.add}
+                        query={resolved}
+                        page={txPage}
+                        onPage={setTxPage}
+                      />
+                    </>
+                  )}
+                  {tab === 'blocks' && (
+                    <>
+                      <ViewNote id="blocks" terms={['block', 'forger']} />
+                      <BlocksView
+                        blocks={blocks.data ?? []}
+                        accounts={accounts.accounts}
+                        contacts={contacts.contacts}
+                        query={resolved}
+                        page={blockPage}
+                        onPage={setBlockPage}
+                        chainLength={state.height ?? 0}
+                        hideEmpty={hideEmptyBlocks}
+                        onHideEmpty={setHideEmptyBlocks}
+                        // The block row itself only expands in place; leaving this tab
+                        // is the consequence of clicking one of the transactions inside
+                        // it, not of clicking the block.
+                        onSelectTransaction={showTransaction}
+                      />
+                    </>
+                  )}
+                  {tab === 'watch' && watched.watchedId && (
+                    <>
+                      <ViewNote id="watch" />
+                      <div className="themed-scroll console-scroll min-h-0 flex-1 overflow-y-auto pr-2">
+                        <WatchView
+                        accountId={watched.watchedId}
+                        accounts={accounts.accounts}
+                        contacts={contacts.contacts}
+                        onUnwatch={() => {
+                          watched.unwatch()
+                          setTab('accounts')
+                        }}
+                          onSelectTransaction={showTransaction}
+                        />
+                      </div>
+                    </>
+                  )}
+                  {tab === 'accounts' && (
+                    <>
+                      <ViewNote id="accounts" />
+                      <div className="themed-scroll console-scroll min-h-0 flex-1 overflow-y-auto pr-2">
+                        <AccountsView
+                        store={accounts}
+                        contacts={contacts}
+                        query={query}
+                          watchedId={watched.watchedId}
+                          onWatch={watched.watch}
+                          onSelectTransaction={showTransaction}
+                        />
+                      </div>
+                    </>
+                  )}
+                </motion.div>
+              </AnimatePresence>
             )}
           </div>
-          {drawer && (
-            <div
-              className="themed-scroll console-scroll w-[34%] overflow-y-auto border p-3"
-              style={{ borderColor: 'var(--blue2)' }}
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-[12px] uppercase tracking-[1px] text-[var(--blue3)]">
-                  {t(`console.drawer.${drawer}`)}
-                </span>
-                <RowButton
-                  className="text-[13px] text-[var(--muted)]"
-                  onClick={() => setDrawer(null)}
-                >
-                  ✕
-                </RowButton>
-              </div>
-              {drawer === 'send' && (
-                <>
-                  <ViewNote id="send" />
-                  <SendDrawer
-                    store={accounts}
-                    contacts={contacts.contacts}
-                    prefill={tour.step?.prefill}
+          <AnimatePresence initial={false}>
+            {drawer && (
+              <motion.div
+                key="drawer"
+                className="themed-scroll console-scroll overflow-y-auto border"
+                style={{ borderColor: 'var(--blue2)' }}
+                initial={{ width: 0, opacity: 0, paddingLeft: 0, paddingRight: 0 }}
+                animate={{ width: '34%', opacity: 1, paddingLeft: 12, paddingRight: 12 }}
+                exit={{ width: 0, opacity: 0, paddingLeft: 0, paddingRight: 0 }}
+                transition={{ duration: seconds('base'), ease: EASINGS.out }}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-[12px] uppercase tracking-[1px] text-[var(--blue3)]">
+                    {t(`console.drawer.${drawer}`)}
+                  </span>
+                  <RowButton
+                    className="text-[13px] text-[var(--muted)]"
+                    onClick={() => setDrawer(null)}
+                  >
+                    ✕
+                  </RowButton>
+                </div>
+                {drawer === 'send' && (
+                  <>
+                    <ViewNote id="send" />
+                    <SendDrawer
+                      store={accounts}
+                      contacts={contacts.contacts}
+                      prefill={tour.step?.prefill}
+                    />
+                  </>
+                )}
+                {drawer === 'chain' && (
+                  <>
+                    <ViewNote id="chain" />
+                    <ChainDrawer height={state.height} />
+                  </>
+                )}
+                {drawer === 'help' && (
+                  <HelpDrawer
+                    beginner={beginner.beginner}
+                    onBeginner={beginner.setBeginner}
+                    tourActive={tour.active}
+                    onStartTour={tour.start}
+                    onStopTour={tour.stop}
                   />
-                </>
-              )}
-              {drawer === 'chain' && (
-                <>
-                  <ViewNote id="chain" />
-                  <ChainDrawer height={state.height} />
-                </>
-              )}
-              {drawer === 'help' && (
-              <HelpDrawer
-                beginner={beginner.beginner}
-                onBeginner={beginner.setBeginner}
-                tourActive={tour.active}
-                onStartTour={tour.start}
-                onStopTour={tour.stop}
-              />
+                )}
+              </motion.div>
             )}
-            </div>
-          )}
+          </AnimatePresence>
         </div>
 
         {/* Last inside the provider, so the ring and the callout paint over
