@@ -37,7 +37,7 @@ Checked by running it, not inferred.
 4. **The JRE version and its four checksums are pinned in the repository**, not queried at run time. Parsing JSON in POSIX `sh` without being able to assume `jq` is a class of failure that cannot be debugged on someone else's machine. This mirrors `.signum-node-version`, which the repo already pins this way.
 5. **The private JRE is always used, even when a system Java exists.** One variable fewer when something breaks for a user. `SIGNUM_SANDBOX_JAVA` overrides it for the developer who insists, and says so in `--help`.
 6. **The chain and the configuration live outside the versioned directory.** An update replaces `app/<version>/` and touches neither. The opposite arrangement would throw away someone's chain on every update, and on a sandbox the annoyance is small enough that nobody would report it and it would go unnoticed for a long time.
-7. **The active version is a text file, not a symlink.** It works in the later Windows variant where symlinks need privileges, it can be read without interpreting `ls -l`, and a rollback is one line because the previous tree is still there.
+7. **Nothing in the layout is a symlink.** The active version is a text file: it works in the later Windows variant where symlinks need privileges, it can be read without interpreting `ls -l`, and a rollback is one line because the previous tree is still there. The `html` the node serves is a copy of the active release's, for the same reason — 2 MB and 84 ms, against a special case on every platform that handles links differently.
 8. **Installing and updating are the same code path.** Installing is an update from nothing. A rarely-run second path is a path that rots.
 9. **The installer assembles nothing.** It downloads the zip `package.sh` produces. The part that is hardest to debug remotely stays the dumbest part.
 10. **No update check from the page, ever, in the background.** The sandbox's promise is an offline mock network, and a page that calls `api.github.com` on every load breaks that promise quietly — for exactly the people who wanted an isolated environment. The check happens when someone types `signum-sandbox update`. If the console is ever to mention updates, it is a button that is pressed.
@@ -69,15 +69,20 @@ signum-sandbox --help
   jre/21.0.12.1+1/     the extracted Temurin JRE
   conf/node.properties ours, created once, never overwritten
   db/                  the chain
-  html -> app/0.2.0/html   maintained by the launcher, see below
+  html/                copied from the active release, see below
+  html/.version        which release it was copied from
   logs/node.log
   run/node.pid
 ~/.local/bin/signum-sandbox
 ```
 
-The node is started with `~/.signum-sandbox` as its working directory, which is what makes `DB.Url`'s `./db/…` land on the chain that survives updates. The same relative-path style forces the second half: `API.UI_Dir = html/sandbox` has to resolve from there too, so the launcher maintains `html` as a pointer to the active release's `html` directory and rewrites it on every start. A symlink on macOS and Linux; the later Windows variant copies instead, which is why nothing depends on it being a link.
+The node is started with `~/.signum-sandbox` as its working directory, which is what makes `DB.Url`'s `./db/…` land on the chain that survives updates. The same relative-path style forces the second half: `API.UI_Dir = html/sandbox` has to resolve from there too.
 
-Doing it this way is what keeps a version number out of the user's own configuration file. The alternative — rewriting `API.UI_Dir` in `conf/node.properties` on every update — would mean the launcher editing a file it promised never to overwrite.
+So `html/` is **copied** out of the active release, not linked to it, and `html/.version` records which release it came from. On start the launcher compares that against `installed` and re-copies only when they differ. The whole tree is 2 MB and copying it takes about 84 ms, measured — so this costs nothing that can be felt, and only on a version change.
+
+A symlink would have done the same job on macOS and Linux, and was the first draft. Copying is better for the reason decision 7 already gives: it leaves no link anywhere in the design, so the later Windows variant is the same code rather than a special case with a junction and a question about privileges. It is also a state you can understand by looking at it — a directory with a version marker in it, rather than a link someone has to interpret.
+
+Either way, what matters is that no version number ends up in the user's own configuration file. The alternative — rewriting `API.UI_Dir` in `conf/node.properties` on every update — would mean the launcher editing a file it promised never to overwrite.
 
 `conf/node-default.properties` is copied out of the active `app/<version>/` on every start, because those are the node's own defaults and they belong to the release. `conf/node.properties` is seeded from the release's copy the first time and never touched again, so a user who changes a port keeps it across updates. That split is the one the node itself defines.
 
