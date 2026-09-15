@@ -37,7 +37,9 @@ export function ThemeShimmer() {
           initial={{ opacity: 0.22 }}
           animate={{ opacity: 0 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: seconds('quick') }}
+          // The same shape as before, just a longer way down: quick was 200ms
+          // and read as a blink.
+          transition={{ duration: seconds('base') }}
           onAnimationComplete={() => setFlash(0)}
         />
       )}
