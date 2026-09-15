@@ -2,6 +2,7 @@ import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
+import { version } from './package.json'
 
 export default defineConfig(({ command, mode }) => {
   // loadEnv is what makes .env.local work here: Vite does not put .env files
@@ -21,6 +22,16 @@ export default defineConfig(({ command, mode }) => {
       // In development that is the proxy target; in production the node serves
       // the page itself, so the page origin is the honest answer.
       __NODE_ADDRESS__: JSON.stringify(command === 'serve' ? nodeUrl : null),
+      // The sandbox's own version, from the one place that already holds it —
+      // package.json is what scripts/package.sh names the release after. Baked
+      // at build time rather than fetched, because the page must say what it
+      // is without asking anything.
+      //
+      // A dev server is almost always ahead of the last release, so it says so
+      // rather than claiming to be that release.
+      __SANDBOX_VERSION__: JSON.stringify(
+        command === 'serve' ? `${version}-dev` : version,
+      ),
     },
     server: {
       port: 5173,

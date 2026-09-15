@@ -12,6 +12,9 @@ interface ImportMeta {
 /** Injected by vite.config.ts: the node's address in development, null in production. */
 declare const __NODE_ADDRESS__: string | null
 
+/** Injected by vite.config.ts: the sandbox's own version, `-dev` in development. */
+declare const __SANDBOX_VERSION__: string
+
 /**
  * hashicon@0.3.0 ships no typings. Declared just enough of its shape for
  * Identicon.tsx: a default export taking a hash string and returning the

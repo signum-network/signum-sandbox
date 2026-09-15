@@ -41,11 +41,21 @@ export function AppHeader({
 
   const wordmark = (
     <h1
-      className="flex items-center gap-3 text-[22px] font-black tracking-[3px] text-[var(--blue3)]"
+      className="flex items-baseline gap-3 text-[22px] font-black tracking-[3px] text-[var(--blue3)]"
       style={{ fontFamily: 'Orbitron, ui-monospace, monospace' }}
     >
-      <Logomark beat={beat} />
+      <Logomark beat={beat} style={{ alignSelf: 'center' }} />
       SIGNUM SANDBOX
+      {/*
+        Beside the name rather than in the status cluster on the right, where
+        the node's own version lives. Next to the wordmark it can only be read
+        as the sandbox's; six words away from "v3.9.11" it cannot be mistaken
+        for the node's, which is exactly the confusion the status line had
+        while this number was missing from it.
+      */}
+      <span className="text-[11px] font-normal tracking-[2px] text-[var(--muted)]">
+        {__SANDBOX_VERSION__}
+      </span>
     </h1>
   )
 
