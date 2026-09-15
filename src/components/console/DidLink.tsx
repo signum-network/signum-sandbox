@@ -51,13 +51,11 @@ export function DidLink({ resolution }: { resolution: DidResolution }) {
         below it down the page — so reading the document meant losing the
         stream it belonged to.
       */}
-      {open && (
-        <Modal title={t('glossary.did.term')} onClose={() => setOpen(false)}>
-          <pre className="p-1 text-[12px] leading-relaxed text-[var(--muted)]">
-            {JSON.stringify(resolution, null, 2)}
-          </pre>
-        </Modal>
-      )}
+      <Modal open={open} title={t('glossary.did.term')} onClose={() => setOpen(false)}>
+        <pre className="p-1 text-[12px] leading-relaxed text-[var(--muted)]">
+          {JSON.stringify(resolution, null, 2)}
+        </pre>
+      </Modal>
     </span>
   )
 }

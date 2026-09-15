@@ -4,7 +4,8 @@ import type { SandboxAccount } from '@/lib/accounts'
 import type { Contacts } from '@/lib/contacts'
 import { matchesTransaction, type ResolvedQuery } from '@/lib/search'
 import { paginate } from '@/lib/paginate'
-import { useArrivals } from '@/motion'
+import { motion } from 'framer-motion'
+import { useArrivals, seconds } from '@/motion'
 import { Pager } from '../Pager'
 import { TransactionRow } from './TransactionRow'
 
@@ -59,7 +60,20 @@ export function TransactionsView({
     // A column so the list can take the space that is left and scroll inside
     // it, while the pager stays where the eye last saw it.
     <div className="flex min-h-0 flex-1 flex-col">
-      <ul className="themed-scroll console-scroll min-h-0 flex-1 overflow-y-auto pr-2">
+      {/*
+        Keyed on the page so a page turn fades rather than swapping, and so the
+        new page starts at the top instead of inheriting the last one's scroll
+        offset. No AnimatePresence: the outgoing page is gone in the same
+        frame, and a wait-mode presence would cost 200ms per turn for nothing
+        anyone can see.
+      */}
+      <motion.ul
+        key={page}
+        className="themed-scroll console-scroll min-h-0 flex-1 overflow-y-auto pr-2"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: seconds('quick') }}
+      >
         {shown.items.map((item) => (
           <TransactionRow
             key={item.id}
@@ -70,7 +84,7 @@ export function TransactionsView({
             onAddContact={onAddContact}
           />
         ))}
-      </ul>
+      </motion.ul>
       <Pager {...shown} onPage={onPage} />
     </div>
   )

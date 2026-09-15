@@ -5,7 +5,8 @@ import type { Contacts } from '@/lib/contacts'
 import { isEmptyBlock, matchesBlock, type ResolvedQuery } from '@/lib/search'
 import { Toggle } from '../Toggle'
 import { PAGE_SIZE, pageCount } from '@/lib/paginate'
-import { useArrivals } from '@/motion'
+import { motion } from 'framer-motion'
+import { useArrivals, seconds } from '@/motion'
 import { Pager } from '../Pager'
 import { BlockRow } from './BlockRow'
 
@@ -66,7 +67,13 @@ export function BlocksView({
         A filter that matched nothing is also not an empty chain, and saying so
         would be the same small lie the transaction stream avoids.
       */}
-      <ul className="themed-scroll console-scroll min-h-0 flex-1 overflow-y-auto pr-2">
+      <motion.ul
+        key={page}
+        className="themed-scroll console-scroll min-h-0 flex-1 overflow-y-auto pr-2"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: seconds('quick') }}
+      >
         {shown.length === 0 && (
           <li className="p-4 text-[13px] text-[var(--muted)]">
             {blocks.length === 0 ? t('console.blocks.none') : t('console.blocks.noMatch')}
@@ -82,7 +89,7 @@ export function BlocksView({
           onSelectTransaction={onSelectTransaction}
         />
         ))}
-      </ul>
+      </motion.ul>
       <Pager
         page={page}
         pages={pageCount(chainLength)}

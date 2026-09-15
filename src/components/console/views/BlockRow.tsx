@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import type { Block, Transaction } from '@signumjs/core'
 import { nodeHost } from '@/lib/ledger'
@@ -8,6 +9,7 @@ import { isTransaction } from '@/lib/chainFeed'
 import { summarize } from '@/lib/txSummary'
 import { RowButton } from '../ConsoleButton'
 import { cn } from '@/lib/utils'
+import { seconds, EASINGS } from '@/motion'
 
 /**
  * A block only ever quotes a name it can already resolve locally (owned
@@ -105,30 +107,41 @@ export function BlockRow({
           </a>
         </div>
 
-        {open && transactions.length > 0 && (
-          <ul
-            className="mb-2 border-l-2 pl-3 text-[13px]"
-            style={{ borderColor: 'var(--blue2)', background: 'rgba(0,102,255,.06)' }}
-          >
-            {transactions.map((tx) => (
-              <li key={tx.transaction} className="border-b last:border-b-0" style={{ borderColor: 'var(--border2)' }}>
-                {/*
-                  The stream already knows how to decode a payload, save a
-                  contact and link to the raw response, so a click hands this
-                  one transaction over to it rather than rebuilding a thinner
-                  copy of all that here. It filters to the transaction itself,
-                  not to its block: you asked about this one.
-                */}
-                <RowButton
-                  className="flex w-full items-center py-1 text-left"
-                  onClick={() => onSelectTransaction(tx.transaction)}
-                >
-                  <TransactionSummaryLine transaction={tx} accounts={accounts} contacts={contacts} />
-                </RowButton>
-              </li>
-            ))}
-          </ul>
-        )}
+        <AnimatePresence initial={false}>
+          {open && transactions.length > 0 && (
+            <motion.ul
+              key="transactions"
+              className="mb-2 border-l-2 pl-3 text-[13px]"
+              style={{
+                borderColor: 'var(--blue2)',
+                background: 'rgba(0,102,255,.06)',
+                overflow: 'hidden',
+              }}
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: seconds('base'), ease: EASINGS.out }}
+            >
+              {transactions.map((tx) => (
+                <li key={tx.transaction} className="border-b last:border-b-0" style={{ borderColor: 'var(--border2)' }}>
+                  {/*
+                    The stream already knows how to decode a payload, save a
+                    contact and link to the raw response, so a click hands this
+                    one transaction over to it rather than rebuilding a thinner
+                    copy of all that here. It filters to the transaction itself,
+                    not to its block: you asked about this one.
+                  */}
+                  <RowButton
+                    className="flex w-full items-center py-1 text-left"
+                    onClick={() => onSelectTransaction(tx.transaction)}
+                  >
+                    <TransactionSummaryLine transaction={tx} accounts={accounts} contacts={contacts} />
+                  </RowButton>
+                </li>
+              ))}
+            </motion.ul>
+          )}
+        </AnimatePresence>
       </div>
     </li>
   )

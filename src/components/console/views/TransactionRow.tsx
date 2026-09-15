@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import { nodeHost } from '@/lib/ledger'
 import { useQuery } from '@tanstack/react-query'
@@ -17,6 +18,7 @@ import type { FeedItem } from '@/lib/chainFeed'
 import { Amount } from '@signumjs/util'
 import { Identicon } from '@/components/console/Identicon'
 import { cn } from '@/lib/utils'
+import { seconds, EASINGS } from '@/motion'
 
 // Whether an address already resolves to something other than a shortened
 // form of itself — an owned account or a contact — which is exactly the
@@ -217,114 +219,125 @@ export function TransactionRow({
           </span>
         </RowButton>
 
-        {open && (
-          <div
-            className="mb-2 border-l-2 py-2 pl-3 text-[13px]"
-            style={{ borderColor: 'var(--blue2)', background: 'rgba(0,102,255,.06)' }}
-          >
-            {/*
-              The basics first, and named rather than abbreviated: the summary
-              line above has to fit on one row and squeezes the parties into
-              whatever space is left, which is exactly what makes opening a row
-              worth doing. Here there is room to say who, to whom and how much
-              in full, with the identicon that tells two accounts apart at a
-              glance — the one place it fits, since a stream of fifty rows
-              cannot carry two pictures each.
-            */}
-            {summary.senderRS && (
-              <Party label={t('console.send.from')} address={summary.senderRS} name={senderName} />
-            )}
-            {summary.recipientRS && (
-              <Party
-                label={t('console.send.to')}
-                address={summary.recipientRS}
-                name={recipientName}
-              />
-            )}
-            {summary.amountSigna && (
-              <Detail label={t('console.send.amount')}>{summary.amountSigna} SIGNA</Detail>
-            )}
-            <Detail label={t('console.tx.fee')}>
-              {Amount.fromPlanck(item.tx.feeNQT ?? '0').getSigna()} SIGNA
-            </Detail>
-
-            {/*
-              The label is a translation key where the console knows the field
-              and the attachment's own key where it does not, and i18next's
-              second argument is the default — so a field nobody has ever named
-              renders as itself rather than as a missing-key marker. Two fields
-              can share a label (an alias arrives under `alias` or under `uri`),
-              so the position is what identifies a line, not the name.
-            */}
-            {fields.map((field, index) =>
-              field.payees ? (
-                <Payees
-                  key={`${field.label}-${index}`}
-                  label={t(`console.field.${field.label}`, field.label)}
-                  payees={field.payees}
-                  accounts={accounts}
-                  contacts={contacts}
+        <AnimatePresence initial={false}>
+          {open && (
+            <motion.div
+              key="detail"
+              className="mb-2 border-l-2 py-2 pl-3 text-[13px]"
+              style={{
+                borderColor: 'var(--blue2)',
+                background: 'rgba(0,102,255,.06)',
+                overflow: 'hidden',
+              }}
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: seconds('base'), ease: EASINGS.out }}
+            >
+              {/*
+                The basics first, and named rather than abbreviated: the summary
+                line above has to fit on one row and squeezes the parties into
+                whatever space is left, which is exactly what makes opening a row
+                worth doing. Here there is room to say who, to whom and how much
+                in full, with the identicon that tells two accounts apart at a
+                glance — the one place it fits, since a stream of fifty rows
+                cannot carry two pictures each.
+              */}
+              {summary.senderRS && (
+                <Party label={t('console.send.from')} address={summary.senderRS} name={senderName} />
+              )}
+              {summary.recipientRS && (
+                <Party
+                  label={t('console.send.to')}
+                  address={summary.recipientRS}
+                  name={recipientName}
                 />
-              ) : (
-                <Detail
-                  key={`${field.label}-${index}`}
-                  label={t(`console.field.${field.label}`, field.label)}
+              )}
+              {summary.amountSigna && (
+                <Detail label={t('console.send.amount')}>{summary.amountSigna} SIGNA</Detail>
+              )}
+              <Detail label={t('console.tx.fee')}>
+                {Amount.fromPlanck(item.tx.feeNQT ?? '0').getSigna()} SIGNA
+              </Detail>
+
+              {/*
+                The label is a translation key where the console knows the field
+                and the attachment's own key where it does not, and i18next's
+                second argument is the default — so a field nobody has ever named
+                renders as itself rather than as a missing-key marker. Two fields
+                can share a label (an alias arrives under `alias` or under `uri`),
+                so the position is what identifies a line, not the name.
+              */}
+              {fields.map((field, index) =>
+                field.payees ? (
+                  <Payees
+                    key={`${field.label}-${index}`}
+                    label={t(`console.field.${field.label}`, field.label)}
+                    payees={field.payees}
+                    accounts={accounts}
+                    contacts={contacts}
+                  />
+                ) : (
+                  <Detail
+                    key={`${field.label}-${index}`}
+                    label={t(`console.field.${field.label}`, field.label)}
+                  >
+                    {field.value ??
+                      (field.label === 'encrypted' && decrypted.data
+                        ? decrypted.data
+                        : t('console.tx.undecryptable'))}
+                  </Detail>
+                ),
+              )}
+
+              {/*
+                Offered only for a party the console cannot already name: an
+                owned account or an existing contact needs no introduction, and
+                the summary line above is already showing its name.
+              */}
+              {summary.recipientRS && !isKnownParty(summary.recipientRS, accounts, contacts) && (
+                <SaveContactField
+                  address={summary.recipientRS}
+                  label={t('console.send.to')}
+                  onSave={onAddContact}
+                />
+              )}
+              {summary.senderRS && !isKnownParty(summary.senderRS, accounts, contacts) && (
+                <SaveContactField
+                  address={summary.senderRS}
+                  label={t('console.send.from')}
+                  onSave={onAddContact}
+                />
+              )}
+
+              {/*
+                The same transaction named the way a verification application
+                names things, derived from what the node already said rather than
+                fetched from anywhere. Immutable is the interesting line in it:
+                that is the property anything built on this chain is relying on.
+              */}
+              <Detail label={<Term id="did" />}>
+                <DidLink resolution={transactionDid(item.tx)} />
+              </Detail>
+
+              {/*
+                Last, because it leads off the page. Everything above answers the
+                question the row was opened to ask; this is for when the answer
+                was not enough.
+              */}
+              <Detail label={t('console.tx.raw')}>
+                <a
+                  className="text-[var(--blue3)] underline"
+                  target="_blank"
+                  rel="noreferrer"
+                  href={`${nodeHost}/api?requestType=getTransaction&transaction=${item.tx.transaction}`}
                 >
-                  {field.value ??
-                    (field.label === 'encrypted' && decrypted.data
-                      ? decrypted.data
-                      : t('console.tx.undecryptable'))}
-                </Detail>
-              ),
-            )}
-
-            {/*
-              Offered only for a party the console cannot already name: an
-              owned account or an existing contact needs no introduction, and
-              the summary line above is already showing its name.
-            */}
-            {summary.recipientRS && !isKnownParty(summary.recipientRS, accounts, contacts) && (
-              <SaveContactField
-                address={summary.recipientRS}
-                label={t('console.send.to')}
-                onSave={onAddContact}
-              />
-            )}
-            {summary.senderRS && !isKnownParty(summary.senderRS, accounts, contacts) && (
-              <SaveContactField
-                address={summary.senderRS}
-                label={t('console.send.from')}
-                onSave={onAddContact}
-              />
-            )}
-
-            {/*
-              The same transaction named the way a verification application
-              names things, derived from what the node already said rather than
-              fetched from anywhere. Immutable is the interesting line in it:
-              that is the property anything built on this chain is relying on.
-            */}
-            <Detail label={<Term id="did" />}>
-              <DidLink resolution={transactionDid(item.tx)} />
-            </Detail>
-
-            {/*
-              Last, because it leads off the page. Everything above answers the
-              question the row was opened to ask; this is for when the answer
-              was not enough.
-            */}
-            <Detail label={t('console.tx.raw')}>
-              <a
-                className="text-[var(--blue3)] underline"
-                target="_blank"
-                rel="noreferrer"
-                href={`${nodeHost}/api?requestType=getTransaction&transaction=${item.tx.transaction}`}
-              >
-                ↗ getTransaction
-              </a>
-            </Detail>
-          </div>
-        )}
+                  ↗ getTransaction
+                </a>
+              </Detail>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </li>
   )
