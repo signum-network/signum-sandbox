@@ -126,10 +126,11 @@ export function ConsoleShell() {
           version={state.version}
           connection={state.connection}
           scanning={state.scanning}
+          beat={pulse}
           homeLink
         />
 
-        <Header state={state} accounts={accounts} onOpenDrawer={setDrawer} />
+        <Header state={state} accounts={accounts} pulse={pulse} onOpenDrawer={setDrawer} />
 
         <div className="mb-3 flex shrink-0 items-center justify-between">
           <div className="flex items-center gap-2">

@@ -19,6 +19,11 @@ console that is nearly every one of them. And every size in it moved up one
 step with the rest of the app — the tooltip carries beginner mode's
 explanations now, not just a hint on a card.
 
+`components/ui/AnimatedNumber.tsx` has one local change to re-apply: it asks
+`useMotion()` before animating. It uses Framer's imperative `animate()`, which
+— unlike the `motion.*` components — does not read `MotionConfig`, so it is
+the one place that would keep moving after the app's motion switch says stop.
+
 They are vendored rather than shared so that the sandbox cannot be broken by
 upstream changes. Keep local edits minimal: the cheaper these files are to
 re-copy, the longer picking up upstream improvements stays practical.

@@ -23,6 +23,7 @@ export function AppHeader({
   scanning,
   subtitle,
   homeLink,
+  beat,
 }: {
   networkName: string | null
   version: string | null
@@ -32,6 +33,8 @@ export function AppHeader({
   subtitle?: ReactNode
   /** True on pages that are not the start page, making the wordmark the way back. */
   homeLink?: boolean
+  /** Changes once per block; handed to the logomark. Absent on the start page. */
+  beat?: number
 }) {
   const { t } = useTranslation()
   const colour = connection === 'live' ? 'var(--green)' : 'var(--amber)'
@@ -41,7 +44,7 @@ export function AppHeader({
       className="flex items-center gap-3 text-[22px] font-black tracking-[3px] text-[var(--blue3)]"
       style={{ fontFamily: 'Orbitron, ui-monospace, monospace' }}
     >
-      <Logomark />
+      <Logomark beat={beat} />
       SIGNUM SANDBOX
     </h1>
   )

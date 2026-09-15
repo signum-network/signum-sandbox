@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useAnimate } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import type { NodeState } from '@/lib/nodeState'
 import type { AccountStore } from '@/hooks/useAccounts'
@@ -11,14 +12,22 @@ import { Identicon } from '@/components/console/Identicon'
 import { ConsoleButton } from '@/components/console/ConsoleButton'
 import { Term } from '@/components/console/Term'
 import { sfx, useAudio } from '@/audio'
+import { AnimatedNumber } from '@/components/ui'
+import { useMotion, seconds } from '@/motion'
 
 export function Header({
   state,
   accounts,
+  pulse,
   onOpenDrawer,
 }: {
   state: Extract<NodeState, { kind: 'ready' }>
   accounts: AccountStore
+  /**
+   * Changes once per block. Observed by the shell rather than here: a second
+   * useChainPulse in this file would be a second detection of one event.
+   */
+  pulse: number
   onOpenDrawer: (drawer: 'send' | 'chain' | 'help') => void
 }) {
   const { t } = useTranslation()
@@ -35,6 +44,20 @@ export function Header({
   } = useForge(accounts.forger)
   const [requested, setRequested] = useState(false)
   const { play } = useAudio()
+  const { enabled } = useMotion()
+  const [bar, animate] = useAnimate<HTMLDivElement>()
+
+  // The bar's own frame marks the arrival. Imperative rather than a prop on a
+  // motion.div, because this is a one-shot keyframe run and not a state the
+  // component is in — the same reason AnimatedNumber is written this way.
+  useEffect(() => {
+    if (!enabled || pulse === 0 || !bar.current) return
+    void animate(
+      bar.current,
+      { borderColor: ['var(--green)', 'var(--border2)'] },
+      { duration: seconds('calm') },
+    )
+  }, [pulse, enabled, animate, bar])
 
   // submitNonce reports success even when several calls collapse into a single
   // block, so the button promises a request, not a block. The height beside it
@@ -57,6 +80,7 @@ export function Header({
 
   return (
     <div
+      ref={bar}
       className="mb-3 flex shrink-0 flex-wrap items-center justify-between gap-2 border p-3"
       style={border}
     >
@@ -69,7 +93,13 @@ export function Header({
         <span className="text-[var(--muted)]">
           <Term id="height">{t('console.chain.height')}</Term>{' '}
         </span>
-        <span className="font-bold text-[var(--blue3)]">{state.height ?? '—'}</span>
+        <span className="font-bold text-[var(--blue3)]">
+          {state.height === null || state.height === undefined ? (
+            '—'
+          ) : (
+            <AnimatedNumber value={state.height} />
+          )}
+        </span>
       </span>
 
       <span className="flex flex-wrap items-center gap-2">

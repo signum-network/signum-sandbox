@@ -5,6 +5,7 @@ import type { Contacts } from '@/lib/contacts'
 import { isEmptyBlock, matchesBlock, type ResolvedQuery } from '@/lib/search'
 import { Toggle } from '../Toggle'
 import { PAGE_SIZE, pageCount } from '@/lib/paginate'
+import { useArrivals } from '@/motion'
 import { Pager } from '../Pager'
 import { BlockRow } from './BlockRow'
 
@@ -37,6 +38,13 @@ export function BlocksView({
   const matching = blocks.filter((block) => matchesBlock(block, query))
   const shown = hideEmpty ? matching.filter((b) => !isEmptyBlock(b)) : matching
   const hidden = matching.length - shown.length
+  // The hide-empty switch changes the displayed set as much as a search does,
+  // so it belongs in the filter key: flipping it must not flare a page.
+  const arrived = useArrivals({
+    ids: shown.map((block) => block.block),
+    page,
+    filter: `${JSON.stringify(query.query)}|${hideEmpty}`,
+  })
 
   const first = page * PAGE_SIZE
 
@@ -68,6 +76,7 @@ export function BlocksView({
         <BlockRow
           key={block.block}
           block={block}
+          arriving={arrived.has(block.block)}
           accounts={accounts}
           contacts={contacts}
           onSelectTransaction={onSelectTransaction}
