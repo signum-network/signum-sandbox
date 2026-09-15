@@ -18,3 +18,46 @@
 [data-motion='off'] *::after {
   animation: none !important;
 }
+
+/*
+  A row that has just arrived: it pushes the rows below it down rather than
+  appearing on top of them, and leaves a green trace that decays.
+
+  The height is animated as grid-template-rows: 0fr -> 1fr because a row's
+  height is not known — locales wrap differently and a long name is a long
+  name — and height: 0 -> auto does not interpolate in CSS. That technique
+  needs the animating element to be the grid container and its content to sit
+  in a single child that can be clipped, which is why the row wraps its
+  content in one div.
+
+  The class is removed by the next feed update, so nothing stays in grid
+  layout: the row is only a grid for the half second it is arriving.
+*/
+.motion-arrive {
+  display: grid;
+  grid-template-rows: 1fr;
+  animation: motion-arrive var(--motion-calm, 550ms) var(--motion-ease-out, ease-out) both;
+}
+
+.motion-arrive > * {
+  min-height: 0;
+  overflow: hidden;
+}
+
+@keyframes motion-arrive {
+  0% {
+    grid-template-rows: 0fr;
+    opacity: 0;
+    background: color-mix(in srgb, var(--green) 18%, transparent);
+  }
+  55% {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    background: color-mix(in srgb, var(--green) 18%, transparent);
+  }
+  100% {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    background: transparent;
+  }
+}

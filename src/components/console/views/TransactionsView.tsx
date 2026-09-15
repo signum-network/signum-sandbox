@@ -4,6 +4,7 @@ import type { SandboxAccount } from '@/lib/accounts'
 import type { Contacts } from '@/lib/contacts'
 import { matchesTransaction, type ResolvedQuery } from '@/lib/search'
 import { paginate } from '@/lib/paginate'
+import { useArrivals } from '@/motion'
 import { Pager } from '../Pager'
 import { TransactionRow } from './TransactionRow'
 
@@ -26,6 +27,17 @@ export function TransactionsView({
 }) {
   const { t } = useTranslation()
 
+  const matching = items.filter((item) => matchesTransaction(item.tx, query))
+  const shown = paginate(matching, page)
+  // What the eye should be told about. The ids come from the page actually on
+  // screen, because a row that is not rendered cannot arrive. The filter key
+  // is the resolved query serialised: it is compared, never read.
+  const arrived = useArrivals({
+    ids: shown.items.map((item) => item.id),
+    page,
+    filter: JSON.stringify(query.query),
+  })
+
   if (items.length === 0) {
     return (
       <div className="p-4">
@@ -34,9 +46,6 @@ export function TransactionsView({
       </div>
     )
   }
-
-  const matching = items.filter((item) => matchesTransaction(item.tx, query))
-  const shown = paginate(matching, page)
 
   if (matching.length === 0) {
     return (
@@ -55,6 +64,7 @@ export function TransactionsView({
           <TransactionRow
             key={item.id}
             item={item}
+            arriving={arrived.has(item.id)}
             accounts={accounts}
             contacts={contacts}
             onAddContact={onAddContact}
