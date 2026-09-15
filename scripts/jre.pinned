@@ -1,0 +1,26 @@
+# The JRE the launcher installs, pinned deliberately.
+#
+# Queried from api.adoptium.net once and written down here rather than asked
+# for at run time: parsing JSON in POSIX sh without being able to assume jq is
+# a class of failure that cannot be debugged on someone else's machine. This
+# is the same reason .signum-node-version is pinned.
+#
+# The `version` endpoint is used rather than `latest`, so that these checksums
+# stay true — with `latest`, Adoptium would eventually serve a newer JRE and
+# every installation would fail against a sum that no longer describes it.
+#
+# To raise it: pick a release at https://adoptium.net/temurin/releases/?version=21
+# and read the four checksums out of
+#   https://api.adoptium.net/v3/assets/latest/21/hotspot?os=<os>&architecture=<arch>&image_type=jre
+# as .[0].binary.package.checksum — then run scripts/launcher.test.sh, which
+# checks that every platform this file claims to cover actually has a sum.
+
+JRE_VERSION='21.0.12.1+1'
+
+# The directory the tarball unpacks into, on both platforms.
+JRE_DIR='jdk-21.0.12.1+1-jre'
+
+JRE_SHA_mac_aarch64='dec50fc6f9fcd4fe3ae8cabf5a5fa68f6afc48841f7698e468e9aa5d54beed84'
+JRE_SHA_mac_x64='6717ec641fd9ce0bb209ca083ee23b42202ac68cb6fcc5753496e0e4a0f41989'
+JRE_SHA_linux_x64='2413149700df0f7d440500a84a8f764c535f21e5a5e87d38328b64eec2c5b500'
+JRE_SHA_linux_aarch64='14be1f35ebdbd1f6e8d57eb911a3ffb74d6d9aa255abc5daf2b1302002cf2cf2'
