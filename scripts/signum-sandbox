@@ -20,7 +20,13 @@ APP_DIR="$HOME_DIR/app"
 JRE_DIR_BASE="$HOME_DIR/jre"
 CONF_DIR="$HOME_DIR/conf"
 HTML_DIR="$HOME_DIR/html"
-LOG_FILE="$HOME_DIR/logs/node.log"
+# Our capture of whatever the JVM writes to stdout and stderr — deliberately
+# not node.log, which is what the node's own logging writes into $HOME_DIR.
+# Two files called node.log in one tree is a confusion waiting to be explained
+# to someone. This one holds crashes and startup noise log4j never sees; the
+# node's holds the operational log. `logs` follows both.
+LOG_FILE="$HOME_DIR/logs/stdout.log"
+NODE_LOG="$HOME_DIR/node.log"
 PID_FILE="$HOME_DIR/run/node.pid"
 INSTALLED_FILE="$HOME_DIR/installed"
 
@@ -222,9 +228,121 @@ ensure_jre() {
   [ -x "$java" ] || die "launcher: the Java archive did not contain $java"
 }
 
+# ── running the node ───────────────────────────────────────────
+
+# active_app -> the directory of the release that is live, or die trying.
+active_app() {
+  version=$(installed_version "$INSTALLED_FILE")
+  [ -n "$version" ] || die 'launcher: nothing is installed yet — run the installer'
+  dir="$APP_DIR/$version"
+  [ -d "$dir" ] || die "launcher: $INSTALLED_FILE names $version but $dir is missing"
+  printf '%s' "$dir"
+}
+
+# is_running -> true when the pidfile names a live process.
+#
+# kill -0 asks the kernel whether the signal could be delivered without
+# sending one, which is how you test a pid without sending it anything. A
+# stale pidfile is removed rather than reported, so a machine that was
+# rebooted while the daemon ran does not refuse to start for ever.
+is_running() {
+  [ -f "$PID_FILE" ] || return 1
+  pid=$(cat "$PID_FILE" 2>/dev/null || true)
+  [ -n "$pid" ] || { rm -f "$PID_FILE"; return 1; }
+  if kill -0 "$pid" 2>/dev/null; then
+    return 0
+  fi
+  rm -f "$PID_FILE"
+  return 1
+}
+
+# prepare_layout <app dir> <version>
+#
+# Everything the node needs to find from $HOME_DIR, which is its working
+# directory. conf/node.properties points at ./db and html/sandbox relatively,
+# so both have to resolve from there — and neither may carry a version number,
+# or an update would have to rewrite a file the launcher promised to leave
+# alone.
+prepare_layout() {
+  mkdir -p "$CONF_DIR" "$HOME_DIR/db" "$HOME_DIR/logs" "$HOME_DIR/run"
+
+  # The node's own defaults belong to the release and are replaced with it.
+  cp "$1/conf/node-default.properties" "$CONF_DIR/node-default.properties"
+  cp "$1/conf/logging-default.properties" "$CONF_DIR/logging-default.properties"
+
+  # Ours is seeded once and never touched again, so a changed port survives
+  # every update.
+  if [ ! -f "$CONF_DIR/node.properties" ]; then
+    cp "$1/conf/node.properties" "$CONF_DIR/node.properties"
+  fi
+
+  if [ "$(html_needs_copy "$2" "$HTML_DIR/.version")" = 'yes' ]; then
+    rm -rf "$HTML_DIR"
+    cp -R "$1/html" "$HTML_DIR"
+    printf '%s\n' "$2" > "$HTML_DIR/.version"
+  fi
+}
+
+# node_port -> the port to talk to.
+#
+# 6876 is the mock network's own default; API.Port appears in
+# node-default.properties only commented out, with the mainnet value. So the
+# only place a port can really come from is a user who set one.
+node_port() {
+  port=$(sed -n 's/^[[:space:]]*API\.Port[[:space:]]*=[[:space:]]*\([0-9]\{1,\}\).*/\1/p' \
+    "$CONF_DIR/node.properties" 2>/dev/null | head -1)
+  if [ -n "$port" ]; then printf '%s' "$port"; else printf '%s' "$DEFAULT_PORT"; fi
+}
+
+cmd_start() {
+  daemon=no
+  for arg in "$@"; do
+    case "$arg" in
+      --daemon) daemon=yes ;;
+      *) die "start: unknown option $arg" ;;
+    esac
+  done
+
+  plat=$(platform_id "$(uname -s)" "$(uname -m)") \
+    || die "launcher: unsupported platform: $(uname -s) $(uname -m)"
+  app=$(active_app)
+  version=$(installed_version "$INSTALLED_FILE")
+
+  if is_running; then
+    die "launcher: already running (pid $(cat "$PID_FILE")) — stop it first"
+  fi
+
+  ensure_jre "$plat"
+  prepare_layout "$app" "$version"
+
+  java=${SIGNUM_SANDBOX_JAVA:-$(java_binary "$plat" "$JRE_DIR_BASE")}
+  port=$(node_port)
+
+  cd "$HOME_DIR"
+  if [ "$daemon" = 'yes' ]; then
+    # nohup and a pidfile, deliberately not launchd or systemd: one mechanism
+    # for both platforms, and a sandbox that does not quietly outlive the
+    # session that started it.
+    nohup "$java" -jar "$app/signum-node.jar" --headless -c ./conf/ \
+      >> "$LOG_FILE" 2>&1 &
+    printf '%s\n' "$!" > "$PID_FILE"
+    say "launcher: running in the background on http://localhost:$port/"
+    say 'launcher: signum-sandbox logs   to watch it'
+    say 'launcher: signum-sandbox stop   to end it'
+  else
+    say "launcher: http://localhost:$port/  (Ctrl-C to stop)"
+    exec "$java" -jar "$app/signum-node.jar" --headless -c ./conf/
+  fi
+}
+
 # ── entry point ────────────────────────────────────────────────
 main() {
-  die 'launcher: not implemented yet'
+  command=${1:-start}
+  [ $# -gt 0 ] && shift
+  case "$command" in
+    start) cmd_start "$@" ;;
+    *)     die "launcher: unknown command $command" ;;
+  esac
 }
 
 # Sourced by the test script, which wants the functions and not the program.
