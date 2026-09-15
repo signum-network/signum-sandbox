@@ -1,5 +1,6 @@
 import { useNodeState } from '@/hooks/useNodeState'
 import { useBlockChime } from '@/hooks/useBlockChime'
+import { useChainPulse } from '@/motion'
 import { StatusHeader } from './StatusHeader'
 import { NodeStatePanel } from './NodeStatePanel'
 import { EntryList } from './EntryList'
@@ -7,7 +8,8 @@ import { Unreachable } from './Unreachable'
 
 export function StartPage() {
   const { state, nodeAddress } = useNodeState()
-  useBlockChime(state.kind === 'ready' ? state.height : null)
+  const pulse = useChainPulse(state.kind === 'ready' ? (state.height ?? null) : null)
+  useBlockChime(pulse)
 
   if (state.kind === 'unreachable') {
     return (

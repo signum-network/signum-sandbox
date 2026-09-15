@@ -1,13 +1,19 @@
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 import { useAudio, sfx } from '@/audio'
 
-export function useBlockChime(height: number | null) {
+/**
+ * The chime for a new block, given the pulse that noticed it.
+ *
+ * It used to watch the height itself, which made it the only place in the app
+ * that knew a block had arrived — and left the console, the screen built for
+ * watching the chain, silent. Now it is handed the observation, so the sound
+ * and the movement cannot disagree about whether anything happened.
+ */
+export function useBlockChime(pulse: number) {
   const { play } = useAudio()
-  const previous = useRef<number | null>(null)
 
   useEffect(() => {
-    if (height === null) return
-    if (previous.current !== null && height > previous.current) play(sfx.chime)
-    previous.current = height
-  }, [height, play])
+    if (pulse === 0) return
+    play(sfx.chime)
+  }, [pulse, play])
 }

@@ -26,6 +26,8 @@ import { FirstVisit } from './FirstVisit'
 import { ViewNote } from './ViewNote'
 import { TourOverlay } from './tour/TourOverlay'
 import { useTour } from '@/hooks/useTour'
+import { useBlockChime } from '@/hooks/useBlockChime'
+import { useChainPulse } from '@/motion'
 import { observeFeed, type Observation } from '@/lib/tour'
 
 import type { ConsoleTab, DrawerName } from '@/lib/consoleNav'
@@ -44,6 +46,10 @@ export function ConsoleShell() {
   const watched = useWatched()
   const beginner = useBeginner()
   const feed = useChainFeed(state.kind === 'ready' ? state.height : null, connected)
+  // One observation per screen. The beat in the logomark, the flash on the
+  // chain bar and this chime all hang off it.
+  const pulse = useChainPulse(state.kind === 'ready' ? (state.height ?? null) : null)
+  useBlockChime(pulse)
   const [search, setSearch] = useState('')
   const [txPage, setTxPage] = useState(0)
   const [blockPage, setBlockPage] = useState(0)

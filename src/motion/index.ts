@@ -2,3 +2,4 @@ export { DURATIONS, EASINGS, SPRINGS, seconds, cssVariables, type DurationName }
 export { arrivals, type FeedSnapshot } from './arrivals'
 export { useArrivals } from './useArrivals'
 export { MotionProvider, useMotion, resolvePreference } from './MotionProvider'
+export { useChainPulse } from './useChainPulse'
