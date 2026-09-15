@@ -191,6 +191,37 @@ verify() {
   die  'launcher: refusing to install it'
 }
 
+# ensure_jre <platform_id>
+#
+# Idempotent: an existing, runnable java at the pinned version is left alone,
+# so a second install or an update does not re-download 50MB.
+#
+# The private JRE is used even when the machine has a system Java, because one
+# variable fewer is worth 50MB when something breaks for a user who cannot be
+# looked over the shoulder of. SIGNUM_SANDBOX_JAVA is the way out for whoever
+# wants their own.
+ensure_jre() {
+  if [ -n "${SIGNUM_SANDBOX_JAVA:-}" ]; then
+    [ -x "$SIGNUM_SANDBOX_JAVA" ] || die "launcher: SIGNUM_SANDBOX_JAVA is not executable: $SIGNUM_SANDBOX_JAVA"
+    say "launcher: using the Java you pointed at: $SIGNUM_SANDBOX_JAVA"
+    return 0
+  fi
+
+  java=$(java_binary "$1" "$JRE_DIR_BASE")
+  if [ -x "$java" ]; then
+    return 0
+  fi
+
+  say "launcher: fetching Java $JRE_VERSION (about 50 MB, once)"
+  mkdir -p "$JRE_DIR_BASE"
+  tarball="$JRE_DIR_BASE/.download.tar.gz"
+  fetch "$(jre_url "$1")" "$tarball"
+  verify "$tarball" "$(jre_sha "$1")" "the Java download"
+  tar -xzf "$tarball" -C "$JRE_DIR_BASE"
+  rm -f "$tarball"
+  [ -x "$java" ] || die "launcher: the Java archive did not contain $java"
+}
+
 # ── entry point ────────────────────────────────────────────────
 main() {
   die 'launcher: not implemented yet'
