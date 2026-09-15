@@ -1,6 +1,7 @@
 export default {
   tagline: '一条可随时丢弃的 Signum 链，用来开发。弄坏它、重置它、重新开始。',
   status: { live: '实时', polling: '轮询中', offline: '离线', scanning: '扫描中' },
+  motion: { enable: '动画已关闭 — 点击开启', disable: '动画已开启 — 点击关闭' },
   panel: { nodeState: '节点状态' },
   tile: { height: '区块高度', lastBlock: '最新区块' },
   entry: {

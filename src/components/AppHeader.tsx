@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Link } from '@tanstack/react-router'
 import type { Connection } from '@/lib/nodeState'
 import { AudioToggle } from '@/components/controls/AudioToggle'
+import { MotionToggle } from '@/components/controls/MotionToggle'
 import { ThemeSwitcher } from '@/components/controls/ThemeSwitcher'
 import { LanguageSelect } from '@/components/controls/LanguageSelect'
 import { Logomark } from '@/components/Logomark'
@@ -68,6 +69,7 @@ export function AppHeader({
           {version && <span>· {version}</span>}
           {scanning && <span>· {t('status.scanning')}</span>}
         </div>
+        <MotionToggle />
         <AudioToggle />
         <ThemeSwitcher />
         <LanguageSelect />

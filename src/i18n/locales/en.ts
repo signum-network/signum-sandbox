@@ -6,6 +6,10 @@ export default {
     offline: 'offline',
     scanning: 'scanning',
   },
+  motion: {
+    enable: 'Motion off — click to enable',
+    disable: 'Motion on — click to turn off',
+  },
   panel: { nodeState: 'Node State' },
   tile: {
     height: 'Block Height',

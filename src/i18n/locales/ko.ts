@@ -1,6 +1,7 @@
 export default {
   tagline: '언제든 버릴 수 있는 Signum 체인으로 개발하세요. 부수고, 초기화하고, 다시 시작하세요.',
   status: { live: '실시간', polling: '폴링 중', offline: '오프라인', scanning: '스캔 중' },
+  motion: { enable: '모션이 꺼져 있습니다 — 클릭하여 켜기', disable: '모션이 켜져 있습니다 — 클릭하여 끄기' },
   panel: { nodeState: '노드 상태' },
   tile: { height: '블록 높이', lastBlock: '마지막 블록' },
   entry: {

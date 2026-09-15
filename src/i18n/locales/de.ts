@@ -1,6 +1,7 @@
 export default {
   tagline: 'Eine Signum-Chain zum Wegwerfen. Kaputtmachen, zurücksetzen, von vorn.',
   status: { live: 'live', polling: 'Abfrage', offline: 'offline', scanning: 'Scan läuft' },
+  motion: { enable: 'Bewegung aus — zum Einschalten klicken', disable: 'Bewegung an — zum Ausschalten klicken' },
   panel: { nodeState: 'Node-Zustand' },
   tile: { height: 'Blockhöhe', lastBlock: 'Letzter Block' },
   entry: {

@@ -1,6 +1,7 @@
 export default {
   tagline: 'विकास के लिए एक फेंकने-योग्य Signum चेन। तोड़ें, रीसेट करें, फिर से शुरू करें।',
   status: { live: 'लाइव', polling: 'पोलिंग', offline: 'ऑफ़लाइन', scanning: 'स्कैन जारी' },
+  motion: { enable: 'एनिमेशन बंद है — चालू करने के लिए क्लिक करें', disable: 'एनिमेशन चालू है — बंद करने के लिए क्लिक करें' },
   panel: { nodeState: 'नोड स्थिति' },
   tile: { height: 'ब्लॉक ऊँचाई', lastBlock: 'अंतिम ब्लॉक' },
   entry: {

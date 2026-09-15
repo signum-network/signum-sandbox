@@ -1,6 +1,7 @@
 export default {
   tagline: 'Una cadena Signum desechable donde desarrollar. Rómpela, reiníciala, empieza de nuevo.',
   status: { live: 'en vivo', polling: 'consultando', offline: 'sin conexión', scanning: 'escaneando' },
+  motion: { enable: 'Movimiento desactivado — pulsa para activar', disable: 'Movimiento activado — pulsa para desactivar' },
   panel: { nodeState: 'Estado del nodo' },
   tile: { height: 'Altura de bloque', lastBlock: 'Último bloque' },
   entry: {
