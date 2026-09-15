@@ -425,7 +425,7 @@ export default {
     step: {
       welcome: {
         title: 'Esta cadeia é tua',
-        body: 'Corre na tua máquina, não vale nada, e não a consegues partir de forma que um reinício não resolva. Vamos criar uma conta, forjar um bloco e enviar um pagamento — tudo real, nada simulado.',
+        body: 'Corre na tua máquina, não há dinheiro real em jogo, e não a consegues partir de forma que um reinício não resolva. Vamos criar uma conta, forjar um bloco e enviar um pagamento — tudo real, nada simulado.',
       },
       openAccounts: {
         title: 'Abre o separador Contas',

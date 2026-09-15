@@ -425,7 +425,7 @@ export default {
     step: {
       welcome: {
         title: 'Diese Chain gehört dir',
-        body: 'Sie läuft auf deinem Rechner, sie ist nichts wert, und du kannst sie nicht so kaputt machen, dass ein Neustart es nicht richtet. Wir legen ein Konto an, forgen einen Block und senden eine Zahlung — alles echt, nichts simuliert.',
+        body: 'Sie läuft auf deinem Rechner, es ist kein echtes Geld im Spiel, und du kannst sie nicht so kaputt machen, dass ein Neustart es nicht richtet. Wir legen ein Konto an, forgen einen Block und senden eine Zahlung — alles echt, nichts simuliert.',
       },
       openAccounts: {
         title: 'Öffne den Reiter Konten',

@@ -424,7 +424,7 @@ export default {
     step: {
       welcome: {
         title: 'Esta cadena es tuya',
-        body: 'Corre en tu máquina, no vale nada, y no puedes romperla de ninguna forma que un reinicio no arregle. Vamos a crear una cuenta, forjar un bloque y enviar un pago — todo real, nada simulado.',
+        body: 'Corre en tu máquina, no hay dinero real en juego, y no puedes romperla de ninguna forma que un reinicio no arregle. Vamos a crear una cuenta, forjar un bloque y enviar un pago — todo real, nada simulado.',
       },
       openAccounts: {
         title: 'Abre la pestaña Cuentas',

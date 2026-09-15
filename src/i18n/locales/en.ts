@@ -444,7 +444,7 @@ export default {
     step: {
       welcome: {
         title: 'This chain is yours',
-        body: 'It runs on your machine, it is worth nothing, and you cannot break it in a way a restart will not fix. We will make an account, forge a block and send a payment — all of it real, none of it simulated.',
+        body: 'It runs on your machine, there is no real money in it, and you cannot break it in a way a restart will not fix. We will make an account, forge a block and send a payment — all of it real, none of it simulated.',
       },
       openAccounts: {
         title: 'Open the Accounts tab',
