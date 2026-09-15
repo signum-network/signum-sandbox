@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-14
 **Status:** approved
-**Scope:** animation across the sandbox UI — the chain's pulse, navigation transitions, the window's atmosphere, and the answer to a deliberate action. Includes the switch that turns all of it off. Builds on `2026-09-12-sandbox-console-design.md`.
+**Scope:** animation across the sandbox UI — the chain's pulse, navigation transitions, the window's atmosphere, the answer to a deliberate action, and the tour that guides a newcomer through all of it. Includes the switch that turns all of it off. Builds on `2026-09-12-sandbox-console-design.md`.
 
 ## Goal
 
@@ -28,6 +28,11 @@ Checked against the working tree, not inferred.
 | `useBlockChime` is called in `StartPage.tsx:10` and nowhere else. It owns the only "the height grew" detection in the app. | The console — the one screen built for watching the chain — currently says nothing at all when a block lands. |
 | `AnimatedNumber` exists and is used for the height on the start page (`NodeStatePanel.tsx:35`). | The console's height can reuse it instead of growing a second version. |
 | `vitest.config.ts` sets `environment: 'node'`, and neither jsdom, happy-dom nor Testing Library is installed. Every existing test covers a pure module under `src/lib`. | No component tests. Judgement has to live in pure functions to be testable at all. |
+| `TOUR_STEPS` runs to eighteen steps. `TourOverlay` positions its ring from a measured rectangle and its card from `calloutTop`/`calloutLeft`, both applied directly — so every step change is a teleport, not a move. | The tour reads as eighteen separate popovers rather than one guide walking you through the console. This is the largest single motion gap in the app. |
+| `useTour.ts:45` plays `sfx.confirm` on **every** completed step. | There is already an audible beat at each step with no visible counterpart — the same asymmetry as the block chime. |
+| `TourOverlay` re-measures its target every 300 ms (`setInterval(measure, 300)`) because the console reflows constantly, and returns the previous object when the rectangle is unchanged. | The ring's travel must animate *towards* the measured values, not via Framer's `layout`, or measurement and animation fight over the same position. |
+| `TourOverlay` is rendered unconditionally in `ConsoleShell` and returns `null` internally when the tour is inactive. | Enter and exit animations fit inside the component; no call site changes. |
+| Exactly one step carries `finale: true`, it has no target, and the code's own comment says its list of eight ideas "should feel like an open door". | The finale happens once per visit, which is what makes the loud register affordable there and nowhere else. |
 | Five themes are defined in `index.css`, each with its own `--green`, `--blue2` and `--glow-*`. In `terminal`, `--green` and `--blue2` are both `#00ff00`. | Motion colour must come from theme variables. In the phosphor theme the arrival tint coincides with the accent, which is correct for that theme rather than a defect. |
 
 ## Decisions
@@ -43,6 +48,8 @@ Checked against the working tree, not inferred.
 9. **Arrival highlighting has a ceiling.** Past a handful of simultaneously new rows, per-row highlighting stops informing and becomes a wall of green; beyond the ceiling nothing highlights and the height and the border flash carry the event alone.
 10. **No permanent overlays.** Scanlines, breathing glow and particles are out. They are states that mean nothing and they fight the legibility of text, which is the actual content.
 11. **One unit test, for the one function whose failure is invisible.** Everything else visual is judged by eye, in all five themes, with the switch in both positions.
+12. **The tour's finale is the one place the loud register is allowed.** Spring, staggered list, a bloom — affordable precisely because it plays once per visit, unlike everything decision 1 rules out.
+13. **The tour's ring animates towards measured values, never via `layout`.** The 300 ms measurement loop stays the single source of the target; the spring only interpolates towards it and retargets when the target moves.
 
 ## The switching layer
 
@@ -133,6 +140,20 @@ Left out: scanlines, breathing glow, particles (decision 10).
 | `Countdown` | In its final three seconds the number pulses gently over `quick` with each tick, so the auto-forge rhythm is visible and not merely countable. |
 | `Balance` | Flashes once over `quick` when the value differs from the one it last showed. |
 
+### E · The tour (Framer Motion)
+
+The tour is guidance, so all of it is "showing where something went" — the second of the two reasons this document allows.
+
+| Where | What happens |
+|---|---|
+| Ring and dimming | Travel to the next rectangle with the `panel` spring. The dimming is the ring's own 9999px `box-shadow`, so it travels for free. |
+| Card | Travels with it instead of reappearing; its text cross-fades over `instant`. |
+| Tour start and stop | The dimming and the card enter and leave, inside an `AnimatePresence` within `TourOverlay`. |
+| Step completed | A brief confirmation flash on the ring, over `quick`, alongside the `sfx.confirm` already played in `useTour.ts:45`. |
+| Finale | The one use of the loud register: the card springs in with `panel`, its eight ideas stagger in 80 ms apart so the eye walks the list instead of facing a wall, and a single bloom in `--glow-b` accompanies the `sfx.confirm`. |
+
+The stagger is a genuine exception to decision 1 rather than a lapse from it: eight items that arrive together read as a form to work through, and the code's own comment asks this card to feel like an open door.
+
 ## `arrivals`
 
 `src/motion/arrivals.ts`. The only function in this design that carries judgement, and the only one with a test.
@@ -169,8 +190,8 @@ Nothing else is tested automatically. `vitest` runs on `environment: 'node'` wit
 
 New: `src/motion/tokens.ts`, `MotionProvider.tsx`, `motion.css`, `arrivals.ts`, `arrivals.test.ts`, `useChainPulse.ts`, `index.ts`; `src/components/controls/MotionToggle.tsx`.
 
-Changed: `src/main.tsx`, `src/index.css` (narrowing the reduced-motion block), `src/VENDORED.md`, `src/routes/__root.tsx`, `src/components/AppHeader.tsx`, `src/components/console/Header.tsx`, `ConsoleShell.tsx`, `Modal.tsx`, `DidLink.tsx`, `Countdown.tsx`, `Pager.tsx`, `views/TransactionsView.tsx`, `views/TransactionRow.tsx`, `views/BlocksView.tsx`, `views/BlockRow.tsx`, `views/Balance.tsx`, `src/hooks/useBlockChime.ts`, `src/components/Logomark.tsx`, `src/components/controls/ThemeSwitcher.tsx` (token names), `src/components/ui/Card.tsx` and `src/components/console/{ConsoleButton,Toggle,Select}.tsx` (token names), and the ten files under `src/i18n/locales/`.
+Changed: `src/main.tsx`, `src/index.css` (narrowing the reduced-motion block), `src/VENDORED.md`, `src/routes/__root.tsx`, `src/components/AppHeader.tsx`, `src/components/console/Header.tsx`, `ConsoleShell.tsx`, `Modal.tsx`, `DidLink.tsx`, `Countdown.tsx`, `Pager.tsx`, `views/TransactionsView.tsx`, `views/TransactionRow.tsx`, `views/BlocksView.tsx`, `views/BlockRow.tsx`, `views/Balance.tsx`, `src/hooks/useBlockChime.ts`, `src/components/Logomark.tsx`, `src/components/console/tour/TourOverlay.tsx`, `src/components/controls/ThemeSwitcher.tsx` (token names), `src/components/ui/Card.tsx` and `src/components/console/{ConsoleButton,Toggle,Select}.tsx` (token names), and the ten files under `src/i18n/locales/`.
 
 ## Out of scope
 
-Page transitions between the start page, the console and the scenario editor. Animation inside the scenario editor and the tour overlay. Any change to the sound palette beyond giving the console the chime that already exists.
+Page transitions between the start page, the console and the scenario editor. Animation inside the scenario editor. Any change to the sound palette beyond giving the console the chime that already exists.
