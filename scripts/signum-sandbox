@@ -554,6 +554,40 @@ cmd_update() {
   say "launcher: now on $wanted"
 }
 
+# cmd_bootstrap <version> <zip>
+#
+# What install.sh calls once it has a release on disk. Everything from here on
+# — the layout, the JRE, placing the launcher — is the same code an update
+# runs, which is the only way the install path stays exercised. Installing is
+# an update from nothing.
+cmd_bootstrap() {
+  [ -n "${1:-}" ] || die 'bootstrap: no version given'
+  [ -f "${2:-}" ] || die 'bootstrap: no release archive given'
+  mkdir -p "$HOME_DIR"
+  install_release "$1" "$2"
+
+  plat=$(platform_id "$(uname -s)" "$(uname -m)") \
+    || die "launcher: unsupported platform: $(uname -s) $(uname -m)"
+  ensure_jre "$plat"
+  prepare_layout "$APP_DIR/$1" "$1"
+
+  say ''
+  say "signum-sandbox $1 is installed."
+  # Said, never written. An installer that edits a shell startup file without
+  # announcing it is one nobody trusts the second time.
+  case ":$PATH:" in
+    *":$BIN_DIR:"*)
+      say 'Start it with:  signum-sandbox'
+      ;;
+    *)
+      say "Add this to your shell's startup file, then open a new terminal:"
+      say "  export PATH=\"$BIN_DIR:\$PATH\""
+      say ''
+      say "Or start it directly:  $BIN_DIR/signum-sandbox"
+      ;;
+  esac
+}
+
 cmd_rollback() {
   previous=$(installed_version "$PREVIOUS_FILE")
   [ -n "$previous" ] || die 'launcher: no previous release recorded'
@@ -609,6 +643,9 @@ main() {
     update)         cmd_update ;;
     rollback)       cmd_rollback ;;
     -h|--help|help) cmd_help ;;
+    # Called by install.sh, not by a person, which is what the underscores
+    # say. Deliberately absent from --help.
+    __bootstrap)    cmd_bootstrap "$@" ;;
     *)              die "launcher: unknown command $command (try --help)" ;;
   esac
 }
