@@ -29,6 +29,11 @@ cp -R html/api-doc "$OUT/html/api-doc"
 cp scripts/start.sh "$OUT/scripts/start.sh"
 cp scripts/start.cmd "$OUT/scripts/start.cmd"
 chmod +x "$OUT/scripts/start.sh"
+# The launcher travels with the release it installs, which is what lets an
+# update replace it too, and what install.sh reaches into the archive for.
+cp scripts/signum-sandbox "$OUT/scripts/signum-sandbox"
+cp scripts/jre.pinned "$OUT/scripts/jre.pinned"
+chmod +x "$OUT/scripts/signum-sandbox"
 cp LICENSE "$OUT/LICENSE"
 cp LICENSE-signum-node.txt "$OUT/LICENSE-signum-node.txt"
 cp README.md "$OUT/README.md"
