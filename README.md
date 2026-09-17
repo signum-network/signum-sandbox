@@ -6,14 +6,36 @@ A local Signum node running an offline mock network, with a UI built for getting
 
 ## For users
 
-Download the latest release, unpack it, and run:
-
 ```bash
-./scripts/start.sh      # macOS, Linux
-scripts\start.cmd       # Windows
+curl -fsSL https://github.com/signum-network/signum-sandbox/releases/latest/download/install.sh | sh
 ```
 
-Then open **http://localhost:6876/**. You need Java 21 or newer.
+Then:
+
+```bash
+signum-sandbox
+```
+
+and open **http://localhost:6876/**.
+
+It brings its own Java, so there is nothing to install first. macOS and Linux
+for now; on Windows, download the release, unpack it and run
+`scripts\start.cmd`.
+
+| Command | Does |
+|---|---|
+| `signum-sandbox` | starts the chain here, until Ctrl-C |
+| `signum-sandbox start --daemon` | starts it in the background |
+| `signum-sandbox stop` | stops a background node |
+| `signum-sandbox status` | version, process, and what the node says |
+| `signum-sandbox logs` | follows the node's log |
+| `signum-sandbox update` | moves to the newest release |
+| `signum-sandbox rollback` | moves back to the previous release |
+| `signum-sandbox reset` | deletes the chain and starts from empty |
+
+Everything lives in `~/.signum-sandbox`, and the chain survives updates. A
+background node does not survive a logout or a reboot, on purpose: a sandbox
+should not keep running unnoticed.
 
 ## For developers
 
@@ -53,6 +75,7 @@ is served by the node itself and talks to its own origin.
 | `./scripts/bootstrap.sh` | fetches node artifacts; `--latest` resolves the newest release |
 | `./scripts/start.sh` / `scripts\start.cmd` | starts the node headless; `--gui` for its own window, `--reset` to begin from an empty chain |
 | `bun run test` | unit tests |
+| `bun run test:launcher` | the launcher's decisions, in plain `sh` |
 | `./scripts/smoke.sh` | starts the node and checks every mount responds |
 | `./scripts/package.sh` | assembles the release deliverable |
 
