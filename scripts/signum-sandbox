@@ -69,10 +69,21 @@ load_pinned() {
     tried="$tried
   $candidate"
   done
+
+  # Report the cause, not the symptom. Nine times out of ten the pinned file
+  # is missing because there is no installation in the home directory this
+  # launcher was told to use — and saying "the installation is incomplete"
+  # about a perfectly good installation somewhere else sends the reader
+  # looking in the wrong place.
+  if [ ! -f "$INSTALLED_FILE" ]; then
+    warn "launcher: nothing is installed in $HOME_DIR"
+    die  'launcher: run the installer, or set SIGNUM_SANDBOX_HOME to an installation that exists.'
+  fi
+
   warn 'launcher: cannot find jre.pinned, so it does not know which Java to use.'
-  warn 'launcher: looked in:'
+  warn "launcher: $HOME_DIR says it has $(cat "$INSTALLED_FILE" 2>/dev/null) installed, but looked in vain:"
   warn "$tried"
-  die  'launcher: the installation is incomplete — reinstall, or run the launcher from its own directory.'
+  die  'launcher: that installation is incomplete — reinstall it.'
 }
 load_pinned
 
