@@ -17,6 +17,9 @@
     "new-version": "bun scripts/new-version.ts"
   },
   "dependencies": {
+    "@dicebear/core": "9.4.3",
+    "@dicebear/identicon": "9.4.3",
+    "@dicebear/pixel-art": "9.4.3",
     "@signumjs/core": "^3.3.4",
     "@signumjs/crypto": "3.3.4",
     "@signumjs/http": "3.3.4",

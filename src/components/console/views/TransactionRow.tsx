@@ -16,7 +16,7 @@ import { Term } from '@/components/console/Term'
 import type { Payee } from '@/lib/txDetail'
 import type { FeedItem } from '@/lib/chainFeed'
 import { Amount } from '@signumjs/util'
-import { Identicon } from '@/components/console/Identicon'
+import { Identicon } from '@/components/Identicon'
 import { cn } from '@/lib/utils'
 import { seconds, EASINGS } from '@/motion'
 

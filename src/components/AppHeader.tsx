@@ -4,6 +4,7 @@ import { Link } from '@tanstack/react-router'
 import type { Connection } from '@/lib/nodeState'
 import { AudioToggle } from '@/components/controls/AudioToggle'
 import { MotionToggle } from '@/components/controls/MotionToggle'
+import { IdenticonToggle } from '@/components/controls/IdenticonToggle'
 import { ThemeSwitcher } from '@/components/controls/ThemeSwitcher'
 import { LanguageSelect } from '@/components/controls/LanguageSelect'
 import { Logomark } from '@/components/Logomark'
@@ -12,9 +13,10 @@ import { Logomark } from '@/components/Logomark'
  * The one header both the start page and the console wear.
  *
  * Everything in it is about the app rather than about the chain: who this is,
- * whether the node is answering, and the three settings a person changes for
- * themselves — sound, theme, language. Chain controls live in the console's
- * own bar below, so nothing here moves when a block arrives.
+ * whether the node is answering, and the five settings a person changes for
+ * themselves — motion, sound, identicons, theme and language. Chain controls
+ * live in the console's own bar below, so nothing here moves when a block
+ * arrives.
  */
 export function AppHeader({
   networkName,
@@ -84,6 +86,7 @@ export function AppHeader({
         </div>
         <MotionToggle />
         <AudioToggle />
+        <IdenticonToggle />
         <ThemeSwitcher />
         <LanguageSelect />
       </div>

@@ -2,6 +2,7 @@ export default {
   tagline: 'Одноразовий блокчейн Signum для розробки. Зламай, скинь, почни заново.',
   status: { live: 'наживо', polling: 'опитування', offline: 'офлайн', scanning: 'сканування' },
   motion: { enable: 'Рух вимкнено — натисніть, щоб увімкнути', disable: 'Рух увімкнено — натисніть, щоб вимкнути' },
+  identicon: { cycle: 'Змінити стиль ідентикона' },
   panel: { nodeState: 'Стан вузла' },
   tile: { height: 'Висота блоку', lastBlock: 'Останній блок' },
   entry: {

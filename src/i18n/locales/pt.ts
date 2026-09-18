@@ -2,6 +2,7 @@ export default {
   tagline: 'Uma cadeia Signum descartável para desenvolver. Quebre-a, reinicie-a, comece de novo.',
   status: { live: 'ao vivo', polling: 'consultando', offline: 'desligado', scanning: 'a analisar' },
   motion: { enable: 'Movimento desligado — clique para ativar', disable: 'Movimento ligado — clique para desativar' },
+  identicon: { cycle: 'Mudar o estilo do identicon' },
   panel: { nodeState: 'Estado do nó' },
   tile: { height: 'Altura do bloco', lastBlock: 'Último bloco' },
   entry: {

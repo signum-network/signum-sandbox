@@ -7,6 +7,7 @@ import { WebCryptoAdapter } from '@signumjs/crypto/adapters'
 import { ThemeProvider } from '@/theme/ThemeProvider'
 import { AudioProvider } from '@/audio'
 import { MotionProvider } from '@/motion'
+import { IdenticonProvider } from '@/identicon'
 import { router } from './router'
 import './i18n'
 import './index.css'
@@ -24,7 +25,9 @@ createRoot(document.getElementById('root')!).render(
       <ThemeProvider>
         <AudioProvider>
           <MotionProvider>
-            <RouterProvider router={router} />
+            <IdenticonProvider>
+              <RouterProvider router={router} />
+            </IdenticonProvider>
           </MotionProvider>
         </AudioProvider>
       </ThemeProvider>

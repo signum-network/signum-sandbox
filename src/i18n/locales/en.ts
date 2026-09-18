@@ -10,6 +10,7 @@ export default {
     enable: 'Motion off — click to enable',
     disable: 'Motion on — click to turn off',
   },
+  identicon: { cycle: 'Change identicon style' },
   panel: { nodeState: 'Node State' },
   tile: {
     height: 'Block Height',
