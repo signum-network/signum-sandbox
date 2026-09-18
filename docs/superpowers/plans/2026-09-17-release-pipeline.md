@@ -43,8 +43,15 @@ gibt darum `0.0.1` heraus, ohne dass `new-version` gelaufen ist.
       test:launcher, build, Tor. Wenn kein Tag: bootstrap, package, e2e, `main`
       fast-forward, `gh release create`. `main`-Push **vor** dem Release.
 
-- [ ] **8. `develop` anlegen**, README (Zweigmodell, `new-version`, e2e), erster Lauf
+- [x] **8. `develop` anlegen**, README (Zweigmodell, `new-version`, e2e), erster Lauf
       veröffentlicht `0.0.1`, danach `--released` von Hand.
+
+      Erledigt am 2026-09-17: v0.0.1 ist veröffentlicht, Lauf 35298720384, alle
+      Schritte grün, Tag auf eceaa0b, `main` nachgezogen, Assets
+      `signum-sandbox-0.0.1.zip` und `install.sh`. `--released` steht noch aus
+      und kann erst laufen, wenn das Repo öffentlich ist: privat antwortet
+      `releases/latest/download/install.sh` mit 404, und `install.sh` kennt
+      keinen Token.
 
 ## Nicht dabei
 Hotfix-Pfad auf `main` (ein Patch-Release aus `develop` genügt), `npx`, Paketmanager,
