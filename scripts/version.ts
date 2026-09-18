@@ -145,3 +145,14 @@ export function releaseNotesSection(changelog: string, version: string): string 
   const section = (end === -1 ? rest : rest.slice(0, end)).join('\n').trim()
   return section.length > 0 ? section : null
 }
+
+/**
+ * One value out of `scripts/jre.pinned`, which is shell the launcher sources
+ * and this script only reads: `JRE_VERSION='21.0.12.1+1'`. Returns null when
+ * the key is absent, so a renamed pin fails the release loudly instead of
+ * publishing notes that promise Java ''.
+ */
+export function pinnedValue(text: string, key: string): string | null {
+  const match = new RegExp(`^${key}='([^']*)'`, 'm').exec(text)
+  return match && match[1].length > 0 ? match[1] : null
+}

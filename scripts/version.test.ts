@@ -8,6 +8,7 @@ import {
   guardVerdict,
   nextVersion,
   pendingLevels,
+  pinnedValue,
   releaseNotesSection,
 } from './version'
 
@@ -153,5 +154,24 @@ describe('releaseNotesSection', () => {
   it('has nothing for a version the changelog never heard of', () => {
     expect(releaseNotesSection(changelog, '0.0.1')).toBeNull()
     expect(releaseNotesSection('', '0.0.1')).toBeNull()
+  })
+})
+
+describe('pinnedValue', () => {
+  const pinned = [
+    "# the JRE this build brings with it",
+    "JRE_VERSION='21.0.12.1+1'",
+    "JRE_DIR='jdk-21.0.12.1+1-jre'",
+    "JRE_SHA_mac_aarch64='dec50fc6'",
+  ].join('\n')
+
+  it('reads a value the launcher sources as shell', () => {
+    expect(pinnedValue(pinned, 'JRE_VERSION')).toBe('21.0.12.1+1')
+    expect(pinnedValue(pinned, 'JRE_DIR')).toBe('jdk-21.0.12.1+1-jre')
+  })
+
+  it('has nothing for a key that was renamed, rather than an empty promise', () => {
+    expect(pinnedValue(pinned, 'JRE_RELEASE')).toBeNull()
+    expect(pinnedValue("JRE_VERSION=''", 'JRE_VERSION')).toBeNull()
   })
 })
