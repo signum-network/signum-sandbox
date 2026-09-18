@@ -14,11 +14,11 @@ gibt darum `0.0.1` heraus, ohne dass `new-version` gelaufen ist.
 
 ## Aufgaben
 
-- [ ] **1. changesets** — `@changesets/cli` als devDependency, `.changeset/config.json`.
+- [x] **1. changesets** — `@changesets/cli` als devDependency, `.changeset/config.json`.
       Prüfen, ob `privatePackages: { version: true, tag: false }` nötig ist (Paket ist
       `private: true`). `changeset publish` kommt nirgends vor, nur `version`.
 
-- [ ] **2. `scripts/version.ts` + `scripts/version.test.ts`** — die Urteile, rein:
+- [x] **2. `scripts/version.ts` + `scripts/version.test.ts`** — die Urteile, rein:
       `nextVersion`, `guardVerdict`, `changelogLines`, `pendingLevels`, `effectiveLevel`,
       `changesetBody`, `changesetFilename`, `releaseNotesSection`.
       `tsconfig.json` → `"include": ["src", "scripts/version.ts"]`.
