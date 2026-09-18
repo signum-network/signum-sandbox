@@ -13,7 +13,8 @@
     "bootstrap": "./scripts/bootstrap.sh",
     "start": "./scripts/start.sh",
     "smoke": "./scripts/smoke.sh",
-    "package": "./scripts/package.sh"
+    "package": "./scripts/package.sh",
+    "new-version": "bun scripts/new-version.ts"
   },
   "dependencies": {
     "@signumjs/core": "^3.3.4",
