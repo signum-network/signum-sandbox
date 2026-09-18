@@ -20,6 +20,7 @@ import {
   nextVersion,
   pendingLevels,
   releaseNotesSection,
+  splitBullets,
   type Level,
 } from './version'
 
@@ -123,10 +124,21 @@ if (!interactive(editor, file)) {
   unlinkSync(file)
   die(`${editor} kam mit einem Fehler zurück, der Changeset ist wieder weg`)
 }
-if (changesetSummary(readFileSync(file, 'utf8')) === '') {
+const edited = changesetSummary(readFileSync(file, 'utf8'))
+if (edited === '') {
   unlinkSync(file)
   die('leer gespeichert, der Changeset ist wieder weg — nichts released')
 }
+
+// Eine Datei je Änderung. changesets macht aus einer Datei genau einen
+// Changelog-Eintrag, also wäre eine Datei mit fünf Stichpunkten ein Stichpunkt
+// mit einer Liste darin. Editiert wird trotzdem nur eine.
+const entries = splitBullets(edited)
+unlinkSync(file)
+entries.forEach((entry, i) => {
+  writeFileSync(join(CHANGESETS, changesetFilename(level, `${sha}-${i + 1}`)), changesetBody(pkg.name, level, [entry]))
+})
+console.log(`  ${entries.length} Changeset(s) geschrieben\n`)
 
 // ── changesets rechnet, wir schreiben nichts selbst ───────────────────────
 if (!interactive('bunx', 'changeset', 'version')) die('changeset version scheiterte')

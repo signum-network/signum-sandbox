@@ -156,3 +156,28 @@ export function pinnedValue(text: string, key: string): string | null {
   const match = new RegExp(`^${key}='([^']*)'`, 'm').exec(text)
   return match && match[1].length > 0 ? match[1] : null
 }
+
+/**
+ * The edited summary, split into one entry per change.
+ *
+ * changesets treats a whole changeset file as a single changelog entry and puts
+ * one `- ` in front of it, so a file holding five bullets comes out as one
+ * bullet with a nested list inside. One change per file is how the format is
+ * meant to be used — you still edit a single file, and this is what is split
+ * out of it afterwards.
+ *
+ * A line that does not begin a bullet belongs to the one before it, so a
+ * sentence may be wrapped, and prose with no bullets at all stays one entry.
+ */
+export function splitBullets(summary: string): string[] {
+  const entries: string[] = []
+  for (const raw of summary.split('\n')) {
+    const line = raw.trim()
+    if (line === '') continue
+    const bullet = /^[-*]\s+(.*)$/.exec(line)
+    if (bullet) entries.push(bullet[1].trim())
+    else if (entries.length > 0) entries[entries.length - 1] += ` ${line}`
+    else entries.push(line)
+  }
+  return entries.filter((entry) => entry.length > 0)
+}

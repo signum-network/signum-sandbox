@@ -10,6 +10,7 @@ import {
   pendingLevels,
   pinnedValue,
   releaseNotesSection,
+  splitBullets,
 } from './version'
 
 describe('nextVersion', () => {
@@ -173,5 +174,29 @@ describe('pinnedValue', () => {
   it('has nothing for a key that was renamed, rather than an empty promise', () => {
     expect(pinnedValue(pinned, 'JRE_RELEASE')).toBeNull()
     expect(pinnedValue("JRE_VERSION=''", 'JRE_VERSION')).toBeNull()
+  })
+})
+
+describe('splitBullets', () => {
+  it('gives one entry per bullet, because one changeset is one change', () => {
+    expect(splitBullets('- the first thing\n- the second thing')).toEqual([
+      'the first thing',
+      'the second thing',
+    ])
+  })
+
+  it('folds a wrapped line into the bullet above it', () => {
+    expect(splitBullets('- a sentence that was\n  wrapped by the editor\n- the next one')).toEqual([
+      'a sentence that was wrapped by the editor',
+      'the next one',
+    ])
+  })
+
+  it('keeps prose without bullets as one entry', () => {
+    expect(splitBullets('a paragraph\nover two lines')).toEqual(['a paragraph over two lines'])
+  })
+
+  it('ignores blank lines', () => {
+    expect(splitBullets('\n- one\n\n- two\n\n')).toEqual(['one', 'two'])
   })
 })
