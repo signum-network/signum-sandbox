@@ -10,7 +10,7 @@ A local Signum node running an offline mock network, with a UI built for getting
      only outside this div, and then it would not be centred. -->
 
 <div align="center">
-  <video src="https://github.com/user-attachments/assets/REPLACE-WITH-UPLOADED-ASSET-URL" controls muted width="640"></video>
+  <video src="https://github.com/user-attachments/assets/4ba00004-da61-411b-bc70-456b7eef1f09" controls muted width="640"></video>
   <p><em>
     A whole blockchain, here,<br />
     mined by a button, for free —<br />
