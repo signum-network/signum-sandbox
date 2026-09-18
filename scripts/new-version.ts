@@ -12,6 +12,7 @@ import { join } from 'node:path'
 import {
   changelogLines,
   changesetBody,
+  changesetEntry,
   changesetFilename,
   changesetSummary,
   effectiveLevel,
@@ -136,7 +137,7 @@ if (edited === '') {
 const entries = splitBullets(edited)
 unlinkSync(file)
 entries.forEach((entry, i) => {
-  writeFileSync(join(CHANGESETS, changesetFilename(level, `${sha}-${i + 1}`)), changesetBody(pkg.name, level, [entry]))
+  writeFileSync(join(CHANGESETS, changesetFilename(level, `${sha}-${i + 1}`)), changesetEntry(pkg.name, level, entry))
 })
 console.log(`  ${entries.length} Changeset(s) geschrieben\n`)
 

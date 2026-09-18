@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   changelogLines,
   changesetBody,
+  changesetEntry,
   changesetFilename,
   changesetSummary,
   effectiveLevel,
@@ -198,5 +199,14 @@ describe('splitBullets', () => {
 
   it('ignores blank lines', () => {
     expect(splitBullets('\n- one\n\n- two\n\n')).toEqual(['one', 'two'])
+  })
+})
+
+describe('changesetEntry', () => {
+  it('carries the summary with no bullet, because changesets adds one', () => {
+    const entry = changesetEntry('signum-sandbox', 'minor', 'the thing that changed')
+    expect(entry).toBe('---\n"signum-sandbox": minor\n---\n\nthe thing that changed\n')
+    expect(changesetSummary(entry).startsWith('-')).toBe(false)
+    expect(pendingLevels([entry])).toEqual(['minor'])
   })
 })

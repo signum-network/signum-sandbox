@@ -102,7 +102,11 @@ export function effectiveLevel(chosen: Level, pending: readonly Level[]): Level 
   return winner
 }
 
-/** A changeset in the shape `changeset version` reads. */
+/**
+ * The draft that goes into the editor: one bullet per line, so that pruning is
+ * a matter of deleting lines. This shape is never what `changeset version`
+ * reads — see changesetEntry.
+ */
 export function changesetBody(pkg: string, level: Level, lines: readonly string[]): string {
   const bullets = lines.map((line) => `- ${line}`).join('\n')
   return `---\n"${pkg}": ${level}\n---\n\n${bullets}\n`
@@ -180,4 +184,13 @@ export function splitBullets(summary: string): string[] {
     else entries.push(line)
   }
   return entries.filter((entry) => entry.length > 0)
+}
+
+/**
+ * One change, in the shape `changeset version` reads: the summary alone.
+ * changesets puts the "- " in front of it when it writes the changelog, so a
+ * bullet in here comes out as a list nested inside a bullet.
+ */
+export function changesetEntry(pkg: string, level: Level, text: string): string {
+  return `---\n"${pkg}": ${level}\n---\n\n${text.trim()}\n`
 }
