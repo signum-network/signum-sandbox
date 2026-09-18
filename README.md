@@ -4,6 +4,20 @@ The sandbox to start building cool blockchain apps with Signum — no costs, no 
 
 A local Signum node running an offline mock network, with a UI built for getting started.
 
+<!-- Video: drag brag-output/brag.mp4 into a GitHub comment box, wait for the
+     upload, and paste the github.com/user-attachments/assets URL it hands back
+     into the src below. Keep it a <video> tag — a bare URL would embed too, but
+     only outside this div, and then it would not be centred. -->
+
+<div align="center">
+  <video src="https://github.com/user-attachments/assets/REPLACE-WITH-UPLOADED-ASSET-URL" controls muted width="640"></video>
+  <p><em>
+    A whole blockchain, here,<br />
+    mined by a button, for free —<br />
+    consensus of one.
+  </em></p>
+</div>
+
 ## For users
 
 ```bash
