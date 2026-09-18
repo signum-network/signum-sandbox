@@ -78,9 +78,32 @@ is served by the node itself and talks to its own origin.
 | `bun run test:launcher` | the launcher's decisions, in plain `sh` |
 | `./scripts/smoke.sh` | starts the node and checks every mount responds |
 | `./scripts/package.sh` | assembles the release deliverable |
+| `sh scripts/e2e-install.sh <zip>` | installs a built release in a bare Debian container |
+| `bun run new-version` | bumps the version and sets a release going |
 
 The node version is pinned in `.signum-node-version`. Nothing the bootstrap
 downloads is committed.
+
+### Releasing
+
+`main` is what has been published, and only the pipeline moves it. Work happens on
+`develop`, and feature branches go there.
+
+```bash
+bun run new-version
+```
+
+On a clean `develop` that equals `origin/develop`, this asks for patch, minor or
+major, prefills a changeset from the commit subjects since the last tag for you to
+edit, lets [changesets](https://github.com/changesets/changesets) do the arithmetic
+and write `CHANGELOG.md`, commits and — after one last question — pushes.
+
+`.github/workflows/release.yml` takes it from there. Every push to `develop` is
+tested and built. A push whose version carries no tag yet is also packaged,
+installed in a `debian:stable-slim` container and made to answer, and only then
+published — with `main` fast-forwarded onto it and the tag created by the release
+itself. The missing tag is the entire trigger, so a re-run or a second push does
+nothing at all.
 
 ## What is served
 

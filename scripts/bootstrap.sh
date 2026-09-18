@@ -4,12 +4,14 @@
 set -eu
 
 REPO="signum-network/signum-node"
-BUN_VERSION="1.2.15"
 
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 cd "$ROOT"
 
 VERSION=$(cat .signum-node-version)
+# One pin, in the file the CI workflows read too, so the Bun this fetches and the
+# Bun a release is built with cannot drift apart.
+BUN_VERSION=$(cat .bun-version)
 if [ "${1:-}" = "--latest" ]; then
   VERSION=$(curl -fsSL "https://api.github.com/repos/$REPO/releases/latest" \
     | sed -n 's/.*"tag_name"[ ]*:[ ]*"v\{0,1\}\([^"]*\)".*/\1/p' | head -1)

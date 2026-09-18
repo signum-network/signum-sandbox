@@ -1,0 +1,33 @@
+# The fast answer while you work. Pull requests only: a push to develop is
+# handled by release.yml, which runs these same checks and then decides whether
+# the push is a release.
+#
+# No bootstrap.sh here. The UI builds without the node jar — only package.sh
+# needs it — so every pull request saves that 60 MB download.
+name: ci
+
+on:
+  pull_request:
+    branches: [develop, main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: .bun-version
+
+      - run: bun install --frozen-lockfile
+      - run: bun run test
+      - run: bun run test:launcher
+      - run: bun run build

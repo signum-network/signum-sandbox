@@ -1,0 +1,111 @@
+# Every push to develop passes through here. Most of them only get checked; the
+# ones that carry a version nobody has released yet get published.
+#
+# The trigger is the absence of a tag, not a button and not a pull request. That
+# makes the whole run idempotent: a re-run, a second push, a double click all
+# see the tag and stop. It also means the version in package.json is the switch
+# — `bun run new-version` is the intended way to move it, but editing it by hand
+# releases just the same.
+#
+# There is no judgement in this file. Which lines go in a changelog, what the
+# release notes say, whether an installation actually works — each of those
+# lives in a script that can be run and tested locally. This is the one file in
+# the repository that cannot be, so it only puts things in order.
+name: release
+
+on:
+  push:
+    branches: [develop]
+
+permissions:
+  contents: write
+
+# Never cancel a release half-way through; queue the next push behind it.
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      # Full history: the release notes read CHANGELOG.md, and the fast-forward
+      # of main needs the commits it is moving over.
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: .bun-version
+
+      # ── what every push gets ──────────────────────────────────
+      - run: bun install --frozen-lockfile
+      - run: bun run test
+      - run: bun run test:launcher
+      - run: bun run build
+
+      # ── is this push a release? ───────────────────────────────
+      # A fact, looked up, not a decision — hence no script. The remote is
+      # asked rather than the local tag list, so a checkout detail cannot turn
+      # into a release detail.
+      - id: gate
+        run: |
+          version=$(sed -n 's/.*"version": *"\([^"]*\)".*/\1/p' package.json | head -1)
+          [ -n "$version" ] || { echo 'release: package.json has no version' >&2; exit 1; }
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          if [ -n "$(git ls-remote --tags origin "refs/tags/v$version")" ]; then
+            echo 'release=false' >> "$GITHUB_OUTPUT"
+            echo "checked only: v$version is already released" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo 'release=true' >> "$GITHUB_OUTPUT"
+            echo "releasing $version" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      # ── and what only a release gets ──────────────────────────
+      - name: Fetch the node artifacts
+        if: steps.gate.outputs.release == 'true'
+        run: ./scripts/bootstrap.sh
+
+      - name: Assemble the deliverable
+        if: steps.gate.outputs.release == 'true'
+        run: ./scripts/package.sh
+
+      # The gate that matters. Nothing below it runs until a bare Debian
+      # container has installed this archive and watched it answer.
+      - name: Install it in a container and use it
+        if: steps.gate.outputs.release == 'true'
+        run: sh scripts/e2e-install.sh "build/signum-sandbox-${{ steps.gate.outputs.version }}.zip"
+
+      - name: Write the release notes
+        if: steps.gate.outputs.release == 'true'
+        run: bun scripts/release-notes.ts > "$RUNNER_TEMP/notes.md"
+
+      # main moves before the release is created, and that order is the point.
+      # If this push is rejected, main has diverged, an assumption is broken and
+      # nothing gets published. If the release then fails, main points at a
+      # commit without one — the tag is still missing, so the next run picks it
+      # up and this push becomes a no-op. The other order would leave the one
+      # state nothing recovers from: a published release main does not point at.
+      - name: Move main to what is being released
+        if: steps.gate.outputs.release == 'true'
+        run: git push origin HEAD:main
+
+      # Creates the tag itself, so there is no tag without a release and no
+      # release without an installation that worked.
+      #
+      # An asset is named after the basename of the file, and the one-liner in
+      # the README depends on that name: install.sh has to arrive as install.sh
+      # for releases/latest/download/install.sh to resolve.
+      - name: Publish
+        if: steps.gate.outputs.release == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.gate.outputs.version }}
+        run: |
+          gh release create "v$VERSION" \
+            --target "$GITHUB_SHA" \
+            --title "$VERSION" \
+            --notes-file "$RUNNER_TEMP/notes.md" \
+            "build/signum-sandbox-$VERSION.zip" \
+            scripts/install.sh
