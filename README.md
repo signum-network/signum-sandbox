@@ -33,8 +33,7 @@ signum-sandbox
 and open **http://localhost:6876/**.
 
 It brings its own Java, so there is nothing to install first. macOS and Linux
-for now; on Windows, download the release, unpack it and run
-`scripts\start.cmd`.
+for now; Windows takes [a few more steps](#on-windows).
 
 | Command | Does |
 |---|---|
@@ -50,6 +49,42 @@ for now; on Windows, download the release, unpack it and run
 Everything lives in `~/.signum-sandbox`, and the chain survives updates. A
 background node does not survive a logout or a reboot, on purpose: a sandbox
 should not keep running unnoticed.
+
+### On Windows
+
+There is no launcher yet, so the node is started by hand. Once:
+
+1. Install a Java 21 runtime — [Temurin 21 JRE](https://adoptium.net/temurin/releases/?version=21&os=windows&package=jre)
+   is what the sandbox is built against. Let the installer put it on `PATH`; in
+   a fresh terminal, `java -version` should answer 21.
+2. Download `signum-sandbox-<version>.zip` from the
+   [latest release](https://github.com/signum-network/signum-sandbox/releases/latest)
+   and unpack it somewhere you can write — `%USERPROFILE%\signum-sandbox` does.
+
+Then, every time, from that folder:
+
+```
+scripts\start.cmd
+```
+
+double-clicked or typed, and open **http://localhost:6876/**. Ctrl-C stops it.
+Windows may ask whether to let Java through the firewall; the node listens on
+localhost only, so declining changes nothing.
+
+| Command | Does |
+|---|---|
+| `scripts\start.cmd` | starts the chain here, until Ctrl-C |
+| `scripts\start.cmd --gui` | starts it in the node's own window |
+| `scripts\start.cmd --reset` | deletes the chain, after asking, and starts from empty |
+
+The chain lives in `db\` inside that folder rather than in your home directory,
+so an update is: unpack the new release, copy `db\` across, delete the old
+folder. Nothing else in there is yours.
+
+The one-liner above does work inside
+[WSL](https://learn.microsoft.com/windows/wsl/install), if you would rather have
+the launcher and its commands. The sandbox is then a Linux installation, and the
+UI is still at http://localhost:6876/ in a Windows browser.
 
 ## For developers
 
