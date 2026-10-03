@@ -84,3 +84,48 @@ export function toAddress(id: string, addressPrefix: string): string {
 export function addressPrefixOf(accounts: { address: string }[]): string {
   return accounts[0]?.address.split('-')[0] ?? 'S'
 }
+
+/**
+ * Whether a public key is one a sender can announce. The node answers a
+ * contract's getAccount with a key of 64 zeros — a contract has no key pair —
+ * and announcing that as the recipient's key would be claiming one it does
+ * not have.
+ */
+export function isAnnounceableKey(publicKey: string | undefined): publicKey is string {
+  return Boolean(publicKey) && !/^0+$/.test(publicKey as string)
+}
+
+/**
+ * The numeric id a transaction is addressed to, from whatever a "To" field
+ * holds. It folds exactly as toComparableId does, so every spelling the
+ * field recognises — a lowercase or prefix-less address included — is also
+ * one it can send to. Unlike toComparableId it does not fall back to the raw
+ * value: a send needs an id, and the node's answer to junk is less clear
+ * than this one.
+ */
+export function toAccountId(value: string): string {
+  const trimmed = value.trim()
+  // A run of digits is already an id, and Address.create would quietly wrap
+  // one that is too long into a different id rather than refuse it.
+  const id = /^\d+$/.test(trimmed) ? trimmed : toComparableId(trimmed)
+  if (!/^\d+$/.test(id) || BigInt(id) > MAX_ACCOUNT_ID) {
+    throw new Error(`Not an address or account id: ${value}`)
+  }
+  return id
+}
+
+const MAX_ACCOUNT_ID = 2n ** 64n - 1n
+
+/**
+ * The canonical address a "To" field currently names, or null while it does
+ * not name one yet. The identicon hashes whatever string it is given, so it
+ * has to be handed this form rather than what was typed: otherwise the same
+ * account would wear one picture typed in lowercase and another as an id.
+ */
+export function recipientAddress(value: string, addressPrefix: string): string | null {
+  try {
+    return toAddress(toAccountId(value), addressPrefix)
+  } catch {
+    return null
+  }
+}

@@ -69,7 +69,7 @@ describe('resolveQuery', () => {
     const resolved = resolveQuery(
       interpret('ali'),
       [account(ALICE_ID, 'Alice')],
-      { [BOB_ID]: 'Alistair' },
+      { [BOB_ID]: { name: 'Alistair', kind: 'account' } },
     )
     expect([...resolved.accountIds].sort()).toEqual([ALICE_ID, BOB_ID].sort())
   })
@@ -87,16 +87,16 @@ describe('resolveQuery', () => {
 
 describe('localNameMatches', () => {
   it('matches an owned account and a contact case-insensitively', () => {
-    expect(localNameMatches('LIC', [account(ALICE_ID, 'Alice')], { [BOB_ID]: 'Bob' })).toEqual([
+    expect(localNameMatches('LIC', [account(ALICE_ID, 'Alice')], { [BOB_ID]: { name: 'Bob', kind: 'account' } })).toEqual([
       ALICE_ID,
     ])
-    expect(localNameMatches('bo', [account(ALICE_ID, 'Alice')], { [BOB_ID]: 'Bob' })).toEqual([
+    expect(localNameMatches('bo', [account(ALICE_ID, 'Alice')], { [BOB_ID]: { name: 'Bob', kind: 'account' } })).toEqual([
       BOB_ID,
     ])
   })
 
   it('reports an account once even when it is both owned and a contact', () => {
-    expect(localNameMatches('a', [account(ALICE_ID, 'Alice')], { [ALICE_ID]: 'Alice' })).toEqual([
+    expect(localNameMatches('a', [account(ALICE_ID, 'Alice')], { [ALICE_ID]: { name: 'Alice', kind: 'account' } })).toEqual([
       ALICE_ID,
     ])
   })

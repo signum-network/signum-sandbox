@@ -17,6 +17,7 @@ import { STALE_ON_BLOCK, STALE_ON_PENDING } from '../src/lib/queryKeys'
 const NEVER_STALE = [
   'networkInfo', // fixed for the life of a node
   'asset', // a token's name and decimals do not change
+  'contract', // a contract's activation amount and name are fixed at deployment
   'decrypt', // a decrypted message stays decrypted
   'accountsWithName', // answers about a typed name, not about chain state
 ]

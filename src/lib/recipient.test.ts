@@ -2,7 +2,15 @@ import { describe, expect, it } from 'vitest'
 import { Address } from '@signumjs/core'
 import { Crypto, generateSignKeys } from '@signumjs/crypto'
 import { NodeJSCryptoAdapter } from '@signumjs/crypto/adapters'
-import { addressPrefixOf, knownPublicKey, toAddress, toComparableId } from './recipient'
+import {
+  addressPrefixOf,
+  isAnnounceableKey,
+  knownPublicKey,
+  recipientAddress,
+  toAccountId,
+  toAddress,
+  toComparableId,
+} from './recipient'
 import type { SandboxAccount } from './accounts'
 
 // Vitest evaluates a describe body during collection, before any beforeAll hook
@@ -111,5 +119,64 @@ describe('addressPrefixOf', () => {
 
   it('falls back when there are no accounts, which is when nothing can be sent anyway', () => {
     expect(addressPrefixOf([])).toBe('S')
+  })
+})
+
+describe('isAnnounceableKey', () => {
+  it('accepts a real public key', () => {
+    expect(isAnnounceableKey(generateSignKeys('sandbox-bob').publicKey)).toBe(true)
+  })
+
+  it('refuses the all-zero key a contract reports', () => {
+    expect(isAnnounceableKey('0'.repeat(64))).toBe(false)
+  })
+
+  it('refuses nothing at all', () => {
+    expect(isAnnounceableKey(undefined)).toBe(false)
+    expect(isAnnounceableKey('')).toBe(false)
+  })
+})
+
+describe('toAccountId', () => {
+  const bob = account('Bob', 'sandbox-bob')
+  const [, ...groups] = bob.address.split('-')
+
+  it('accepts every spelling the To field recognises', () => {
+    expect(toAccountId(bob.id)).toBe(bob.id)
+    expect(toAccountId(bob.address)).toBe(bob.id)
+    expect(toAccountId(bob.address.toLowerCase())).toBe(bob.id)
+    expect(toAccountId(groups.join('-').toLowerCase())).toBe(bob.id)
+    expect(toAccountId(` ${bob.address} `)).toBe(bob.id)
+  })
+
+  it('refuses what is not an account, naming it', () => {
+    expect(() => toAccountId('TS-NOPE')).toThrow('TS-NOPE')
+  })
+
+  it('passes a numeric id through digit for digit', () => {
+    expect(toAccountId('18446744073709551615')).toBe('18446744073709551615')
+  })
+
+  it('refuses a number too large to be an account id rather than rewriting it', () => {
+    expect(() => toAccountId('131256411304916891780')).toThrow('131256411304916891780')
+  })
+})
+
+describe('recipientAddress', () => {
+  const bob = account('Bob', 'sandbox-bob')
+  const [, ...groups] = bob.address.split('-')
+
+  it('gives the canonical address for every spelling of the same account', () => {
+    expect(recipientAddress(bob.address, 'TS')).toBe(bob.address)
+    expect(recipientAddress(bob.id, 'TS')).toBe(bob.address)
+    expect(recipientAddress(groups.join('-').toLowerCase(), 'TS')).toBe(bob.address)
+    expect(recipientAddress(` ${bob.address.toLowerCase()} `, 'TS')).toBe(bob.address)
+  })
+
+  it('gives nothing while the field does not hold an account yet', () => {
+    expect(recipientAddress('', 'TS')).toBeNull()
+    expect(recipientAddress('TS-', 'TS')).toBeNull()
+    expect(recipientAddress('TS-NOPE', 'TS')).toBeNull()
+    expect(recipientAddress('18446744073709551616', 'TS')).toBeNull()
   })
 })

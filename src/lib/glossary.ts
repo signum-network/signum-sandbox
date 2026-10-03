@@ -30,6 +30,7 @@ export const GLOSSARY_TERMS = [
   'subscription',
   'multiOut',
   'contact',
+  'contract',
 ] as const
 
 export type GlossaryTerm = (typeof GLOSSARY_TERMS)[number]
