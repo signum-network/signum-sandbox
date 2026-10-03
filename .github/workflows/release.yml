@@ -71,6 +71,13 @@ jobs:
         if: steps.gate.outputs.release == 'true'
         run: ./scripts/package.sh
 
+      # The sum is published beside the archive and every download is checked
+      # against it, so a release whose sum is missing or wrong must not get out.
+      - name: Check the archive against its sum
+        if: steps.gate.outputs.release == 'true'
+        working-directory: build
+        run: sha256sum -c "signum-sandbox-${{ steps.gate.outputs.version }}.zip.sha256"
+
       # The gate that matters. Nothing below it runs until a bare Debian
       # container has installed this archive and watched it answer.
       - name: Install it in a container and use it
@@ -108,4 +115,5 @@ jobs:
             --title "$VERSION" \
             --notes-file "$RUNNER_TEMP/notes.md" \
             "build/signum-sandbox-$VERSION.zip" \
+            "build/signum-sandbox-$VERSION.zip.sha256" \
             scripts/install.sh

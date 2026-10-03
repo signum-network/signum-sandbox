@@ -107,6 +107,20 @@ check 'release asset url' \
   'https://github.com/signum-network/signum-sandbox/releases/download/v0.2.0/signum-sandbox-0.2.0.zip' \
   "$(release_url 0.2.0)"
 
+# ── install.sh checks the release it downloads ───────────────
+# install.sh runs on its own (curl | sh), so it carries its own copy of the
+# check rather than borrowing the launcher's; sourcing it with
+# INSTALL_LIB_ONLY=1 defines the functions and runs nothing.
+INSTALL_LIB_ONLY=1 . "$HERE/install.sh"
+known_sum='0a8abc637f4f2641c3dd39b93fa078ea42b6f988c57f621d93f20b1b594b1149'
+check 'install: the sum of a known file' "$known_sum" "$(install_sha256 "$TMP/known.txt")"
+check 'install: a matching sum is ok' 'ok' "$(sum_verdict "$TMP/known.txt" "$known_sum")"
+check 'install: another sum is a mismatch' 'mismatch' \
+  "$(sum_verdict "$TMP/known.txt" 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff')"
+check 'install: no published sum is absent' 'absent' "$(sum_verdict "$TMP/known.txt" '')"
+check 'install: the sum file names the file too, only the sum counts' 'ok' \
+  "$(sum_verdict "$TMP/known.txt" "$(printf '%s  signum-sandbox-0.2.0.zip\n' "$known_sum" | cut -d' ' -f1)")"
+
 printf '\n'
 if [ "$fails" -eq 0 ]; then
   printf 'all checks passed\n'
