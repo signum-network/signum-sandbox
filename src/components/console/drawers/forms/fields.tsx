@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next'
 import { feePresets, type SendAction } from '@/lib/fees'
 import type { SandboxAccount } from '@/lib/accounts'
 import type { Contacts } from '@/lib/contacts'
-import { addressPrefixOf, toAddress } from '@/lib/recipient'
+import { addressPrefixOf, recipientAddress, toAddress } from '@/lib/recipient'
 import { ConsoleButton } from '@/components/console/ConsoleButton'
 import { Identicon } from '@/components/Identicon'
 import { Select } from '@/components/console/Select'
@@ -19,6 +19,7 @@ export interface KnownRecipient {
   id: string
   address: string
   name: string
+  isContract: boolean
 }
 
 /**
@@ -38,10 +39,15 @@ export function knownRecipients(accounts: SandboxAccount[], contacts: Contacts):
   // string it is given — drew the same account as two different pictures
   // depending on which list you were looking at.
   const prefix = addressPrefixOf(accounts)
-  const owned = accounts.map((a) => ({ id: a.id, address: a.address, name: a.name }))
+  const owned = accounts.map((a) => ({ id: a.id, address: a.address, name: a.name, isContract: false }))
   const fromContacts = Object.entries(contacts)
     .filter(([id]) => !seen.has(id))
-    .map(([id, name]) => ({ id, address: toAddress(id, prefix), name }))
+    .map(([id, contact]) => ({
+      id,
+      address: toAddress(id, prefix),
+      name: contact.name,
+      isContract: contact.kind === 'contract',
+    }))
   return [...owned, ...fromContacts]
 }
 
@@ -154,6 +160,7 @@ export function SuggestInput({
   suggestions,
   placeholder,
   filter = true,
+  leading,
 }: {
   value: string
   onChange: (v: string) => void
@@ -161,6 +168,8 @@ export function SuggestInput({
   placeholder?: string
   /** Off for a short fixed list, where filtering as you type only hides options. */
   filter?: boolean
+  /** Drawn inside the field, before the text — the way a select shows its choice's icon. */
+  leading?: ReactNode
 }) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -195,8 +204,13 @@ export function SuggestInput({
 
   return (
     <div ref={ref} className="relative">
+      {leading && (
+        <span className="pointer-events-none absolute left-2 top-1/2 flex -translate-y-1/2">
+          {leading}
+        </span>
+      )}
       <input
-        className="w-full border bg-transparent px-2 py-1 text-[13px] text-[var(--fg)]"
+        className={`w-full border bg-transparent py-1 pr-2 text-[13px] text-[var(--fg)] ${leading ? 'pl-7' : 'pl-2'}`}
         style={border}
         value={value}
         placeholder={placeholder}
@@ -271,15 +285,20 @@ export function RecipientPicker({
   onChange: (v: string) => void
   placeholder?: string
 }) {
+  const { t } = useTranslation()
+  // The picture of whoever the field names right now, so a typed or pasted
+  // address is recognisable at a glance the same way a chosen sender is.
+  const named = recipientAddress(value, addressPrefixOf(accounts))
   return (
     <SuggestInput
       value={value}
       onChange={onChange}
       placeholder={placeholder ?? 'TS-…'}
+      leading={named ? <Identicon value={named} size={14} /> : undefined}
       suggestions={knownRecipients(accounts, contacts).map((p) => ({
         value: p.address,
         label: p.name,
-        sublabel: p.address,
+        sublabel: p.isContract ? `${p.address} · ${t('console.accounts.contractTag')}` : p.address,
         icon: <Identicon value={p.address} size={14} />,
       }))}
     />

@@ -1,13 +1,12 @@
 import { generateSignKeys } from '@signumjs/crypto'
 import {
-  Address,
   AttachmentMessage,
   type TransactionId,
   type UnsignedTransaction,
 } from '@signumjs/core'
 import { Amount } from '@signumjs/util'
 import { ledger, signingLedger } from './ledger'
-import { knownPublicKey } from './recipient'
+import { isAnnounceableKey, knownPublicKey, toAccountId } from './recipient'
 import { feeFor, type SendAction } from './fees'
 import type { SandboxAccount } from './accounts'
 
@@ -37,9 +36,8 @@ const base = (account: SandboxAccount, action: SendAction, fee?: Amount) => {
   }
 }
 
-/** The API takes numeric ids; people type Reed-Solomon addresses. */
-export const toNumericId = (addressOrId: string) =>
-  /^\d+$/.test(addressOrId) ? addressOrId : Address.create(addressOrId).getNumericId()
+/** The API takes numeric ids; people type Reed-Solomon addresses, in any case and spelling. */
+export const toNumericId = toAccountId
 
 /**
  * Every call site here always passes senderPrivateKey via `base`, so the result
@@ -70,11 +68,22 @@ export async function resolveRecipientPublicKey(
   if (own) return own
   try {
     const account = await ledger.account.getAccount({ accountId: toNumericId(to) })
-    return account.publicKey || undefined
+    return isAnnounceableKey(account.publicKey) ? account.publicKey : undefined
   } catch {
     return undefined
   }
 }
+
+/**
+ * A message beside an amount: text a person wrote, or the hex a contract
+ * reads as 8-byte blocks. Never both — a transaction carries one message.
+ */
+const attachmentOf = (message?: string, binaryMessage?: string) =>
+  binaryMessage
+    ? new AttachmentMessage({ message: binaryMessage, messageIsText: false })
+    : message
+      ? new AttachmentMessage({ message, messageIsText: true })
+      : undefined
 
 export interface PaymentArgs extends Fee {
   from: SandboxAccount
@@ -82,16 +91,26 @@ export interface PaymentArgs extends Fee {
   signa: string
   recipientPublicKey: string | undefined
   message?: string
+  /** Hex, sent with messageIsText: false. Mutually exclusive with message. */
+  binaryMessage?: string
 }
 
-export async function sendPayment({ from, to, signa, recipientPublicKey, message, fee }: PaymentArgs) {
+export async function sendPayment({
+  from,
+  to,
+  signa,
+  recipientPublicKey,
+  message,
+  binaryMessage,
+  fee,
+}: PaymentArgs) {
   return asId(
     await signingLedger.transaction.sendAmountToSingleRecipient({
       ...base(from, 'payment', fee),
       amountPlanck: Amount.fromSigna(signa).getPlanck(),
       recipientId: toNumericId(to),
       recipientPublicKey,
-      attachment: message ? new AttachmentMessage({ message, messageIsText: true }) : undefined,
+      attachment: attachmentOf(message, binaryMessage),
     }),
   )
 }
@@ -248,6 +267,10 @@ export async function issueToken({
  * and `version.Message`. That message is a payload like any other, so it can
  * be an SRC44 descriptor: an application shipping a token can say what the
  * transfer was for in a form another application can read.
+ *
+ * It can carry SIGNA as well (`amountPlanck`), which is what makes a token
+ * transfer able to run a contract: a contract only runs for at least its
+ * activation amount, whatever else arrives with it.
  */
 export interface TransferTokenArgs extends Fee {
   from: SandboxAccount
@@ -256,6 +279,9 @@ export interface TransferTokenArgs extends Fee {
   quantity: string
   recipientPublicKey: string | undefined
   message?: string
+  binaryMessage?: string
+  /** SIGNA sent alongside the token — what wakes a contract that receives it. */
+  signa?: string
 }
 
 export async function transferToken({
@@ -265,6 +291,8 @@ export async function transferToken({
   quantity,
   recipientPublicKey,
   message,
+  binaryMessage,
+  signa,
   fee,
 }: TransferTokenArgs) {
   return asId(
@@ -272,9 +300,10 @@ export async function transferToken({
       ...base(from, 'transferAsset', fee),
       assetId,
       quantity,
+      amountPlanck: signa ? Amount.fromSigna(signa).getPlanck() : undefined,
       recipientId: toNumericId(to),
       recipientPublicKey,
-      attachment: message ? new AttachmentMessage({ message, messageIsText: true }) : undefined,
+      attachment: attachmentOf(message, binaryMessage),
     }),
   )
 }

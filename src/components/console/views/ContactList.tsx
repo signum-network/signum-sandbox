@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import type { Contacts } from '@/lib/contacts'
+import type { Contacts, ResolveContactError } from '@/lib/contacts'
 import { matchesAccountQuery, type Query } from '@/lib/search'
 import { Identicon } from '@/components/Identicon'
 import { ConsoleButton } from '../ConsoleButton'
@@ -20,7 +20,7 @@ export function ContactList({
   contacts: Contacts
   addressPrefix: string
   query: Query
-  onAdd: (accountIdOrAddress: string, name: string) => void
+  onAdd: (accountIdOrAddress: string, name: string) => Promise<ResolveContactError | null>
   onRemove: (accountIdOrAddress: string) => void
   onWatch: (accountIdOrAddress: string) => void
   watchedId: string | null
@@ -28,12 +28,19 @@ export function ContactList({
   const { t } = useTranslation()
   const [address, setAddress] = useState('')
   const [name, setName] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<ResolveContactError | null>(null)
 
   const field = 'border bg-transparent px-2 py-1 text-[13px] text-[var(--fg)]'
   const border = { borderColor: 'var(--border2)' }
 
   const entries = Object.entries(contacts)
-    .map(([id, contactName]) => ({ id, name: contactName, address: toAddress(id, addressPrefix) }))
+    .map(([id, contact]) => ({
+      id,
+      name: contact.name,
+      isContract: contact.kind === 'contract',
+      address: toAddress(id, addressPrefix),
+    }))
     .filter((c) => matchesAccountQuery(c.name, c.address, query))
 
   return (
@@ -58,16 +65,29 @@ export function ContactList({
           placeholder={t('console.accounts.localLabel')}
         />
         <ConsoleButton
-          onClick={() => {
+          disabled={busy}
+          onClick={async () => {
             if (!address.trim() || !name.trim()) return
-            onAdd(address.trim(), name.trim())
+            setBusy(true)
+            setError(null)
+            const refused = await onAdd(address.trim(), name.trim())
+            setBusy(false)
+            if (refused) {
+              setError(refused)
+              return
+            }
             setAddress('')
             setName('')
           }}
         >
-          {t('console.accounts.addContact')}
+          {busy ? t('console.accounts.checking') : t('console.accounts.addContact')}
         </ConsoleButton>
       </div>
+      {error && (
+        <p className="-mt-2 mb-3 text-[12px]" style={{ color: 'var(--mag)' }}>
+          ✕ {t(`console.accounts.contactError.${error}`)}
+        </p>
+      )}
 
       {entries.length === 0 && (
         <p className="text-[13px] text-[var(--muted)]">{t('console.accounts.noContacts')}</p>
@@ -82,6 +102,14 @@ export function ContactList({
           >
             <Identicon value={c.address} />
             <span className="font-bold text-[var(--fg)]">{c.name}</span>
+            {c.isContract && (
+              <span
+                className="border px-1 text-[10px] uppercase tracking-[1px]"
+                style={{ borderColor: 'var(--blue3)', color: 'var(--blue3)' }}
+              >
+                <Term id="contract">{t('console.accounts.contractTag')}</Term>
+              </span>
+            )}
             <span className="text-[var(--muted)]">{c.address}</span>
             <span className="ml-auto flex items-center gap-2">
               <ConsoleButton active={watchedId === c.id} onClick={() => onWatch(c.id)}>

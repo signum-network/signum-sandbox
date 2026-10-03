@@ -8,7 +8,7 @@
  * same reason — whoever added the query did not know this list existed.
  *
  * Deliberately not everything. `networkInfo` is fixed for the life of a node,
- * an `asset`'s name and decimals never change, a decrypted message stays
+ * an `asset`'s name and decimals never change, a `contract`'s activation amount is fixed at deployment, a decrypted message stays
  * decrypted, and `accountsWithName` answers a question about a name the user
  * typed rather than about the chain's latest state.
  */

@@ -7,11 +7,11 @@ import { decryptFor } from '@/lib/payload'
 import { detailFields } from '@/lib/txDetail'
 import type { SandboxAccount } from '@/lib/accounts'
 import { ConsoleButton, RowButton } from '../ConsoleButton'
-import { displayName, type Contacts } from '@/lib/contacts'
+import { displayName, type Contacts, type ResolveContactError } from '@/lib/contacts'
 import { addressPrefixOf, toAddress, toComparableId } from '@/lib/recipient'
 import { summarize } from '@/lib/txSummary'
 import { transactionDid } from '@/lib/did'
-import { DidLink } from '@/components/console/DidLink'
+import { CopyLink, DidLink } from '@/components/console/DidLink'
 import { Term } from '@/components/console/Term'
 import type { Payee } from '@/lib/txDetail'
 import type { FeedItem } from '@/lib/chainFeed'
@@ -36,10 +36,12 @@ function SaveContactField({
 }: {
   address: string
   label: string
-  onSave: (accountIdOrAddress: string, name: string) => void
+  onSave: (accountIdOrAddress: string, name: string) => Promise<ResolveContactError | null>
 }) {
   const { t } = useTranslation()
   const [name, setName] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<ResolveContactError | null>(null)
   return (
     <div className="flex flex-wrap items-center gap-2 py-1">
       <span className="min-w-[100px] text-[var(--muted)]">{label}</span>
@@ -52,14 +54,26 @@ function SaveContactField({
         onChange={(e) => setName(e.target.value)}
       />
       <ConsoleButton
-        disabled={!name.trim()}
-        onClick={() => {
-          onSave(address, name.trim())
+        disabled={!name.trim() || busy}
+        onClick={async () => {
+          setBusy(true)
+          setError(null)
+          const refused = await onSave(address, name.trim())
+          setBusy(false)
+          if (refused) {
+            setError(refused)
+            return
+          }
           setName('')
         }}
       >
-        {t('console.tx.saveContact')}
+        {busy ? t('console.accounts.checking') : t('console.tx.saveContact')}
       </ConsoleButton>
+      {error && (
+        <span className="text-[12px]" style={{ color: 'var(--mag)' }}>
+          ✕ {t(`console.accounts.contactError.${error}`)}
+        </span>
+      )}
     </div>
   )
 }
@@ -169,7 +183,7 @@ export function TransactionRow({
   arriving?: boolean
   accounts: SandboxAccount[]
   contacts: Contacts
-  onAddContact: (accountIdOrAddress: string, name: string) => void
+  onAddContact: (accountIdOrAddress: string, name: string) => Promise<ResolveContactError | null>
 }) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
@@ -183,6 +197,14 @@ export function TransactionRow({
   const recipientName = summary.recipientRS
     ? displayName(summary.recipientRS, accounts, contacts)
     : null
+
+  // A deployment names no recipient, yet it creates one: the contract's
+  // account id is this transaction's id. It exists only once the block
+  // does, so an unconfirmed deployment has nothing to save yet.
+  const deployedContract =
+    summary.kind === 'contractCreate' && item.confirmed
+      ? toAddress(item.tx.transaction ?? '', addressPrefixOf(accounts))
+      : null
 
   // Decryption is asynchronous and only attempted once the row is open, so a
   // long stream does not do crypto work for rows nobody looked at.
@@ -309,6 +331,13 @@ export function TransactionRow({
                   onSave={onAddContact}
                 />
               )}
+              {deployedContract && !isKnownParty(deployedContract, accounts, contacts) && (
+                <SaveContactField
+                  address={deployedContract}
+                  label={t('console.tx.contract')}
+                  onSave={onAddContact}
+                />
+              )}
 
               {/*
                 The same transaction named the way a verification application
@@ -316,6 +345,16 @@ export function TransactionRow({
                 fetched from anywhere. Immutable is the interesting line in it:
                 that is the property anything built on this chain is relying on.
               */}
+              {/*
+                The id a developer pastes into an API call or a log search —
+                the DID below wraps it, but is not what getTransaction takes.
+              */}
+              <Detail label={t('console.tx.id')}>
+                <span className="flex flex-wrap items-center gap-2">
+                  <code className="break-all text-[var(--fg)]">{item.tx.transaction}</code>
+                  <CopyLink value={item.tx.transaction ?? ''} />
+                </span>
+              </Detail>
               <Detail label={<Term id="did" />}>
                 <DidLink resolution={transactionDid(item.tx)} />
               </Detail>
