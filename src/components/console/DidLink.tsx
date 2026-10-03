@@ -5,6 +5,29 @@ import { RowButton } from './ConsoleButton'
 import { Modal } from './Modal'
 
 /**
+ * The console's quiet copy action: a small underlined word beside the value,
+ * not a button. Shared so every identifier in a transaction row copies the
+ * same way.
+ */
+export function CopyLink({ value }: { value: string }) {
+  const { t } = useTranslation()
+  const [copied, setCopied] = useState(false)
+  return (
+    <RowButton
+      className="shrink-0 text-[12px] text-[var(--blue3)] underline"
+      onClick={() => {
+        void navigator.clipboard.writeText(value).then(() => {
+          setCopied(true)
+          setTimeout(() => setCopied(false), 1200)
+        })
+      }}
+    >
+      {copied ? t('console.accounts.copied') : t('console.accounts.copy')}
+    </RowButton>
+  )
+}
+
+/**
  * The decentralised identifier for whatever is on screen, and its document.
  *
  * Shown beside the raw JSON response rather than instead of it: the raw
@@ -21,23 +44,13 @@ import { Modal } from './Modal'
 export function DidLink({ resolution }: { resolution: DidResolution }) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
-  const [copied, setCopied] = useState(false)
   const did = resolution.didDocument.id
-
-  const copy = () => {
-    void navigator.clipboard.writeText(did).then(() => {
-      setCopied(true)
-      setTimeout(() => setCopied(false), 1200)
-    })
-  }
 
   return (
     <span className="flex min-w-0 flex-col gap-1">
       <span className="flex flex-wrap items-center gap-2">
         <code className="break-all text-[var(--fg)]">{did}</code>
-        <RowButton className="shrink-0 text-[12px] text-[var(--blue3)] underline" onClick={copy}>
-          {copied ? t('console.accounts.copied') : t('console.accounts.copy')}
-        </RowButton>
+        <CopyLink value={did} />
         <RowButton
           className="shrink-0 text-[12px] text-[var(--blue3)] underline"
           onClick={() => setOpen(!open)}

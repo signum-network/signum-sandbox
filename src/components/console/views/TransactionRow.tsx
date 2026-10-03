@@ -11,14 +11,13 @@ import { displayName, type Contacts, type ResolveContactError } from '@/lib/cont
 import { addressPrefixOf, toAddress, toComparableId } from '@/lib/recipient'
 import { summarize } from '@/lib/txSummary'
 import { transactionDid } from '@/lib/did'
-import { DidLink } from '@/components/console/DidLink'
+import { CopyLink, DidLink } from '@/components/console/DidLink'
 import { Term } from '@/components/console/Term'
 import type { Payee } from '@/lib/txDetail'
 import type { FeedItem } from '@/lib/chainFeed'
 import { Amount } from '@signumjs/util'
 import { Identicon } from '@/components/Identicon'
 import { cn } from '@/lib/utils'
-import { CopyButton } from './AccountFields'
 import { seconds, EASINGS } from '@/motion'
 
 // Whether an address already resolves to something other than a shortened
@@ -351,8 +350,10 @@ export function TransactionRow({
                 the DID below wraps it, but is not what getTransaction takes.
               */}
               <Detail label={t('console.tx.id')}>
-                <span className="font-mono">{item.tx.transaction}</span>{' '}
-                <CopyButton value={item.tx.transaction ?? ''} />
+                <span className="flex flex-wrap items-center gap-2">
+                  <code className="break-all text-[var(--fg)]">{item.tx.transaction}</code>
+                  <CopyLink value={item.tx.transaction ?? ''} />
+                </span>
               </Detail>
               <Detail label={<Term id="did" />}>
                 <DidLink resolution={transactionDid(item.tx)} />
