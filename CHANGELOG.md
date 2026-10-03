@@ -1,5 +1,13 @@
 # signum-sandbox
 
+## 0.1.0
+
+### Minor Changes
+
+- Smart Contract (SC) Accounts
+- Arguments Form in Send Dialog for SCs
+- Copy Tx ID
+
 ## 0.0.2
 
 ### Patch Changes
