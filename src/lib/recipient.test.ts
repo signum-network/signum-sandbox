@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { Address } from '@signumjs/core'
 import { Crypto, generateSignKeys } from '@signumjs/crypto'
 import { NodeJSCryptoAdapter } from '@signumjs/crypto/adapters'
-import { addressPrefixOf, knownPublicKey, toAddress, toComparableId } from './recipient'
+import { addressPrefixOf, isAnnounceableKey, knownPublicKey, toAddress, toComparableId } from './recipient'
 import type { SandboxAccount } from './accounts'
 
 // Vitest evaluates a describe body during collection, before any beforeAll hook
@@ -111,5 +111,20 @@ describe('addressPrefixOf', () => {
 
   it('falls back when there are no accounts, which is when nothing can be sent anyway', () => {
     expect(addressPrefixOf([])).toBe('S')
+  })
+})
+
+describe('isAnnounceableKey', () => {
+  it('accepts a real public key', () => {
+    expect(isAnnounceableKey(generateSignKeys('sandbox-bob').publicKey)).toBe(true)
+  })
+
+  it('refuses the all-zero key a contract reports', () => {
+    expect(isAnnounceableKey('0'.repeat(64))).toBe(false)
+  })
+
+  it('refuses nothing at all', () => {
+    expect(isAnnounceableKey(undefined)).toBe(false)
+    expect(isAnnounceableKey('')).toBe(false)
   })
 })

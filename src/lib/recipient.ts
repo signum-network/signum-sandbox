@@ -84,3 +84,13 @@ export function toAddress(id: string, addressPrefix: string): string {
 export function addressPrefixOf(accounts: { address: string }[]): string {
   return accounts[0]?.address.split('-')[0] ?? 'S'
 }
+
+/**
+ * Whether a public key is one a sender can announce. The node answers a
+ * contract's getAccount with a key of 64 zeros — a contract has no key pair —
+ * and announcing that as the recipient's key would be claiming one it does
+ * not have.
+ */
+export function isAnnounceableKey(publicKey: string | undefined): publicKey is string {
+  return Boolean(publicKey) && !/^0+$/.test(publicKey as string)
+}
