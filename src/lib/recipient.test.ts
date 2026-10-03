@@ -6,6 +6,7 @@ import {
   addressPrefixOf,
   isAnnounceableKey,
   knownPublicKey,
+  recipientAddress,
   toAccountId,
   toAddress,
   toComparableId,
@@ -158,5 +159,24 @@ describe('toAccountId', () => {
 
   it('refuses a number too large to be an account id rather than rewriting it', () => {
     expect(() => toAccountId('131256411304916891780')).toThrow('131256411304916891780')
+  })
+})
+
+describe('recipientAddress', () => {
+  const bob = account('Bob', 'sandbox-bob')
+  const [, ...groups] = bob.address.split('-')
+
+  it('gives the canonical address for every spelling of the same account', () => {
+    expect(recipientAddress(bob.address, 'TS')).toBe(bob.address)
+    expect(recipientAddress(bob.id, 'TS')).toBe(bob.address)
+    expect(recipientAddress(groups.join('-').toLowerCase(), 'TS')).toBe(bob.address)
+    expect(recipientAddress(` ${bob.address.toLowerCase()} `, 'TS')).toBe(bob.address)
+  })
+
+  it('gives nothing while the field does not hold an account yet', () => {
+    expect(recipientAddress('', 'TS')).toBeNull()
+    expect(recipientAddress('TS-', 'TS')).toBeNull()
+    expect(recipientAddress('TS-NOPE', 'TS')).toBeNull()
+    expect(recipientAddress('18446744073709551616', 'TS')).toBeNull()
   })
 })

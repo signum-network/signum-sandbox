@@ -115,3 +115,17 @@ export function toAccountId(value: string): string {
 }
 
 const MAX_ACCOUNT_ID = 2n ** 64n - 1n
+
+/**
+ * The canonical address a "To" field currently names, or null while it does
+ * not name one yet. The identicon hashes whatever string it is given, so it
+ * has to be handed this form rather than what was typed: otherwise the same
+ * account would wear one picture typed in lowercase and another as an id.
+ */
+export function recipientAddress(value: string, addressPrefix: string): string | null {
+  try {
+    return toAddress(toAccountId(value), addressPrefix)
+  } catch {
+    return null
+  }
+}
