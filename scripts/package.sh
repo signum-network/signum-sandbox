@@ -45,3 +45,16 @@ EOF
 
 ( cd build && rm -f "$NAME.zip" && zip -qr "$NAME.zip" "$NAME" )
 echo "package: build/$NAME.zip"
+
+# The sum the launcher and install.sh check a download against, published
+# beside the archive. Written in the usual "sum  name" form, so that
+# sha256sum -c can check it as well as the first field can be read alone.
+(
+  cd build
+  if command -v sha256sum >/dev/null 2>&1; then
+    sha256sum "$NAME.zip" > "$NAME.zip.sha256"
+  else
+    shasum -a 256 "$NAME.zip" > "$NAME.zip.sha256"
+  fi
+)
+echo "package: build/$NAME.zip.sha256"

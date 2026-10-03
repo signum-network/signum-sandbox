@@ -10,6 +10,7 @@ export default {
     dashboard: { title: 'サンドボックス', description: 'ブロックを生成し、取引を送信し、チェーンを調べる' },
     comingSoon: '近日公開',
   },
+  stale: { message: 'Signum Sandbox {{installed}} がインストールされています — このページはまだ {{running}} です。', reload: '再読み込み' },
   unreachable: { title: '{{host}} にノードがありません', description: './scripts/start.sh で起動してください' },
   glossary: {
     block: {

@@ -10,6 +10,7 @@ export default {
     dashboard: { title: 'Песочница', description: 'Куйте блоки, отправляйте транзакции, изучайте цепочку' },
     comingSoon: 'скоро',
   },
+  stale: { message: 'Установлен Signum Sandbox {{installed}} — эта страница всё ещё {{running}}.', reload: 'Перезагрузить' },
   unreachable: { title: 'Нет узла на {{host}}', description: 'Запустите его через ./scripts/start.sh' },
   glossary: {
     block: {

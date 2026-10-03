@@ -1,5 +1,6 @@
 import { createRootRoute, Outlet } from '@tanstack/react-router'
 import { ThemeShimmer } from '@/motion'
+import { StaleBanner } from '@/components/StaleBanner'
 
 export const Route = createRootRoute({
   component: () => (
@@ -18,6 +19,7 @@ export const Route = createRootRoute({
         }}
       />
       <div className="relative z-10">
+        <StaleBanner />
         <Outlet />
       </div>
       <ThemeShimmer />
