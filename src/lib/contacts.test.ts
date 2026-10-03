@@ -254,6 +254,16 @@ describe('resolveContact', () => {
     expect(asked).toBe(false)
   })
 
+  it('refuses a number too large to be an id without asking the node', async () => {
+    let asked = false
+    const result = await resolveContact('131256411304916891780', async () => {
+      asked = true
+      return {}
+    })
+    expect(result).toEqual({ error: 'invalidAddress' })
+    expect(asked).toBe(false)
+  })
+
   it('refuses an address the chain has never seen', async () => {
     expect(await resolveContact(bob.id, unknown)).toEqual({ error: 'unknownAccount' })
   })

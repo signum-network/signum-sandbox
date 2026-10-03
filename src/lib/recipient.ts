@@ -104,7 +104,14 @@ export function isAnnounceableKey(publicKey: string | undefined): publicKey is s
  * than this one.
  */
 export function toAccountId(value: string): string {
-  const id = toComparableId(value.trim())
-  if (!/^\d+$/.test(id)) throw new Error(`Not an address or account id: ${value}`)
+  const trimmed = value.trim()
+  // A run of digits is already an id, and Address.create would quietly wrap
+  // one that is too long into a different id rather than refuse it.
+  const id = /^\d+$/.test(trimmed) ? trimmed : toComparableId(trimmed)
+  if (!/^\d+$/.test(id) || BigInt(id) > MAX_ACCOUNT_ID) {
+    throw new Error(`Not an address or account id: ${value}`)
+  }
   return id
 }
+
+const MAX_ACCOUNT_ID = 2n ** 64n - 1n

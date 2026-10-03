@@ -1,4 +1,4 @@
-import { toComparableId } from './recipient'
+import { toAccountId, toComparableId } from './recipient'
 import { isUnknownAccount } from './accountStatus'
 import type { SandboxAccount } from './accounts'
 
@@ -65,8 +65,12 @@ export async function resolveContact(
   accountIdOrAddress: string,
   lookup: AccountLookup,
 ): Promise<{ id: string; kind: ContactKind } | { error: ResolveContactError }> {
-  const id = toComparableId(accountIdOrAddress.trim())
-  if (!/^\d+$/.test(id)) return { error: 'invalidAddress' }
+  let id: string
+  try {
+    id = toAccountId(accountIdOrAddress)
+  } catch {
+    return { error: 'invalidAddress' }
+  }
   try {
     const account = await lookup(id)
     return { id, kind: account.isAT ? 'contract' : 'account' }

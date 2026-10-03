@@ -151,4 +151,12 @@ describe('toAccountId', () => {
   it('refuses what is not an account, naming it', () => {
     expect(() => toAccountId('TS-NOPE')).toThrow('TS-NOPE')
   })
+
+  it('passes a numeric id through digit for digit', () => {
+    expect(toAccountId('18446744073709551615')).toBe('18446744073709551615')
+  })
+
+  it('refuses a number too large to be an account id rather than rewriting it', () => {
+    expect(() => toAccountId('131256411304916891780')).toThrow('131256411304916891780')
+  })
 })
