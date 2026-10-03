@@ -271,6 +271,13 @@ export default {
       addContact: '添加联系人',
       contactAddress: '地址或账户Id',
       noContacts: '还没有联系人',
+      contractTag: '合约',
+      checking: '检查中…',
+      contactError: {
+        invalidAddress: '不是有效的地址或账户 ID',
+        unknownAccount: '该地址尚未出现在链上',
+        unreachable: '无法询问节点——未保存任何内容',
+      },
       publicKey: '公钥',
       unconfirmed: '未确认',
       recent: '近期活动',

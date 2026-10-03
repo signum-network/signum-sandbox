@@ -294,6 +294,13 @@ export default {
       addContact: 'Add contact',
       contactAddress: 'Address or account id',
       noContacts: 'No contacts yet',
+      contractTag: 'contract',
+      checking: 'Checking…',
+      contactError: {
+        invalidAddress: 'Not a valid address or account id',
+        unknownAccount: 'This address does not exist on the chain yet',
+        unreachable: 'Could not ask the node — nothing was saved',
+      },
       publicKey: 'Public key',
       unconfirmed: 'unconfirmed',
       recent: 'Recent activity',

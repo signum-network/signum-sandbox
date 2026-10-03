@@ -272,6 +272,13 @@ export default {
       addContact: 'Добавить контакт',
       contactAddress: 'Адрес или id счёта',
       noContacts: 'Пока нет контактов',
+      contractTag: 'контракт',
+      checking: 'Проверка…',
+      contactError: {
+        invalidAddress: 'Это не адрес и не id аккаунта',
+        unknownAccount: 'Этого адреса ещё нет в цепочке',
+        unreachable: 'Не удалось обратиться к узлу — ничего не сохранено',
+      },
       publicKey: 'Открытый ключ',
       unconfirmed: 'не подтверждено',
       recent: 'Последняя активность',

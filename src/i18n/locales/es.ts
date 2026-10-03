@@ -272,6 +272,13 @@ export default {
       addContact: 'Añadir contacto',
       contactAddress: 'Dirección o id de cuenta',
       noContacts: 'Aún no hay contactos',
+      contractTag: 'contrato',
+      checking: 'Comprobando…',
+      contactError: {
+        invalidAddress: 'No es una dirección ni un id de cuenta válidos',
+        unknownAccount: 'Esta dirección aún no existe en la cadena',
+        unreachable: 'No se pudo consultar al nodo — no se guardó nada',
+      },
       publicKey: 'Clave pública',
       unconfirmed: 'sin confirmar',
       recent: 'Actividad reciente',

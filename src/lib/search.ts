@@ -59,7 +59,7 @@ export function localNameMatches(
     ...new Set([
       ...accounts.filter((a) => a.name.toLowerCase().includes(needle)).map((a) => a.id),
       ...Object.entries(contacts)
-        .filter(([, name]) => name.toLowerCase().includes(needle))
+        .filter(([, contact]) => contact.name.toLowerCase().includes(needle))
         .map(([id]) => id),
     ]),
   ]

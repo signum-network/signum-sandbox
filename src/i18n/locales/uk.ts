@@ -272,6 +272,13 @@ export default {
       addContact: 'Додати контакт',
       contactAddress: 'Адреса або id рахунку',
       noContacts: 'Поки що немає контактів',
+      contractTag: 'контракт',
+      checking: 'Перевірка…',
+      contactError: {
+        invalidAddress: 'Це не адреса і не id акаунта',
+        unknownAccount: 'Цієї адреси ще немає в ланцюжку',
+        unreachable: 'Не вдалося звернутися до вузла — нічого не збережено',
+      },
       publicKey: 'Відкритий ключ',
       unconfirmed: 'непідтверджено',
       recent: 'Остання активність',

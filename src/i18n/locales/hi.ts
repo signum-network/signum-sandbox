@@ -272,6 +272,13 @@ export default {
       addContact: 'संपर्क जोड़ें',
       contactAddress: 'पता या खाता आईडी',
       noContacts: 'अभी तक कोई संपर्क नहीं',
+      contractTag: 'कॉन्ट्रैक्ट',
+      checking: 'जाँच हो रही है…',
+      contactError: {
+        invalidAddress: 'यह मान्य पता या खाता आईडी नहीं है',
+        unknownAccount: 'यह पता अभी चेन पर मौजूद नहीं है',
+        unreachable: 'नोड से पूछा नहीं जा सका — कुछ भी सहेजा नहीं गया',
+      },
       publicKey: 'सार्वजनिक कुंजी',
       unconfirmed: 'अपुष्ट',
       recent: 'हाल की गतिविधि',

@@ -19,6 +19,7 @@ export interface KnownRecipient {
   id: string
   address: string
   name: string
+  isContract: boolean
 }
 
 /**
@@ -38,10 +39,15 @@ export function knownRecipients(accounts: SandboxAccount[], contacts: Contacts):
   // string it is given — drew the same account as two different pictures
   // depending on which list you were looking at.
   const prefix = addressPrefixOf(accounts)
-  const owned = accounts.map((a) => ({ id: a.id, address: a.address, name: a.name }))
+  const owned = accounts.map((a) => ({ id: a.id, address: a.address, name: a.name, isContract: false }))
   const fromContacts = Object.entries(contacts)
     .filter(([id]) => !seen.has(id))
-    .map(([id, name]) => ({ id, address: toAddress(id, prefix), name }))
+    .map(([id, contact]) => ({
+      id,
+      address: toAddress(id, prefix),
+      name: contact.name,
+      isContract: contact.kind === 'contract',
+    }))
   return [...owned, ...fromContacts]
 }
 
@@ -271,6 +277,7 @@ export function RecipientPicker({
   onChange: (v: string) => void
   placeholder?: string
 }) {
+  const { t } = useTranslation()
   return (
     <SuggestInput
       value={value}
@@ -279,7 +286,7 @@ export function RecipientPicker({
       suggestions={knownRecipients(accounts, contacts).map((p) => ({
         value: p.address,
         label: p.name,
-        sublabel: p.address,
+        sublabel: p.isContract ? `${p.address} · ${t('console.accounts.contractTag')}` : p.address,
         icon: <Identicon value={p.address} size={14} />,
       }))}
     />

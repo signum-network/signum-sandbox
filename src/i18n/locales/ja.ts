@@ -272,6 +272,13 @@ export default {
       addContact: '連絡先を追加',
       contactAddress: 'アドレスまたはアカウントId',
       noContacts: 'まだ連絡先がありません',
+      contractTag: 'コントラクト',
+      checking: '確認中…',
+      contactError: {
+        invalidAddress: '有効なアドレスまたはアカウント ID ではありません',
+        unknownAccount: 'このアドレスはまだチェーン上に存在しません',
+        unreachable: 'ノードに問い合わせできませんでした — 何も保存していません',
+      },
       publicKey: '公開鍵',
       unconfirmed: '未確認',
       recent: '最近の活動',

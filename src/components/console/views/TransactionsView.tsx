@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import type { FeedItem } from '@/lib/chainFeed'
 import type { SandboxAccount } from '@/lib/accounts'
-import type { Contacts } from '@/lib/contacts'
+import type { Contacts, ResolveContactError } from '@/lib/contacts'
 import { matchesTransaction, type ResolvedQuery } from '@/lib/search'
 import { paginate } from '@/lib/paginate'
 import { motion } from 'framer-motion'
@@ -21,7 +21,7 @@ export function TransactionsView({
   items: FeedItem[]
   accounts: SandboxAccount[]
   contacts: Contacts
-  onAddContact: (accountIdOrAddress: string, name: string) => void
+  onAddContact: (accountIdOrAddress: string, name: string) => Promise<ResolveContactError | null>
   query: ResolvedQuery
   page: number
   onPage: (page: number) => void

@@ -272,6 +272,13 @@ export default {
       addContact: '연락처 추가',
       contactAddress: '주소 또는 계정 Id',
       noContacts: '아직 연락처가 없습니다',
+      contractTag: '컨트랙트',
+      checking: '확인 중…',
+      contactError: {
+        invalidAddress: '유효한 주소나 계정 ID가 아닙니다',
+        unknownAccount: '이 주소는 아직 체인에 없습니다',
+        unreachable: '노드에 물어볼 수 없었습니다 — 아무것도 저장하지 않았습니다',
+      },
       publicKey: '공개 키',
       unconfirmed: '미확인',
       recent: '최근 활동',

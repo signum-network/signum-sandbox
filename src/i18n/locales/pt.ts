@@ -272,6 +272,13 @@ export default {
       addContact: 'Adicionar contacto',
       contactAddress: 'Endereço ou id da conta',
       noContacts: 'Ainda não há contactos',
+      contractTag: 'contrato',
+      checking: 'A verificar…',
+      contactError: {
+        invalidAddress: 'Não é um endereço nem um id de conta válido',
+        unknownAccount: 'Este endereço ainda não existe na cadeia',
+        unreachable: 'Não foi possível consultar o nó — nada foi guardado',
+      },
       publicKey: 'Chave pública',
       unconfirmed: 'não confirmado',
       recent: 'Atividade recente',
