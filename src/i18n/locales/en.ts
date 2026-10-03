@@ -166,6 +166,8 @@ export default {
       hide: 'Hide document',
     },
     tx: {
+      id: 'Transaction ID',
+      contract: 'Contract',
       fee: 'Fee',
       andMore: '+{{count}} more',
       unconfirmed: 'unconfirmed',
@@ -248,7 +250,7 @@ export default {
       subscription: 'Subscription',
       cancelSubscription: 'Cancel subscription',
       subscriptionPayment: 'Subscription payment',
-      contractCreate: 'Contract deployed',
+      contractCreate: 'Contract Deployment',
       contractPayment: 'Contract payment',
       burn: 'Burned',
       reward: 'Block reward',

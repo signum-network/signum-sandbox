@@ -152,6 +152,8 @@ export default {
       hide: 'ドキュメントを隠す',
     },
     tx: {
+      id: 'トランザクション ID',
+      contract: 'コントラクト',
       fee: '手数料',
       andMore: 'ほか {{count}} 件',
       unconfirmed: '未確認',
@@ -226,7 +228,7 @@ export default {
       subscription: 'サブスクリプション',
       cancelSubscription: 'サブスクリプションを解約',
       subscriptionPayment: 'サブスクリプション支払い',
-      contractCreate: 'コントラクト配備',
+      contractCreate: 'コントラクトのデプロイ',
       contractPayment: 'コントラクト支払い',
       burn: 'バーン',
       reward: 'ブロック報酬',

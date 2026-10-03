@@ -152,6 +152,8 @@ export default {
       hide: 'दस्तावेज़ छिपाएँ',
     },
     tx: {
+      id: 'लेनदेन आईडी',
+      contract: 'कॉन्ट्रैक्ट',
       fee: 'शुल्क',
       andMore: '+{{count}} और',
       unconfirmed: 'अपुष्ट',
@@ -226,7 +228,7 @@ export default {
       subscription: 'सब्सक्रिप्शन',
       cancelSubscription: 'सब्सक्रिप्शन रद्द करें',
       subscriptionPayment: 'सब्सक्रिप्शन भुगतान',
-      contractCreate: 'कॉन्ट्रैक्ट तैनात',
+      contractCreate: 'कॉन्ट्रैक्ट डिप्लॉयमेंट',
       contractPayment: 'कॉन्ट्रैक्ट भुगतान',
       burn: 'जलाया गया',
       reward: 'ब्लॉक इनाम',

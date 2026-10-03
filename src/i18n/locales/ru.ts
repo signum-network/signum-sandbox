@@ -152,6 +152,8 @@ export default {
       hide: 'Скрыть документ',
     },
     tx: {
+      id: 'ID транзакции',
+      contract: 'Контракт',
       fee: 'Комиссия',
       andMore: '+{{count}} ещё',
       unconfirmed: 'не подтверждено',
@@ -226,7 +228,7 @@ export default {
       subscription: 'Подписка',
       cancelSubscription: 'Отменить подписку',
       subscriptionPayment: 'Платёж по подписке',
-      contractCreate: 'Контракт развёрнут',
+      contractCreate: 'Развёртывание контракта',
       contractPayment: 'Платёж контракта',
       burn: 'Сожжено',
       reward: 'Награда за блок',

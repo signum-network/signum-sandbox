@@ -152,6 +152,8 @@ export default {
       hide: 'Ocultar documento',
     },
     tx: {
+      id: 'ID da transação',
+      contract: 'Contrato',
       fee: 'Taxa',
       andMore: '+{{count}} mais',
       unconfirmed: 'não confirmada',
@@ -226,7 +228,7 @@ export default {
       subscription: 'Subscrição',
       cancelSubscription: 'Cancelar subscrição',
       subscriptionPayment: 'Pagamento de subscrição',
-      contractCreate: 'Contrato publicado',
+      contractCreate: 'Implementação de contrato',
       contractPayment: 'Pagamento de contrato',
       burn: 'Queimado',
       reward: 'Recompensa de bloco',

@@ -18,6 +18,7 @@ import type { FeedItem } from '@/lib/chainFeed'
 import { Amount } from '@signumjs/util'
 import { Identicon } from '@/components/Identicon'
 import { cn } from '@/lib/utils'
+import { CopyButton } from './AccountFields'
 import { seconds, EASINGS } from '@/motion'
 
 // Whether an address already resolves to something other than a shortened
@@ -198,6 +199,14 @@ export function TransactionRow({
     ? displayName(summary.recipientRS, accounts, contacts)
     : null
 
+  // A deployment names no recipient, yet it creates one: the contract's
+  // account id is this transaction's id. It exists only once the block
+  // does, so an unconfirmed deployment has nothing to save yet.
+  const deployedContract =
+    summary.kind === 'contractCreate' && item.confirmed
+      ? toAddress(item.tx.transaction ?? '', addressPrefixOf(accounts))
+      : null
+
   // Decryption is asynchronous and only attempted once the row is open, so a
   // long stream does not do crypto work for rows nobody looked at.
   const decrypted = useQuery({
@@ -323,6 +332,13 @@ export function TransactionRow({
                   onSave={onAddContact}
                 />
               )}
+              {deployedContract && !isKnownParty(deployedContract, accounts, contacts) && (
+                <SaveContactField
+                  address={deployedContract}
+                  label={t('console.tx.contract')}
+                  onSave={onAddContact}
+                />
+              )}
 
               {/*
                 The same transaction named the way a verification application
@@ -330,6 +346,14 @@ export function TransactionRow({
                 fetched from anywhere. Immutable is the interesting line in it:
                 that is the property anything built on this chain is relying on.
               */}
+              {/*
+                The id a developer pastes into an API call or a log search —
+                the DID below wraps it, but is not what getTransaction takes.
+              */}
+              <Detail label={t('console.tx.id')}>
+                <span className="font-mono">{item.tx.transaction}</span>{' '}
+                <CopyButton value={item.tx.transaction ?? ''} />
+              </Detail>
               <Detail label={<Term id="did" />}>
                 <DidLink resolution={transactionDid(item.tx)} />
               </Detail>

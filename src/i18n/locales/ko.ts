@@ -152,6 +152,8 @@ export default {
       hide: '문서 숨기기',
     },
     tx: {
+      id: '트랜잭션 ID',
+      contract: '컨트랙트',
       fee: '수수료',
       andMore: '외 {{count}}개',
       unconfirmed: '미확인',

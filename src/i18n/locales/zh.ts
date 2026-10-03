@@ -152,6 +152,8 @@ export default {
       hide: '隐藏文档',
     },
     tx: {
+      id: '交易 ID',
+      contract: '合约',
       fee: '手续费',
       andMore: '另有 {{count}} 个',
       unconfirmed: '未确认',
