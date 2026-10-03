@@ -1,13 +1,12 @@
 import { generateSignKeys } from '@signumjs/crypto'
 import {
-  Address,
   AttachmentMessage,
   type TransactionId,
   type UnsignedTransaction,
 } from '@signumjs/core'
 import { Amount } from '@signumjs/util'
 import { ledger, signingLedger } from './ledger'
-import { isAnnounceableKey, knownPublicKey } from './recipient'
+import { isAnnounceableKey, knownPublicKey, toAccountId } from './recipient'
 import { feeFor, type SendAction } from './fees'
 import type { SandboxAccount } from './accounts'
 
@@ -37,9 +36,8 @@ const base = (account: SandboxAccount, action: SendAction, fee?: Amount) => {
   }
 }
 
-/** The API takes numeric ids; people type Reed-Solomon addresses. */
-export const toNumericId = (addressOrId: string) =>
-  /^\d+$/.test(addressOrId) ? addressOrId : Address.create(addressOrId).getNumericId()
+/** The API takes numeric ids; people type Reed-Solomon addresses, in any case and spelling. */
+export const toNumericId = toAccountId
 
 /**
  * Every call site here always passes senderPrivateKey via `base`, so the result

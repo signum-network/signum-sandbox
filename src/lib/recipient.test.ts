@@ -2,7 +2,14 @@ import { describe, expect, it } from 'vitest'
 import { Address } from '@signumjs/core'
 import { Crypto, generateSignKeys } from '@signumjs/crypto'
 import { NodeJSCryptoAdapter } from '@signumjs/crypto/adapters'
-import { addressPrefixOf, isAnnounceableKey, knownPublicKey, toAddress, toComparableId } from './recipient'
+import {
+  addressPrefixOf,
+  isAnnounceableKey,
+  knownPublicKey,
+  toAccountId,
+  toAddress,
+  toComparableId,
+} from './recipient'
 import type { SandboxAccount } from './accounts'
 
 // Vitest evaluates a describe body during collection, before any beforeAll hook
@@ -126,5 +133,22 @@ describe('isAnnounceableKey', () => {
   it('refuses nothing at all', () => {
     expect(isAnnounceableKey(undefined)).toBe(false)
     expect(isAnnounceableKey('')).toBe(false)
+  })
+})
+
+describe('toAccountId', () => {
+  const bob = account('Bob', 'sandbox-bob')
+  const [, ...groups] = bob.address.split('-')
+
+  it('accepts every spelling the To field recognises', () => {
+    expect(toAccountId(bob.id)).toBe(bob.id)
+    expect(toAccountId(bob.address)).toBe(bob.id)
+    expect(toAccountId(bob.address.toLowerCase())).toBe(bob.id)
+    expect(toAccountId(groups.join('-').toLowerCase())).toBe(bob.id)
+    expect(toAccountId(` ${bob.address} `)).toBe(bob.id)
+  })
+
+  it('refuses what is not an account, naming it', () => {
+    expect(() => toAccountId('TS-NOPE')).toThrow('TS-NOPE')
   })
 })

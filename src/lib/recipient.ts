@@ -94,3 +94,17 @@ export function addressPrefixOf(accounts: { address: string }[]): string {
 export function isAnnounceableKey(publicKey: string | undefined): publicKey is string {
   return Boolean(publicKey) && !/^0+$/.test(publicKey as string)
 }
+
+/**
+ * The numeric id a transaction is addressed to, from whatever a "To" field
+ * holds. It folds exactly as toComparableId does, so every spelling the
+ * field recognises — a lowercase or prefix-less address included — is also
+ * one it can send to. Unlike toComparableId it does not fall back to the raw
+ * value: a send needs an id, and the node's answer to junk is less clear
+ * than this one.
+ */
+export function toAccountId(value: string): string {
+  const id = toComparableId(value.trim())
+  if (!/^\d+$/.test(id)) throw new Error(`Not an address or account id: ${value}`)
+  return id
+}
