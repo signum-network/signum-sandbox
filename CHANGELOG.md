@@ -1,5 +1,12 @@
 # signum-sandbox
 
+## 0.1.1
+
+### Patch Changes
+
+- a page older than the installed sandbox says so, and offers the reload
+- a release publishes its checksum, and the installer checks it
+
 ## 0.1.0
 
 ### Minor Changes
