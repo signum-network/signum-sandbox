@@ -309,7 +309,7 @@ export default {
         types: {
           integer: 'Ganzzahl',
           address: 'Adresse',
-          boolean: 'Ja/Nein',
+          boolean: 'Boolean',
           shortString: 'Kurztext (≤ 8 Bytes)',
         },
         errors: {

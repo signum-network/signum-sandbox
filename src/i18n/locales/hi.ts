@@ -309,7 +309,7 @@ export default {
         types: {
           integer: 'पूर्णांक',
           address: 'पता',
-          boolean: 'हाँ/नहीं',
+          boolean: 'बूलियन',
           shortString: 'छोटा टेक्स्ट (≤ 8 बाइट)',
         },
         errors: {

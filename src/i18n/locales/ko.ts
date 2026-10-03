@@ -309,7 +309,7 @@ export default {
         types: {
           integer: '정수',
           address: '주소',
-          boolean: '예/아니요',
+          boolean: '불리언',
           shortString: '짧은 텍스트(8바이트 이하)',
         },
         errors: {

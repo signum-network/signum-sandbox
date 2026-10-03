@@ -308,7 +308,7 @@ export default {
         types: {
           integer: '整数',
           address: '地址',
-          boolean: '是/否',
+          boolean: '布尔值',
           shortString: '短文本（≤ 8 字节）',
         },
         errors: {

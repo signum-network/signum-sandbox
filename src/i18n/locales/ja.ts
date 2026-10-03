@@ -309,7 +309,7 @@ export default {
         types: {
           integer: '整数',
           address: 'アドレス',
-          boolean: 'はい/いいえ',
+          boolean: 'ブール値',
           shortString: '短いテキスト（8 バイト以内）',
         },
         errors: {

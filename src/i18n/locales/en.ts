@@ -331,7 +331,7 @@ export default {
         types: {
           integer: 'Integer',
           address: 'Address',
-          boolean: 'Yes/No',
+          boolean: 'Boolean',
           shortString: 'Short text (≤ 8 bytes)',
         },
         errors: {

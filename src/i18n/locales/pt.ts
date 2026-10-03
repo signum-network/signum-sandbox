@@ -309,7 +309,7 @@ export default {
         types: {
           integer: 'Inteiro',
           address: 'Endereço',
-          boolean: 'Sim/Não',
+          boolean: 'Booleano',
           shortString: 'Texto curto (≤ 8 bytes)',
         },
         errors: {

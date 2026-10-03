@@ -309,7 +309,7 @@ export default {
         types: {
           integer: 'Целое число',
           address: 'Адрес',
-          boolean: 'Да/Нет',
+          boolean: 'Булево',
           shortString: 'Короткий текст (≤ 8 байт)',
         },
         errors: {
