@@ -107,7 +107,7 @@ export function ContactList({
                 className="border px-1 text-[10px] uppercase tracking-[1px]"
                 style={{ borderColor: 'var(--blue3)', color: 'var(--blue3)' }}
               >
-                {t('console.accounts.contractTag')}
+                <Term id="contract">{t('console.accounts.contractTag')}</Term>
               </span>
             )}
             <span className="text-[var(--muted)]">{c.address}</span>
