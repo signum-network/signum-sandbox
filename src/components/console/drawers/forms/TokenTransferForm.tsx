@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Amount } from '@signumjs/util'
 import { feeFor } from '@/lib/fees'
 import { useTranslation } from 'react-i18next'
@@ -20,7 +20,7 @@ import {
   TextInput,
 } from './fields'
 import { PayloadEditor, usePayload } from './payload'
-import { pickAttachment, type AttachmentMode } from '@/lib/contractArgs'
+import { attachmentModeFor, pickAttachment, type AttachmentMode } from '@/lib/contractArgs'
 import { useContract } from '@/hooks/useContract'
 import { ContractNote, useActivationPrefill } from './ContractNote'
 import { ContractAttachment, useContractArgs } from './ContractArgsEditor'
@@ -53,6 +53,10 @@ export function TokenTransferForm({
   const { isContract: toContract, contract } = useContract(to, contacts)
   const args = useContractArgs()
   const [mode, setMode] = useState<AttachmentMode>('args')
+  useEffect(() => {
+    if (toContract) setMode(attachmentModeFor(payload.value))
+    // Decided when the recipient becomes a contract, not on every keystroke.
+  }, [toContract])
   useActivationPrefill(contract, signa, setSigna)
   const [fee, setFee] = useState(feeFor('transferAsset').getSigna())
   const [busy, setBusy] = useState(false)

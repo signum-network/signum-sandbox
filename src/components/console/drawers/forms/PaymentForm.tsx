@@ -9,7 +9,7 @@ import { useFromAccount } from '@/hooks/useFromAccount'
 import { Toggle } from '@/components/console/Toggle'
 import { AccountSelect, FeeField, Field, RecipientPicker, SubmitButton, TextInput } from './fields'
 import { PayloadEditor, usePayload } from './payload'
-import { pickAttachment, type AttachmentMode } from '@/lib/contractArgs'
+import { attachmentModeFor, pickAttachment, type AttachmentMode } from '@/lib/contractArgs'
 import { useContract } from '@/hooks/useContract'
 import { ContractNote, useActivationPrefill } from './ContractNote'
 import { ContractAttachment, useContractArgs } from './ContractArgsEditor'
@@ -48,6 +48,10 @@ export function PaymentForm({
   const { isContract: toContract, contract } = useContract(to, contacts)
   const args = useContractArgs()
   const [mode, setMode] = useState<AttachmentMode>('args')
+  useEffect(() => {
+    if (toContract) setMode(attachmentModeFor(payload.value))
+    // Decided when the recipient becomes a contract, not on every keystroke.
+  }, [toContract])
   useActivationPrefill(contract, amount, setAmount)
   const [fee, setFee] = useState(feeFor('payment').getSigna())
   const [busy, setBusy] = useState(false)

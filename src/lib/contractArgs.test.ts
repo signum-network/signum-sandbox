@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   activationSigna,
+  attachmentModeFor,
   encodeContractArgs,
   isBelowActivation,
   pickAttachment,
@@ -164,5 +165,16 @@ describe('pickAttachment', () => {
 
   it('attaches nothing for empty text', () => {
     expect(pickAttachment({ ...base, mode: 'text', text: '' })).toEqual({})
+  })
+})
+
+describe('attachmentModeFor — what a contract recipient opens with', () => {
+  it('opens on arguments when nothing was written yet', () => {
+    expect(attachmentModeFor('')).toBe('args')
+    expect(attachmentModeFor(null)).toBe('args')
+  })
+
+  it('keeps text that was already written in view', () => {
+    expect(attachmentModeFor('hello')).toBe('text')
   })
 })

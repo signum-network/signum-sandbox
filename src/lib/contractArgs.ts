@@ -132,3 +132,13 @@ export function pickAttachment({
   if (text === null) return null
   return text === '' ? {} : { message: text }
 }
+
+/**
+ * Which half of the attachment a form shows when its recipient becomes a
+ * contract. Arguments are the usual case, but text someone already wrote
+ * stays in view: opening on an empty argument list would hide it, and the
+ * send would then go out without it and without a word.
+ */
+export function attachmentModeFor(text: string | null): AttachmentMode {
+  return text ? 'text' : 'args'
+}
