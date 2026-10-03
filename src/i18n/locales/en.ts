@@ -21,6 +21,10 @@ export default {
     dashboard: { title: 'Sandbox', description: 'Forge blocks, send transactions, inspect the chain' },
     comingSoon: 'coming next',
   },
+  stale: {
+    message: 'Signum Sandbox {{installed}} is installed — this page is still {{running}}.',
+    reload: 'Reload',
+  },
   unreachable: {
     title: 'No node at {{host}}',
     description: 'Start it with ./scripts/start.sh',

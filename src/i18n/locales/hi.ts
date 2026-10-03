@@ -10,6 +10,7 @@ export default {
     dashboard: { title: 'सैंडबॉक्स', description: 'ब्लॉक बनाएँ, लेनदेन भेजें, चेन की जाँच करें' },
     comingSoon: 'जल्द आ रहा है',
   },
+  stale: { message: 'Signum Sandbox {{installed}} इंस्टॉल है — यह पेज अभी भी {{running}} है।', reload: 'फिर से लोड करें' },
   unreachable: { title: '{{host}} पर कोई नोड नहीं', description: 'इसे ./scripts/start.sh से शुरू करें' },
   glossary: {
     block: {

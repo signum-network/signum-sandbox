@@ -15,7 +15,24 @@ export default defineConfig(({ command, mode }) => {
   const nodeUrl = env.VITE_NODE_URL || 'http://localhost:6876'
 
   return {
-    plugins: [react(), tailwindcss()],
+    plugins: [
+      react(),
+      tailwindcss(),
+      // What the running page compares itself against (see src/lib/uiVersion.ts).
+      // Emitted by the build rather than kept in public/, so it cannot name a
+      // version other than the one the bundle was built as.
+      {
+        name: 'sandbox-version-json',
+        apply: 'build',
+        generateBundle() {
+          this.emitFile({
+            type: 'asset',
+            fileName: 'version.json',
+            source: JSON.stringify({ version }),
+          })
+        },
+      },
+    ],
     base: '/',
     define: {
       // Where the node actually lives, for the UI to name when nothing answers.

@@ -10,6 +10,7 @@ export default {
     dashboard: { title: '샌드박스', description: '블록을 생성하고, 트랜잭션을 보내고, 체인을 살펴보세요' },
     comingSoon: '곧 제공',
   },
+  stale: { message: 'Signum Sandbox {{installed}}이(가) 설치되어 있습니다 — 이 페이지는 아직 {{running}}입니다.', reload: '새로 고침' },
   unreachable: { title: '{{host}}에 노드가 없습니다', description: './scripts/start.sh 로 시작하세요' },
   glossary: {
     block: {

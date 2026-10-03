@@ -10,6 +10,7 @@ export default {
     dashboard: { title: 'Пісочниця', description: 'Куйте блоки, надсилайте транзакції, досліджуйте блокчейн' },
     comingSoon: 'незабаром',
   },
+  stale: { message: 'Встановлено Signum Sandbox {{installed}} — ця сторінка досі {{running}}.', reload: 'Перезавантажити' },
   unreachable: { title: 'Немає вузла на {{host}}', description: 'Запустіть його через ./scripts/start.sh' },
   glossary: {
     block: {

@@ -10,6 +10,7 @@ export default {
     dashboard: { title: '沙盒', description: '铸造区块、发送交易、检查链' },
     comingSoon: '即将推出',
   },
+  stale: { message: '已安装 Signum Sandbox {{installed}} —— 此页面仍是 {{running}}。', reload: '重新加载' },
   unreachable: { title: '{{host}} 上没有节点', description: '用 ./scripts/start.sh 启动它' },
   glossary: {
     block: {

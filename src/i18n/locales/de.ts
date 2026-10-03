@@ -10,6 +10,7 @@ export default {
     dashboard: { title: 'Sandbox', description: 'Blöcke forgen, Transaktionen senden, die Chain inspizieren' },
     comingSoon: 'kommt als Nächstes',
   },
+  stale: { message: 'Signum Sandbox {{installed}} ist installiert — diese Seite ist noch {{running}}.', reload: 'Neu laden' },
   unreachable: { title: 'Kein Node auf {{host}}', description: 'Starte ihn mit ./scripts/start.sh' },
   glossary: {
     block: {
