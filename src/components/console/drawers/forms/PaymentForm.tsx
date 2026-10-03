@@ -9,6 +9,10 @@ import { useFromAccount } from '@/hooks/useFromAccount'
 import { Toggle } from '@/components/console/Toggle'
 import { AccountSelect, FeeField, Field, RecipientPicker, SubmitButton, TextInput } from './fields'
 import { PayloadEditor, usePayload } from './payload'
+import { pickAttachment, type AttachmentMode } from '@/lib/contractArgs'
+import { useContract } from '@/hooks/useContract'
+import { ContractNote, useActivationPrefill } from './ContractNote'
+import { ContractAttachment, useContractArgs } from './ContractArgsEditor'
 import { Term } from '@/components/console/Term'
 
 export function PaymentForm({
@@ -41,14 +45,24 @@ export function PaymentForm({
   }, [initialSigna])
   const [attach, setAttach] = useState(false)
   const payload = usePayload()
+  const { isContract: toContract, contract } = useContract(to, contacts)
+  const args = useContractArgs()
+  const [mode, setMode] = useState<AttachmentMode>('args')
+  useActivationPrefill(contract, amount, setAmount)
   const [fee, setFee] = useState(feeFor('payment').getSigna())
   const [busy, setBusy] = useState(false)
 
   const submit = async () => {
     const from = accounts.find((a) => a.id === fromId)
-    const attached = payload.value ?? undefined
     if (!from || !to || !amount) return
-    if (attach && attached === undefined) return
+    const attachment = pickAttachment({
+      attach,
+      toContract,
+      mode,
+      encoded: args.encoded,
+      text: payload.value,
+    })
+    if (attachment === null) return
     setBusy(true)
     try {
       const recipientPublicKey = await resolveRecipientPublicKey(to, accounts)
@@ -57,12 +71,13 @@ export function PaymentForm({
         to,
         signa: amount,
         recipientPublicKey,
-        message: attach ? attached : undefined,
+        ...attachment,
         fee: Amount.fromSigna(fee),
       })
       setTo('')
       setAmount('')
       payload.reset()
+      args.reset()
       onSent()
     } catch (error) {
       onError(error instanceof Error ? error.message : String(error))
@@ -79,6 +94,7 @@ export function PaymentForm({
       <Field label={t('console.send.to')}>
         <RecipientPicker accounts={accounts} contacts={contacts} value={to} onChange={setTo} />
       </Field>
+      {toContract && <ContractNote contract={contract} signa={amount} />}
       <Field label={t('console.send.amount')}>
         <TextInput value={amount} onChange={setAmount} placeholder="100" />
       </Field>
@@ -89,9 +105,18 @@ export function PaymentForm({
           label={<Term id="payload">{t('console.send.attach')}</Term>}
         />
       </div>
-      {attach && (
-        <PayloadEditor state={payload} label={t('console.send.message')} variant="attachment" />
-      )}
+      {attach &&
+        (toContract ? (
+          <ContractAttachment
+            mode={mode}
+            onModeChange={setMode}
+            args={args}
+            payload={payload}
+            textLabel={t('console.send.message')}
+          />
+        ) : (
+          <PayloadEditor state={payload} label={t('console.send.message')} variant="attachment" />
+        ))}
       <FeeField action="payment" value={fee} onChange={setFee} />
       <SubmitButton label={t('console.send.submit')} busy={busy} onClick={() => void submit()} />
     </div>

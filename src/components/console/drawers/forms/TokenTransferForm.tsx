@@ -20,6 +20,10 @@ import {
   TextInput,
 } from './fields'
 import { PayloadEditor, usePayload } from './payload'
+import { pickAttachment, type AttachmentMode } from '@/lib/contractArgs'
+import { useContract } from '@/hooks/useContract'
+import { ContractNote, useActivationPrefill } from './ContractNote'
+import { ContractAttachment, useContractArgs } from './ContractArgsEditor'
 import { Term } from '@/components/console/Term'
 
 export function TokenTransferForm({
@@ -45,6 +49,11 @@ export function TokenTransferForm({
   // application can read.
   const [attach, setAttach] = useState(false)
   const payload = usePayload()
+  const [signa, setSigna] = useState('')
+  const { isContract: toContract, contract } = useContract(to, contacts)
+  const args = useContractArgs()
+  const [mode, setMode] = useState<AttachmentMode>('args')
+  useActivationPrefill(contract, signa, setSigna)
   const [fee, setFee] = useState(feeFor('transferAsset').getSigna())
   const [busy, setBusy] = useState(false)
 
@@ -61,9 +70,15 @@ export function TokenTransferForm({
 
   const submit = async () => {
     const from = accounts.find((a) => a.id === fromId)
-    const attached = payload.value ?? undefined
     if (!from || !to || !assetId || !quantity) return
-    if (attach && attached === undefined) return
+    const attachment = pickAttachment({
+      attach,
+      toContract,
+      mode,
+      encoded: args.encoded,
+      text: payload.value,
+    })
+    if (attachment === null) return
     setBusy(true)
     try {
       const recipientPublicKey = await resolveRecipientPublicKey(to, accounts)
@@ -73,13 +88,18 @@ export function TokenTransferForm({
         assetId,
         quantity,
         recipientPublicKey,
-        message: attach ? attached : undefined,
+        ...attachment,
+        // Only a contract has a use for SIGNA beside a token, and a field the
+        // person cannot see must not send anything.
+        signa: toContract && signa.trim() !== '' ? signa.trim() : undefined,
         fee: Amount.fromSigna(fee),
       })
       setTo('')
       setAssetId('')
       setQuantity('')
       payload.reset()
+      args.reset()
+      setSigna('')
       onSent()
     } catch (error) {
       onError(error instanceof Error ? error.message : String(error))
@@ -96,6 +116,7 @@ export function TokenTransferForm({
       <Field label={t('console.send.to')}>
         <RecipientPicker accounts={accounts} contacts={contacts} value={to} onChange={setTo} />
       </Field>
+      {toContract && <ContractNote contract={contract} signa={signa} />}
       <Field label={t('console.send.token')}>
         <Select
           value={assetId}
@@ -115,6 +136,11 @@ export function TokenTransferForm({
         decimals={chosenToken?.decimals ?? 0}
         symbol={chosenToken?.name}
       />
+      {toContract && (
+        <Field label={t('console.send.contract.signa')}>
+          <TextInput value={signa} onChange={setSigna} placeholder="0.4" />
+        </Field>
+      )}
       <label className="mb-2 flex items-center gap-2">
         <Toggle
           checked={attach}
@@ -122,9 +148,18 @@ export function TokenTransferForm({
           label={<Term id="payload">{t('console.send.attach')}</Term>}
         />
       </label>
-      {attach && (
-        <PayloadEditor state={payload} label={t('console.send.message')} variant="attachment" />
-      )}
+      {attach &&
+        (toContract ? (
+          <ContractAttachment
+            mode={mode}
+            onModeChange={setMode}
+            args={args}
+            payload={payload}
+            textLabel={t('console.send.message')}
+          />
+        ) : (
+          <PayloadEditor state={payload} label={t('console.send.message')} variant="attachment" />
+        ))}
       <FeeField action="transferAsset" value={fee} onChange={setFee} />
       <SubmitButton label={t('console.send.submit')} busy={busy} onClick={() => void submit()} />
     </div>
