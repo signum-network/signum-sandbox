@@ -222,6 +222,17 @@ fetch() {
     || die "launcher: could not download $1"
 }
 
+# published_sum <url> -> the sum a release publishes beside an asset, or
+# nothing when it publishes none.
+#
+# -L is the point of this function: GitHub answers a release download with a
+# 302 to its storage host, and without following it curl hands back the empty
+# redirect body — which read exactly like "no sum published", so every update
+# installed unverified while the sum sat right there.
+published_sum() {
+  curl -fsSL -m 20 "$1" 2>/dev/null | cut -d' ' -f1 || true
+}
+
 # verify <file> <expected sum> <what it is, for the message>
 verify() {
   actual=$(sha256_of "$1")
@@ -554,7 +565,7 @@ cmd_update() {
   fetch "$(release_url "$wanted")" "$tmp/release.zip"
   # Verified when the release publishes a sum beside it, and said plainly when
   # it does not — a check that silently does nothing is worse than no check.
-  sum=$(curl -fsS -m 20 "$(release_url "$wanted").sha256" 2>/dev/null | cut -d' ' -f1 || true)
+  sum=$(published_sum "$(release_url "$wanted").sha256")
   if [ -n "$sum" ]; then
     verify "$tmp/release.zip" "$sum" "the $wanted release"
   else

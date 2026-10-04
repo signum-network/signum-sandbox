@@ -121,6 +121,18 @@ check 'install: no published sum is absent' 'absent' "$(sum_verdict "$TMP/known.
 check 'install: the sum file names the file too, only the sum counts' 'ok' \
   "$(sum_verdict "$TMP/known.txt" "$(printf '%s  signum-sandbox-0.2.0.zip\n' "$known_sum" | cut -d' ' -f1)")"
 
+# ── the published sum is read through a URL ───────────────────
+# Only the reading is checked here; that a release URL redirects (GitHub
+# answers 302 to the storage host) is why both fetch with -L, which needs
+# the real thing to prove — see the --released run of e2e-install.sh.
+printf '%s  signum-sandbox-0.2.0.zip\n' "$known_sum" > "$TMP/release.zip.sha256"
+check 'launcher: reads the sum out of a published file' "$known_sum" \
+  "$(published_sum "file://$TMP/release.zip.sha256")"
+check 'launcher: no published file is no sum' '' "$(published_sum "file://$TMP/absent.sha256")"
+check 'install: reads the sum out of a published file' "$known_sum" \
+  "$(install_published_sum "file://$TMP/release.zip.sha256")"
+check 'install: no published file is no sum' '' "$(install_published_sum "file://$TMP/absent.sha256")"
+
 printf '\n'
 if [ "$fails" -eq 0 ]; then
   printf 'all checks passed\n'
