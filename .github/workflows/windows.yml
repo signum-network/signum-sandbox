@@ -1,0 +1,57 @@
+# A pull request that touches the Windows launcher gets installed on Windows.
+#
+# Only those: building an archive means bootstrap.sh's 60 MB download, which
+# ci.yml spares every other pull request. release.yml runs the same
+# installation again before anything is published, against the very archive it
+# publishes - this is the earlier warning, not the gate.
+name: windows
+
+on:
+  pull_request:
+    branches: [develop, main]
+    paths:
+      - 'scripts/*.ps1'
+      - 'scripts/*.cmd'
+      - 'scripts/jre.pinned'
+      - 'scripts/package.sh'
+      - '.github/workflows/windows.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: windows-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: .bun-version
+      - run: bun install --frozen-lockfile
+      - run: ./scripts/bootstrap.sh
+      - run: ./scripts/package.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: archive
+          path: build/signum-sandbox-*.zip*
+
+  install:
+    needs: package
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: archive
+          path: build
+      # Windows PowerShell 5.1, not pwsh: the one every user has.
+      - name: The launcher's decisions, under Windows PowerShell
+        shell: powershell
+        run: .\scripts\launcher.test.ps1
+      - name: Install it and use it
+        shell: powershell
+        run: .\scripts\e2e-install.ps1 (Get-Item build\signum-sandbox-*.zip).FullName

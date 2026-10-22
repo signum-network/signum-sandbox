@@ -30,4 +30,7 @@ jobs:
       - run: bun install --frozen-lockfile
       - run: bun run test
       - run: bun run test:launcher
+      # The Windows launcher's decisions, under the pwsh every runner has. Under
+      # Windows PowerShell 5.1, which is what users have, windows.yml runs them.
+      - run: bun run test:launcher:windows
       - run: bun run build

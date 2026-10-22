@@ -33,6 +33,10 @@ chmod +x "$OUT/scripts/start.sh"
 # update replace it too, and what install.sh reaches into the archive for.
 cp scripts/signum-sandbox "$OUT/scripts/signum-sandbox"
 cp scripts/jre.pinned "$OUT/scripts/jre.pinned"
+# Its Windows twin and the .cmd that puts it on PATH; install.ps1 reaches into
+# the archive for the first.
+cp scripts/signum-sandbox.ps1 "$OUT/scripts/signum-sandbox.ps1"
+cp scripts/signum-sandbox.cmd "$OUT/scripts/signum-sandbox.cmd"
 chmod +x "$OUT/scripts/signum-sandbox"
 cp LICENSE "$OUT/LICENSE"
 cp LICENSE-signum-node.txt "$OUT/LICENSE-signum-node.txt"
