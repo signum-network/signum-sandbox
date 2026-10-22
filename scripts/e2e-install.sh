@@ -100,7 +100,14 @@ install_from_archive() {
 }
 
 install_from_release() {
-  curl -fsSL "https://github.com/$REPO/releases/latest/download/install.sh" | sh
+  # Kept, so the run can say afterwards whether the download was checked.
+  # Not through tee: a pipeline's status is its last command's, and a failed
+  # install must still fail the run.
+  status=0
+  curl -fsSL "https://github.com/$REPO/releases/latest/download/install.sh" | sh \
+    > /tmp/install.log 2>&1 || status=$?
+  cat /tmp/install.log
+  return "$status"
 }
 
 wait_for_node() {
@@ -131,6 +138,13 @@ inside() {
 
   say ''
   check 'the installation records a version'  'yes' "$(yesno "$([ -n "$version" ]; echo $?)")"
+  # Only the real one-liner downloads anything; an archive handed in has no
+  # published sum to check against. A release without a readable sum installs
+  # with a warning — which is how an unfollowed redirect went unnoticed.
+  if [ "$1" = '--released' ]; then
+    check 'the download was checked against its sum' 'yes' \
+      "$(yesno "$(grep -q 'checksum verified' /tmp/install.log; echo $?)")"
+  fi
   check 'the launcher was placed and is runnable' 'yes' "$(yesno "$([ -x "$BIN" ]; echo $?)")"
   [ -n "$version" ] || die 'e2e: nothing more can be asserted without an installed version'
 

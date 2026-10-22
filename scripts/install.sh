@@ -34,6 +34,13 @@ sum_verdict() {
   if [ "$(install_sha256 "$1")" = "$2" ]; then printf 'ok'; else printf 'mismatch'; fi
 }
 
+# install_published_sum <url> -> the sum a release publishes beside its
+# archive, or nothing. -L because GitHub redirects release downloads; without
+# it the empty redirect body reads as "no sum published".
+install_published_sum() {
+  curl -fsSL -m 20 "$1" 2>/dev/null | cut -d' ' -f1 || true
+}
+
 # Sourced by scripts/launcher.test.sh to reach the functions above. Nothing
 # below this line may run then: it downloads a release and installs it over
 # whatever is in ~/.signum-sandbox.
@@ -64,7 +71,7 @@ printf 'install: downloading %s\n' "$version"
 curl -fL --retry 2 --progress-bar -o "$tmp/release.zip" "$zip_url" \
   || die "install: could not download $zip_url"
 
-published=$(curl -fsS -m 20 "$zip_url.sha256" 2>/dev/null | cut -d' ' -f1 || true)
+published=$(install_published_sum "$zip_url.sha256")
 case $(sum_verdict "$tmp/release.zip" "$published") in
   ok)       printf 'install: checksum verified\n' ;;
   mismatch) die "install: $zip_url does not match its published checksum — not installing it" ;;
