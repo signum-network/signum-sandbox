@@ -31,14 +31,6 @@ function http_status([string]$url) {
   try { "$((Invoke-WebRequest -UseBasicParsing -Uri $url -TimeoutSec 10).StatusCode)" } catch { 'nothing' }
 }
 
-function wait_for_node([string]$port) {
-  for ($waited = 0; $waited -lt 90; $waited++) {
-    if ((http_status "http://localhost:$port/api?requestType=getBlockchainStatus") -eq '200') { return 'yes' }
-    Start-Sleep -Seconds 1
-  }
-  "nothing after ${waited}s"
-}
-
 # --- install it -------------------------------------------------------------
 $Archive = (Resolve-Path -LiteralPath $Archive).Path
 $version = [IO.Path]::GetFileNameWithoutExtension($Archive) -replace '^signum-sandbox-', ''
@@ -87,13 +79,18 @@ try {
   & $Bin --help | Out-Null
   check 'help answers' '0' "$LASTEXITCODE"
 
-  & $Bin start --daemon
-  check 'starting in the background succeeds' '0' "$LASTEXITCODE"
+  # The bare command, as a user types it: it has to come back, and only once
+  # the node answers.
+  $started = (& $Bin) -join "`n"
+  say $started
+  check 'the bare command succeeds' '0' "$LASTEXITCODE"
+  check 'and says it started' 'yes' (yesno ($started -match 'Sandbox started successfully'))
   $PidFile = Join-Path $HomeDir 'run\node.pid'
   check 'and leaves a pidfile' 'yes' (yesno (Test-Path -LiteralPath $PidFile))
 
   $port = '6876'
-  check 'the node answers' 'yes' (wait_for_node $port)
+  # Not waited for: "started successfully" promised it already answers.
+  check 'the node answers' '200' (http_status "http://localhost:$port/api?requestType=getBlockchainStatus")
   check 'the sandbox ui answers' '200' (http_status "http://localhost:$port/")
   check 'the api documentation answers' '200' (http_status "http://localhost:$port/api-doc/")
 
