@@ -10,6 +10,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:launcher": "sh scripts/launcher.test.sh",
+    "test:launcher:windows": "pwsh -NoProfile -File scripts/launcher.test.ps1",
     "bootstrap": "./scripts/bootstrap.sh",
     "start": "./scripts/start.sh",
     "smoke": "./scripts/smoke.sh",
