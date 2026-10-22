@@ -1,5 +1,11 @@
 # signum-sandbox
 
+## 0.2.1
+
+### Patch Changes
+
+- the sandbox starts in the background, and says when it answers
+
 ## 0.2.0
 
 ### Minor Changes
