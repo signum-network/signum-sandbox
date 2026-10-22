@@ -124,6 +124,10 @@ check 'no answer means no version' ''      (latest_tag '')
 check 'an error answer means none' ''      (latest_tag '{"message":"Not Found"}')
 check 'not json at all means none' ''      (latest_tag '<html>rate limited</html>')
 
+# --- node_api: never localhost, which Windows tries over IPv6 first --------
+check 'the launcher asks the node on IPv4' `
+  'http://127.0.0.1:6876/api?requestType=getBlockchainStatus' (node_api '6876')
+
 # --- release_url ------------------------------------------------------------
 check 'release asset url' `
   'https://github.com/signum-network/signum-sandbox/releases/download/v0.2.0/signum-sandbox-0.2.0.zip' `

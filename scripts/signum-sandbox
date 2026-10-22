@@ -369,8 +369,11 @@ START_TIMEOUT=90
 # in a browser instead of here.
 wait_until_ready() {
   printf 'launcher: starting the sandbox '
-  waited=0
+  # Seconds on a clock, not turns of the loop: a turn takes as long as the
+  # question it asks, and the limit is meant to be ninety seconds.
+  began=$(date +%s)
   while :; do
+    waited=$(($(date +%s) - began))
     if answering "$2"; then up=yes; else up=no; fi
     if kill -0 "$1" 2>/dev/null; then alive=yes; else alive=no; fi
     case $(start_verdict "$alive" "$up" "$waited" "$START_TIMEOUT") in
@@ -402,7 +405,6 @@ wait_until_ready() {
     esac
     printf '.'
     sleep 1
-    waited=$((waited + 1))
   done
 }
 

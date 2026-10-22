@@ -399,9 +399,20 @@ function start_verdict([string]$alive, [string]$answering, [int]$waited, [int]$l
   if ($waited -ge $limit) { 'timeout' } else { 'waiting' }
 }
 
+# node_api <port> -> where the launcher asks the node how it is.
+#
+# 127.0.0.1, not localhost. Windows resolves localhost to ::1 first, the node
+# listens on IPv4 only, and Windows takes two seconds to give up on a refused
+# connection - so every question asked of localhost spent its first two
+# seconds on an address nobody listens on. A browser tries both at once,
+# which is why the address shown to people stays localhost.
+function node_api([string]$port) {
+  "http://127.0.0.1:$port/api?requestType=getBlockchainStatus"
+}
+
 # answering <port> -> true when a node answers its API there.
 function answering([string]$port) {
-  [bool](fetch_text "http://localhost:$port/api?requestType=getBlockchainStatus" 2)
+  [bool](fetch_text (node_api $port) 2)
 }
 
 $StartTimeout = 90
@@ -418,8 +429,11 @@ function count_lines([string]$file) {
 # pid having to be looked up again.
 function wait_until_ready($process, [string]$port, [int]$logLines) {
   [Console]::Out.Write('launcher: starting the sandbox ')
-  $waited = 0
+  # Seconds on a clock, not turns of the loop: a turn takes as long as the
+  # question it asks, and the limit is meant to be ninety seconds.
+  $clock = [Diagnostics.Stopwatch]::StartNew()
   while ($true) {
+    $waited = [int]$clock.Elapsed.TotalSeconds
     $up = if (answering $port) { 'yes' } else { 'no' }
     $alive = if ($process.HasExited) { 'no' } else { 'yes' }
     switch (start_verdict $alive $up $waited $StartTimeout) {
@@ -453,7 +467,6 @@ function wait_until_ready($process, [string]$port, [int]$logLines) {
     }
     [Console]::Out.Write('.')
     Start-Sleep -Seconds 1
-    $waited++
   }
 }
 
@@ -579,7 +592,7 @@ function cmd_status {
     say 'process: no background node (one may be running in the foreground)'
   }
 
-  $answer = fetch_text "http://localhost:$port/api?requestType=getBlockchainStatus" 3
+  $answer = fetch_text (node_api $port) 3
   if ($answer) {
     $height = 'unknown'
     try { $height = ($answer | ConvertFrom-Json).numberOfBlocks } catch { }
