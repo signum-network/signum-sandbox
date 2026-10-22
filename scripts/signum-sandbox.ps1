@@ -391,10 +391,93 @@ function prepare_layout([string]$app, [string]$version) {
   }
 }
 
+# start_verdict <alive: yes|no> <answering: yes|no> <seconds waited> <limit>
+#   -> ready | died | timeout | waiting - see start_verdict in the sh launcher.
+function start_verdict([string]$alive, [string]$answering, [int]$waited, [int]$limit) {
+  if ($answering -eq 'yes') { return 'ready' }
+  if ($alive -eq 'no') { return 'died' }
+  if ($waited -ge $limit) { 'timeout' } else { 'waiting' }
+}
+
+# node_api <port> -> where the launcher asks the node how it is.
+#
+# 127.0.0.1, not localhost. Windows resolves localhost to ::1 first, the node
+# listens on IPv4 only, and Windows takes two seconds to give up on a refused
+# connection - so every question asked of localhost spent its first two
+# seconds on an address nobody listens on. A browser tries both at once,
+# which is why the address shown to people stays localhost.
+function node_api([string]$port) {
+  "http://127.0.0.1:$port/api?requestType=getBlockchainStatus"
+}
+
+# answering <port> -> true when a node answers its API there.
+function answering([string]$port) {
+  [bool](fetch_text (node_api $port) 2)
+}
+
+$StartTimeout = 90
+
+# count_lines <file> -> how many lines it has, 0 when there is none.
+function count_lines([string]$file) {
+  if (-not (Test-Path -LiteralPath $file -PathType Leaf)) { return 0 }
+  @([IO.File]::ReadAllLines($file)).Count
+}
+
+# wait_until_ready <process> <port> <lines the log had before> - see
+# wait_until_ready in the sh launcher. The process is cmd, holding the node's
+# console; it exits when the node does, and HasExited says so without the
+# pid having to be looked up again.
+function wait_until_ready($process, [string]$port, [int]$logLines) {
+  [Console]::Out.Write('launcher: starting the sandbox ')
+  # Seconds on a clock, not turns of the loop: a turn takes as long as the
+  # question it asks, and the limit is meant to be ninety seconds.
+  $clock = [Diagnostics.Stopwatch]::StartNew()
+  while ($true) {
+    $waited = [int]$clock.Elapsed.TotalSeconds
+    $up = if (answering $port) { 'yes' } else { 'no' }
+    $alive = if ($process.HasExited) { 'no' } else { 'yes' }
+    switch (start_verdict $alive $up $waited $StartTimeout) {
+      'ready' {
+        say ' ok'
+        say ''
+        say "Sandbox started successfully - open http://localhost:$port/"
+        say ''
+        say '  signum-sandbox logs   to watch it'
+        say '  signum-sandbox stop   to end it'
+        return
+      }
+      'died' {
+        say ''
+        Remove-Item -LiteralPath $PidFile -Force -ErrorAction SilentlyContinue
+        warn 'launcher: the node stopped before it answered. It said:'
+        # Only what this start wrote, as in the sh launcher.
+        if (Test-Path -LiteralPath $LogFile -PathType Leaf) {
+          $lines = @([IO.File]::ReadAllLines($LogFile) | Select-Object -Skip $logLines | Select-Object -Last 20)
+          foreach ($line in $lines) { warn $line }
+        }
+        exit 1
+      }
+      'timeout' {
+        say ''
+        warn "launcher: the node is running but has not answered on port $port after ${StartTimeout}s."
+        warn 'launcher: it may still be starting. "signum-sandbox status" asks again,'
+        warn 'launcher: "signum-sandbox logs" shows what it is doing, "signum-sandbox stop" gives up.'
+        exit 1
+      }
+    }
+    [Console]::Out.Write('.')
+    Start-Sleep -Seconds 1
+  }
+}
+
 function cmd_start([string[]]$options) {
-  $daemon = $false
+  $foreground = $false
   foreach ($option in $options) {
-    if ($option -eq '--daemon') { $daemon = $true } else { die "start: unknown option $option" }
+    if ($option -eq '--foreground') { $foreground = $true }
+    # How the background was asked for while it was not the default. Still
+    # accepted, so whatever was written against 0.2.0 keeps working.
+    elseif ($option -eq '--daemon') { }
+    else { die "start: unknown option $option" }
   }
 
   $platform = platform_id (processor_architecture)
@@ -412,26 +495,30 @@ function cmd_start([string[]]$options) {
   $jar = Join-Path $app 'signum-node.jar'
   $port = node_port
 
+  # A node this launcher did not start - see cmd_start in the sh launcher.
+  if (answering $port) {
+    die "launcher: a node already answers on port $port - one in the foreground, in another terminal?"
+  }
+
   Set-Location -LiteralPath $HomeDir
-  if ($daemon) {
-    # Windows has no nohup. What it has is a console of the node's own, hidden,
-    # with cmd in it to send the output where the sh launcher sends it. The
-    # console is the point: it is what stop sends the Ctrl-C into.
-    #
-    # The quoting is cmd's: /c strips the outermost pair of quotes, so the
-    # whole line is wrapped in one more pair than it needs.
-    $line = '/d /c ""{0}" -jar "{1}" --headless -c ./conf/ >> "{2}" 2>&1"' -f $java, $jar, $LogFile
-    $shell = if ($env:ComSpec) { $env:ComSpec } else { 'cmd.exe' }
-    $process = Start-Process -FilePath $shell -ArgumentList $line -WorkingDirectory $HomeDir -WindowStyle Hidden -PassThru
-    [IO.File]::WriteAllLines($PidFile, [string[]]@($process.Id, (start_time $process)))
-    say "launcher: running in the background on http://localhost:$port/"
-    say 'launcher: signum-sandbox logs   to watch it'
-    say 'launcher: signum-sandbox stop   to end it'
-  } else {
+  if ($foreground) {
     say "launcher: http://localhost:$port/  (Ctrl-C to stop)"
     & $java -jar $jar --headless -c ./conf/
     exit $LASTEXITCODE
   }
+
+  $logLines = count_lines $LogFile
+  # Windows has no nohup. What it has is a console of the node's own, hidden,
+  # with cmd in it to send the output where the sh launcher sends it. The
+  # console is the point: it is what stop sends the Ctrl-C into.
+  #
+  # The quoting is cmd's: /c strips the outermost pair of quotes, so the whole
+  # line is wrapped in one more pair than it needs.
+  $line = '/d /c ""{0}" -jar "{1}" --headless -c ./conf/ >> "{2}" 2>&1"' -f $java, $jar, $LogFile
+  $shell = if ($env:ComSpec) { $env:ComSpec } else { 'cmd.exe' }
+  $process = Start-Process -FilePath $shell -ArgumentList $line -WorkingDirectory $HomeDir -WindowStyle Hidden -PassThru
+  [IO.File]::WriteAllLines($PidFile, [string[]]@($process.Id, (start_time $process)))
+  wait_until_ready $process $port $logLines
 }
 
 # What Windows has instead of SIGTERM. Stop-Process is TerminateProcess, which
@@ -505,7 +592,7 @@ function cmd_status {
     say 'process: no background node (one may be running in the foreground)'
   }
 
-  $answer = fetch_text "http://localhost:$port/api?requestType=getBlockchainStatus" 3
+  $answer = fetch_text (node_api $port) 3
   if ($answer) {
     $height = 'unknown'
     try { $height = ($answer | ConvertFrom-Json).numberOfBlocks } catch { }
@@ -709,14 +796,15 @@ function cmd_help {
   say @'
 signum-sandbox - a throwaway Signum chain on your own machine
 
-  signum-sandbox                  start it, here, until Ctrl-C
-  signum-sandbox start --daemon   start it in the background
-  signum-sandbox stop             stop a background node
-  signum-sandbox status           version, process, and what the node says
-  signum-sandbox logs             follow the node's log
-  signum-sandbox update           move to the newest release
-  signum-sandbox rollback         move back to the previous one
-  signum-sandbox reset            delete the chain and start from empty
+  signum-sandbox                      start it in the background, and say
+                                      when it answers
+  signum-sandbox start --foreground   start it here, until Ctrl-C
+  signum-sandbox stop                 stop it
+  signum-sandbox status               version, process, and what the node says
+  signum-sandbox logs                 follow the node's log
+  signum-sandbox update               move to the newest release
+  signum-sandbox rollback             move back to the previous one
+  signum-sandbox reset                delete the chain and start from empty
 
 A background node does not survive a logout or a reboot, on purpose: a
 sandbox should not keep running unnoticed.

@@ -38,16 +38,20 @@ Then:
 signum-sandbox
 ```
 
-and open **http://localhost:6876/**.
+It starts in the background, waits until the node answers, and says so:
+
+```
+Sandbox started successfully — open http://localhost:6876/
+```
 
 It brings its own Java, so there is nothing to install first, and it needs no
 administrator rights.
 
 | Command | Does |
 |---|---|
-| `signum-sandbox` | starts the chain here, until Ctrl-C |
-| `signum-sandbox start --daemon` | starts it in the background |
-| `signum-sandbox stop` | stops a background node |
+| `signum-sandbox` | starts the chain in the background, and says when it answers |
+| `signum-sandbox stop` | stops it |
+| `signum-sandbox start --foreground` | starts it here instead, until Ctrl-C |
 | `signum-sandbox status` | version, process, and what the node says |
 | `signum-sandbox logs` | follows the node's log |
 | `signum-sandbox update` | moves to the newest release |
@@ -55,8 +59,8 @@ administrator rights.
 | `signum-sandbox reset` | deletes the chain and starts from empty |
 
 Everything lives in `~/.signum-sandbox` (`%USERPROFILE%\.signum-sandbox` on
-Windows), and the chain survives updates. A
-background node does not survive a logout or a reboot, on purpose: a sandbox
+Windows), and the chain survives updates. The node keeps running when you
+close the terminal, but not past a logout or a reboot, on purpose: a sandbox
 should not keep running unnoticed.
 
 ### On Windows
@@ -65,7 +69,7 @@ The installer puts `%USERPROFILE%\.signum-sandbox\bin` on your user `PATH` and
 says so. It works in Windows PowerShell, which every Windows 10 and 11 has, and
 without changing the execution policy. Windows may ask whether to let Java
 through the firewall; the node listens on localhost only, so declining changes
-nothing. Ctrl-C on a node in the foreground may be followed by cmd's
+nothing. Ctrl-C on a node started with `--foreground` may be followed by cmd's
 *Terminate batch job (Y/N)?*. The node has already stopped by then, so either
 answer is fine.
 

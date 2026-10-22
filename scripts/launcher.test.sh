@@ -95,6 +95,15 @@ check 'refuses even unconfirmed'           'refuse'    "$(reset_verdict yes no)"
 check 'deletes when stopped and confirmed' 'delete'    "$(reset_verdict no yes)"
 check 'cancels when not confirmed'         'cancelled' "$(reset_verdict no no)"
 
+# ── start_verdict: when a start has succeeded, failed, or not yet ─
+# start_verdict <alive> <answering> <waited> <limit>
+check 'answering is ready'                   'ready'   "$(start_verdict yes yes 3 90)"
+check 'answering wins even at the limit'     'ready'   "$(start_verdict yes yes 90 90)"
+check 'dead and silent has died'             'died'    "$(start_verdict no no 3 90)"
+check 'death is reported before the clock'   'died'    "$(start_verdict no no 90 90)"
+check 'alive and silent keeps waiting'       'waiting' "$(start_verdict yes no 89 90)"
+check 'alive and silent at the limit is out' 'timeout' "$(start_verdict yes no 90 90)"
+
 # ── latest_tag reads a version out of the releases API answer ─
 api='{"tag_name":"v0.2.0","name":"0.2.0","draft":false}'
 check 'tag without the v'          '0.2.0' "$(latest_tag "$api")"

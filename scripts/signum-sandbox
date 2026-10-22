@@ -340,11 +340,82 @@ node_port() {
   if [ -n "$port" ]; then printf '%s' "$port"; else printf '%s' "$DEFAULT_PORT"; fi
 }
 
+# start_verdict <alive: yes|no> <answering: yes|no> <seconds waited> <limit>
+#   -> ready | died | timeout | waiting
+#
+# Answering comes first, because that is what "started" means to whoever is
+# about to open the browser. Dead comes before the clock: a node that has
+# exited will not answer however long one waits, and saying so at once beats
+# a minute and a half of dots.
+start_verdict() {
+  if [ "$2" = 'yes' ]; then printf 'ready'; return 0; fi
+  if [ "$1" = 'no' ]; then printf 'died'; return 0; fi
+  if [ "$3" -ge "$4" ]; then printf 'timeout'; else printf 'waiting'; fi
+}
+
+# answering <port> -> true when a node answers its API there.
+answering() {
+  curl -fsS -m 2 "http://localhost:$1/api?requestType=getBlockchainStatus" >/dev/null 2>&1
+}
+
+# How long a fresh node may take to answer. The e2e runs wait as long.
+START_TIMEOUT=90
+
+# wait_until_ready <pid> <port> <lines the log had before>
+#
+# The difference between "started" and "started successfully". Without it the
+# launcher would announce a URL that answers nothing for the next several
+# seconds - or ever, when the node dies on its way up, which is then found out
+# in a browser instead of here.
+wait_until_ready() {
+  printf 'launcher: starting the sandbox '
+  # Seconds on a clock, not turns of the loop: a turn takes as long as the
+  # question it asks, and the limit is meant to be ninety seconds.
+  began=$(date +%s)
+  while :; do
+    waited=$(($(date +%s) - began))
+    if answering "$2"; then up=yes; else up=no; fi
+    if kill -0 "$1" 2>/dev/null; then alive=yes; else alive=no; fi
+    case $(start_verdict "$alive" "$up" "$waited" "$START_TIMEOUT") in
+      ready)
+        printf ' ok\n\n'
+        say "Sandbox started successfully — open http://localhost:$2/"
+        say ''
+        say '  signum-sandbox logs   to watch it'
+        say '  signum-sandbox stop   to end it'
+        return 0
+        ;;
+      died)
+        printf '\n'
+        rm -f "$PID_FILE"
+        warn 'launcher: the node stopped before it answered. It said:'
+        # Only what this start wrote: the log is appended to, and an old
+        # failure shown beside a new one would send the reader after the wrong
+        # one.
+        tail -n "+$(($3 + 1))" "$LOG_FILE" 2>/dev/null | tail -n 20 >&2
+        exit 1
+        ;;
+      timeout)
+        printf '\n'
+        warn "launcher: the node is running but has not answered on port $2 after ${START_TIMEOUT}s."
+        warn 'launcher: it may still be starting. "signum-sandbox status" asks again,'
+        warn 'launcher: "signum-sandbox logs" shows what it is doing, "signum-sandbox stop" gives up.'
+        exit 1
+        ;;
+    esac
+    printf '.'
+    sleep 1
+  done
+}
+
 cmd_start() {
-  daemon=no
+  foreground=no
   for arg in "$@"; do
     case "$arg" in
-      --daemon) daemon=yes ;;
+      --foreground) foreground=yes ;;
+      # How the background was asked for while it was not the default. Still
+      # accepted, so that whatever was written against 0.2.0 keeps working.
+      --daemon) ;;
       *) die "start: unknown option $arg" ;;
     esac
   done
@@ -364,21 +435,35 @@ cmd_start() {
   java=${SIGNUM_SANDBOX_JAVA:-$(java_binary "$plat" "$JRE_DIR_BASE")}
   port=$(node_port)
 
+  # Something answering already is a node this launcher did not start - most
+  # likely one in the foreground in another terminal. A second one would die
+  # on the taken port, and the first would be mistaken for it.
+  if answering "$port"; then
+    die "launcher: a node already answers on port $port — one in the foreground, in another terminal?"
+  fi
+
   cd "$HOME_DIR"
-  if [ "$daemon" = 'yes' ]; then
-    # nohup and a pidfile, deliberately not launchd or systemd: one mechanism
-    # for both platforms, and a sandbox that does not quietly outlive the
-    # session that started it.
-    nohup "$java" -jar "$app/signum-node.jar" --headless -c ./conf/ \
-      >> "$LOG_FILE" 2>&1 &
-    printf '%s\n' "$!" > "$PID_FILE"
-    say "launcher: running in the background on http://localhost:$port/"
-    say 'launcher: signum-sandbox logs   to watch it'
-    say 'launcher: signum-sandbox stop   to end it'
-  else
+  if [ "$foreground" = 'yes' ]; then
     say "launcher: http://localhost:$port/  (Ctrl-C to stop)"
     exec "$java" -jar "$app/signum-node.jar" --headless -c ./conf/
   fi
+
+  log_lines=0
+  [ -f "$LOG_FILE" ] && log_lines=$(wc -l < "$LOG_FILE")
+  # nohup and a pidfile, deliberately not launchd or systemd: one mechanism
+  # for both platforms, and a sandbox that does not quietly outlive the
+  # session that started it.
+  #
+  # Started from a subshell that exits at once, so the node is adopted by init
+  # rather than remaining a child of this shell. Otherwise a node that dies
+  # while we wait would linger as a zombie of ours - and kill -0 answers yes
+  # for a zombie, so it would never be seen to have died.
+  (
+    nohup "$java" -jar "$app/signum-node.jar" --headless -c ./conf/ \
+      >> "$LOG_FILE" 2>&1 &
+    printf '%s\n' "$!" > "$PID_FILE"
+  )
+  wait_until_ready "$(cat "$PID_FILE")" "$port" "$log_lines"
 }
 
 cmd_stop() {
@@ -636,14 +721,15 @@ cmd_help() {
   cat <<'EOF'
 signum-sandbox — a throwaway Signum chain on your own machine
 
-  signum-sandbox                  start it, here, until Ctrl-C
-  signum-sandbox start --daemon   start it in the background
-  signum-sandbox stop             stop a background node
-  signum-sandbox status           version, process, and what the node says
-  signum-sandbox logs             follow the node's log
-  signum-sandbox update           move to the newest release
-  signum-sandbox rollback         move back to the previous one
-  signum-sandbox reset            delete the chain and start from empty
+  signum-sandbox                      start it in the background, and say
+                                      when it answers
+  signum-sandbox start --foreground   start it here, until Ctrl-C
+  signum-sandbox stop                 stop it
+  signum-sandbox status               version, process, and what the node says
+  signum-sandbox logs                 follow the node's log
+  signum-sandbox update               move to the newest release
+  signum-sandbox rollback             move back to the previous one
+  signum-sandbox reset                delete the chain and start from empty
 
 A background node does not survive a logout or a reboot, on purpose: a
 sandbox should not keep running unnoticed.

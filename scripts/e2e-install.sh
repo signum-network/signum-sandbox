@@ -110,19 +110,6 @@ install_from_release() {
   return "$status"
 }
 
-wait_for_node() {
-  waited=0
-  while [ "$waited" -lt 90 ]; do
-    if curl -fsS -m 2 "http://localhost:$1/api?requestType=getBlockchainStatus" >/dev/null 2>&1; then
-      printf '%s' 'yes'
-      return 0
-    fi
-    waited=$((waited + 1))
-    sleep 1
-  done
-  printf '%s' "nothing after ${waited}s"
-}
-
 inside() {
   prerequisites
 
@@ -157,12 +144,18 @@ inside() {
 
   trap '"$BIN" stop >/dev/null 2>&1 || true' EXIT
 
-  "$BIN" start --daemon
+  # The bare command, as a user types it: it has to come back, and only once
+  # the node answers.
+  started=$("$BIN")
+  printf '%s\n' "$started"
+  check 'the bare command starts it and says so' 'yes' \
+    "$(yesno "$(printf '%s' "$started" | grep -q 'Sandbox started successfully'; echo $?)")"
   PID_FILE="$HOME_DIR/run/node.pid"
   check 'starting in the background leaves a pidfile' 'yes' "$(yesno "$([ -f "$PID_FILE" ]; echo $?)")"
 
   port=6876
-  check 'the node answers' 'yes' "$(wait_for_node "$port")"
+  # Not waited for: "started successfully" promised it already answers.
+  check 'the node answers' 'yes' "$(yesno "$(curl -fsS -m 5 -o /dev/null "http://localhost:$port/api?requestType=getBlockchainStatus"; echo $?)")"
   check 'the sandbox ui answers'  '200' "$(curl -sL -o /dev/null -w '%{http_code}' "http://localhost:$port/")"
   check 'the api documentation answers' '200' \
     "$(curl -sL -o /dev/null -w '%{http_code}' "http://localhost:$port/api-doc/")"
