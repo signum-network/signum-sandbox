@@ -1,5 +1,12 @@
 # signum-sandbox
 
+## 0.2.0
+
+### Minor Changes
+
+- Windows installs with one line too, and gets the launcher's commands
+- a published checksum is found behind GitHub's redirect
+
 ## 0.1.1
 
 ### Patch Changes
