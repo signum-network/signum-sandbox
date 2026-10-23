@@ -14,6 +14,8 @@ import { interpret, resolveQuery } from '@/lib/search'
 import { displayName } from '@/lib/contacts'
 import { cn } from '@/lib/utils'
 import { useNameLookup } from '@/hooks/useNameLookup'
+import { useBlockLookup, useTransactionLookup } from '@/hooks/useTransactionLookup'
+import { withLookups } from '@/lib/chainFeed'
 import { Header } from './Header'
 import { AccountsView } from './views/AccountsView'
 import { TransactionsView } from './views/TransactionsView'
@@ -78,10 +80,16 @@ export function ConsoleShell() {
   // Resolved once here rather than per row: an address and a name both end up
   // meaning "this account", and only the name kind ever asks the node.
   const resolved = resolveQuery(query, accounts.accounts, contacts.contacts, namedAccountIds)
+  // An id, a height or an account older than the stream reaches is fetched by
+  // itself, so the search finds it anyway.
+  const lookedUp = useTransactionLookup(resolved, feed.items)
+  const transactionItems = withLookups(feed.items, lookedUp)
 
   // The Blocks tab walks the whole chain, so it fetches its own page rather
   // than sharing the stream's fixed window at the tip.
   const blocks = useBlockPage(blockPage, connected, state.kind === 'ready')
+  // A height or a block id off the page on screen is fetched by itself.
+  const blockItems = useBlockLookup(query, blocks.data ?? [])
 
   // Everything the tour is allowed to know, assembled from what the shell
   // already holds. No extra query: a tour that polls the node to decide
@@ -216,7 +224,7 @@ export function ConsoleShell() {
                     <>
                       <ViewNote id="transactions" terms={['block', 'unconfirmed']} />
                       <TransactionsView
-                        items={feed.items}
+                        items={transactionItems}
                         accounts={accounts.accounts}
                         contacts={contacts.contacts}
                         onAddContact={contacts.add}
@@ -230,7 +238,7 @@ export function ConsoleShell() {
                     <>
                       <ViewNote id="blocks" terms={['block', 'forger']} />
                       <BlocksView
-                        blocks={blocks.data ?? []}
+                        blocks={blockItems}
                         accounts={accounts.accounts}
                         contacts={contacts.contacts}
                         query={resolved}

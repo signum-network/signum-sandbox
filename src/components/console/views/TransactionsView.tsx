@@ -79,6 +79,7 @@ export function TransactionsView({
             key={item.id}
             item={item}
             arriving={arrived.has(item.id)}
+            expand={query.query.kind === 'id' && query.query.value === item.id}
             accounts={accounts}
             contacts={contacts}
             onAddContact={onAddContact}

@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import { nodeHost } from '@/lib/ledger'
@@ -174,6 +174,7 @@ function Payees({
 export function TransactionRow({
   item,
   arriving,
+  expand,
   accounts,
   contacts,
   onAddContact,
@@ -181,12 +182,19 @@ export function TransactionRow({
   item: FeedItem
   /** True for the one render on which this row is new at the tip of the feed. */
   arriving?: boolean
+  /** True while a search names exactly this row, which opens it. */
+  expand?: boolean
   accounts: SandboxAccount[]
   contacts: Contacts
   onAddContact: (accountIdOrAddress: string, name: string) => Promise<ResolveContactError | null>
 }) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
+  // A search that names this one row opens it, since seeing it is the point
+  // of having asked. Only on the way in: closing it again stays possible.
+  useEffect(() => {
+    if (expand) setOpen(true)
+  }, [expand])
   const summary = summarize(item.tx)
   const fields = detailFields(item.tx)
 

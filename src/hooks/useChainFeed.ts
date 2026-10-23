@@ -1,16 +1,20 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import type { Block, Transaction } from '@signumjs/core'
 import { ledger } from '@/lib/ledger'
-import { isTransaction, mergeFeed, type FeedItem } from '@/lib/chainFeed'
+import { isTransaction, mergeFeed, walkBack, type FeedItem } from '@/lib/chainFeed'
 import { PAGE_SIZE, pageRange } from '@/lib/paginate'
 
 /**
- * How far back the live stream looks. One page's worth: the stream is about
- * what just happened, and the Blocks tab is where you walk the whole chain.
+ * How far back the live stream looks: at least one page of blocks, and back
+ * past however many empty ones it takes to fill a page of transactions. The
+ * Blocks tab is where you walk the whole chain.
  */
-const RECENT_BLOCKS = PAGE_SIZE
+const WALK_TARGET = { minBlocks: PAGE_SIZE, minTransactions: PAGE_SIZE }
+
+const BLOCKS_KEY = ['blocks']
 
 export function useBlocks(height: number | null, connected: boolean) {
+  const queryClient = useQueryClient()
   return useQuery({
     // height is deliberately not part of the key: a changing key forces a hard
     // TanStack Query transition (data goes undefined until refetch), which
@@ -18,13 +22,16 @@ export function useBlocks(height: number | null, connected: boolean) {
     // destroys each row's open/closed state. useNodeSocket already invalidates
     // ['blocks'] on BLOCK_PUSHED, so a stable key plus that invalidation is
     // enough; refetchInterval below covers the socket-down case.
-    queryKey: ['blocks'],
-    queryFn: async () => {
-      const firstIndex = 0
-      const lastIndex = RECENT_BLOCKS - 1
-      const { blocks } = await ledger.block.getBlocks(firstIndex, lastIndex, true)
-      return blocks
-    },
+    queryKey: BLOCKS_KEY,
+    queryFn: () =>
+      walkBack(
+        async (firstIndex, lastIndex) =>
+          (await ledger.block.getBlocks(firstIndex, lastIndex, true)).blocks,
+        // The last walk, so a new block costs one request rather than a walk
+        // back through every empty block since the last transaction.
+        queryClient.getQueryData<Block[]>(BLOCKS_KEY) ?? [],
+        WALK_TARGET,
+      ),
     enabled: height !== null,
     refetchInterval: connected ? false : 10_000,
     retry: false,

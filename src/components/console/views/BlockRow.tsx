@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import type { Block, Transaction } from '@signumjs/core'
@@ -59,6 +59,7 @@ function TransactionSummaryLine({
 export function BlockRow({
   block,
   arriving,
+  expand,
   accounts,
   contacts,
   onSelectTransaction,
@@ -66,12 +67,19 @@ export function BlockRow({
   block: Block
   /** True for the one render on which this block is new at the tip. */
   arriving?: boolean
+  /** True while a search names exactly this row, which opens it. */
+  expand?: boolean
   accounts: SandboxAccount[]
   contacts: Contacts
   onSelectTransaction: (transactionId: string) => void
 }) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
+  // A search that names this one row opens it, since seeing it is the point
+  // of having asked. Only on the way in: closing it again stays possible.
+  useEffect(() => {
+    if (expand) setOpen(true)
+  }, [expand])
   const count = block.numberOfTransactions
   const transactions = (block.transactions ?? []).filter(isTransaction)
 

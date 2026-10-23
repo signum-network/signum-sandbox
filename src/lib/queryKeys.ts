@@ -24,6 +24,10 @@ export const STALE_ON_BLOCK = [
   'receivedBy',
   'aliases',
   'assetsByOwner',
+  // An id looked up while unconfirmed gains its block, and a height looked up
+  // ahead of the tip comes into existence.
+  'txLookup',
+  'blockLookup',
 ] as const
 
 /** The unconfirmed pool changes on a pending transaction as well as a block. */

@@ -2,13 +2,18 @@ import { useTranslation } from 'react-i18next'
 import type { Block } from '@signumjs/core'
 import type { SandboxAccount } from '@/lib/accounts'
 import type { Contacts } from '@/lib/contacts'
-import { isEmptyBlock, matchesBlock, type ResolvedQuery } from '@/lib/search'
+import { isEmptyBlock, matchesBlock, type Query, type ResolvedQuery } from '@/lib/search'
 import { Toggle } from '../Toggle'
 import { PAGE_SIZE, pageCount } from '@/lib/paginate'
 import { motion } from 'framer-motion'
 import { useArrivals, seconds } from '@/motion'
 import { Pager } from '../Pager'
 import { BlockRow } from './BlockRow'
+
+/** A search that points at one block rather than filtering by its forger. */
+const names = (block: Block, query: Query) =>
+  (query.kind === 'height' && query.height === block.height) ||
+  (query.kind === 'id' && query.value === block.block)
 
 export function BlocksView({
   blocks,
@@ -37,7 +42,10 @@ export function BlocksView({
   const { t } = useTranslation()
 
   const matching = blocks.filter((block) => matchesBlock(block, query))
-  const shown = hideEmpty ? matching.filter((b) => !isEmptyBlock(b)) : matching
+  // A height or an id asks for one block by name, so hiding it for being
+  // empty would answer a question nobody asked. Only a list gets thinned.
+  const pointed = query.query.kind === 'height' || query.query.kind === 'id'
+  const shown = hideEmpty && !pointed ? matching.filter((b) => !isEmptyBlock(b)) : matching
   const hidden = matching.length - shown.length
   // The hide-empty switch changes the displayed set as much as a search does,
   // so it belongs in the filter key: flipping it must not flare a page.
@@ -84,20 +92,37 @@ export function BlocksView({
           key={block.block}
           block={block}
           arriving={arrived.has(block.block)}
+          expand={names(block, query.query)}
           accounts={accounts}
           contacts={contacts}
           onSelectTransaction={onSelectTransaction}
         />
         ))}
       </motion.ul>
-      <Pager
-        page={page}
-        pages={pageCount(chainLength)}
-        from={first + 1}
-        to={first + shown.length}
-        total={chainLength}
-        onPage={onPage}
-      />
+      {/*
+        A block found by name is the whole result, not a slice of the chain's
+        pages, so the pager counts it alone instead of "1–1 of 1068" with
+        twenty-one other pages that would not contain it.
+      */}
+      {pointed ? (
+        <Pager
+          page={0}
+          pages={1}
+          from={shown.length === 0 ? 0 : 1}
+          to={shown.length}
+          total={shown.length}
+          onPage={onPage}
+        />
+      ) : (
+        <Pager
+          page={page}
+          pages={pageCount(chainLength)}
+          from={first + 1}
+          to={first + shown.length}
+          total={chainLength}
+          onPage={onPage}
+        />
+      )}
     </div>
   )
 }
