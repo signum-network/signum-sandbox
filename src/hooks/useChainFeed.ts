@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { Block, Transaction } from '@signumjs/core'
 import { ledger } from '@/lib/ledger'
 import { isTransaction, mergeFeed, walkBack, type FeedItem } from '@/lib/chainFeed'
@@ -74,6 +74,11 @@ export function useChainFeed(
  * Blocks tab must not drag it along — hence a separate query with the page in
  * its key rather than a shared one. getBlocks counts backwards from the tip,
  * so page zero is the newest blocks.
+ *
+ * A new key would leave the data undefined until the next page arrives, and
+ * the list would flash empty between the two. The page on screen stays until
+ * the next one is in hand instead, and carries its own page number, so the
+ * view turns the page once, when there is something to turn to.
  */
 export function useBlockPage(page: number, connected: boolean, enabled: boolean) {
   const { firstIndex, lastIndex } = pageRange(page)
@@ -81,9 +86,10 @@ export function useBlockPage(page: number, connected: boolean, enabled: boolean)
     queryKey: ['blockPage', firstIndex],
     queryFn: async () => {
       const { blocks } = await ledger.block.getBlocks(firstIndex, lastIndex, true)
-      return blocks
+      return { page, blocks }
     },
     enabled,
+    placeholderData: keepPreviousData,
     refetchInterval: connected ? false : 10_000,
     retry: false,
   })

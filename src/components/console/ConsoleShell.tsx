@@ -89,7 +89,10 @@ export function ConsoleShell() {
   // than sharing the stream's fixed window at the tip.
   const blocks = useBlockPage(blockPage, connected, state.kind === 'ready')
   // A height or a block id off the page on screen is fetched by itself.
-  const blockItems = useBlockLookup(query, blocks.data ?? [])
+  const blockItems = useBlockLookup(query, blocks.data?.blocks ?? [])
+  // The page whose blocks are in hand, which trails the requested one for as
+  // long as the request takes.
+  const shownBlockPage = blocks.data?.page ?? blockPage
 
   // Everything the tour is allowed to know, assembled from what the shell
   // already holds. No extra query: a tour that polls the node to decide
@@ -242,7 +245,7 @@ export function ConsoleShell() {
                         accounts={accounts.accounts}
                         contacts={contacts.contacts}
                         query={resolved}
-                        page={blockPage}
+                        page={shownBlockPage}
                         onPage={setBlockPage}
                         chainLength={state.height ?? 0}
                         hideEmpty={hideEmptyBlocks}
