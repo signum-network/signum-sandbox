@@ -5,8 +5,7 @@ import type { Contacts } from '@/lib/contacts'
 import { isEmptyBlock, matchesBlock, type Query, type ResolvedQuery } from '@/lib/search'
 import { Toggle } from '../Toggle'
 import { PAGE_SIZE, pageCount } from '@/lib/paginate'
-import { motion } from 'framer-motion'
-import { useArrivals, seconds } from '@/motion'
+import { useArrivals } from '@/motion'
 import { Pager } from '../Pager'
 import { BlockRow } from './BlockRow'
 
@@ -75,12 +74,9 @@ export function BlocksView({
         A filter that matched nothing is also not an empty chain, and saying so
         would be the same small lie the transaction stream avoids.
       */}
-      <motion.ul
+      <ul
         key={page}
-        className="themed-scroll console-scroll min-h-0 flex-1 overflow-y-auto pr-2"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: seconds('quick') }}
+        className="motion-page-in themed-scroll console-scroll min-h-0 flex-1 overflow-y-auto pr-2"
       >
         {shown.length === 0 && (
           <li className="p-4 text-[13px] text-[var(--muted)]">
@@ -98,7 +94,7 @@ export function BlocksView({
           onSelectTransaction={onSelectTransaction}
         />
         ))}
-      </motion.ul>
+      </ul>
       {/*
         A block found by name is the whole result, not a slice of the chain's
         pages, so the pager counts it alone instead of "1–1 of 1068" with

@@ -63,6 +63,28 @@
 }
 
 /*
+  A page of a list fading in after a page turn. The list is keyed on its page,
+  so a new page is a new element and the animation starts over by itself.
+
+  CSS rather than Framer Motion on purpose: Framer 11 runs an opacity fade as a
+  Web Animation and only writes the final value inline once that animation has
+  finished, so for one frame between the two the list falls back to its
+  initial opacity of 0 — a second flash at the end of every page turn.
+*/
+.motion-page-in {
+  animation: motion-page-in var(--motion-quick, 200ms) var(--motion-ease-out, ease-out) both;
+}
+
+@keyframes motion-page-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/*
   The background grid drifts by exactly one cell, so the loop is seamless —
   40px is the backgroundSize in __root.tsx. Transform only, which means the
   compositor does the work and no layout is recomputed for 90 seconds at a

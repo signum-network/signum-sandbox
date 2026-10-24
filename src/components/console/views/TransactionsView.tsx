@@ -4,8 +4,7 @@ import type { SandboxAccount } from '@/lib/accounts'
 import type { Contacts, ResolveContactError } from '@/lib/contacts'
 import { matchesTransaction, type ResolvedQuery } from '@/lib/search'
 import { paginate } from '@/lib/paginate'
-import { motion } from 'framer-motion'
-import { useArrivals, seconds } from '@/motion'
+import { useArrivals } from '@/motion'
 import { Pager } from '../Pager'
 import { TransactionRow } from './TransactionRow'
 
@@ -65,14 +64,11 @@ export function TransactionsView({
         new page starts at the top instead of inheriting the last one's scroll
         offset. No AnimatePresence: the outgoing page is gone in the same
         frame, and a wait-mode presence would cost 200ms per turn for nothing
-        anyone can see.
+        anyone can see. The fade itself is CSS, not Framer: see motion-page-in.
       */}
-      <motion.ul
+      <ul
         key={page}
-        className="themed-scroll console-scroll min-h-0 flex-1 overflow-y-auto pr-2"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: seconds('quick') }}
+        className="motion-page-in themed-scroll console-scroll min-h-0 flex-1 overflow-y-auto pr-2"
       >
         {shown.items.map((item) => (
           <TransactionRow
@@ -85,7 +81,7 @@ export function TransactionsView({
             onAddContact={onAddContact}
           />
         ))}
-      </motion.ul>
+      </ul>
       <Pager {...shown} onPage={onPage} />
     </div>
   )
