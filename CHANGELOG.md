@@ -1,5 +1,13 @@
 # signum-sandbox
 
+## 0.2.2
+
+### Patch Changes
+
+- the transaction list reaches past empty blocks, so the latest transactions always show
+- a search for a transaction, block or account finds it anywhere on the chain, and opens it
+- turning a page no longer flickers
+
 ## 0.2.1
 
 ### Patch Changes
