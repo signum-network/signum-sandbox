@@ -106,6 +106,22 @@ export default {
       term: 'Smart contract',
       help: 'A program living at an account: it runs when it receives at least its activation amount, and reads its arguments from the attachment in blocks of 8 bytes. Its account id is the id of the transaction that deployed it.',
     },
+    dataStack: {
+      term: 'Data stack',
+      help: 'A contract\'s variables: a row of 8-byte slots. Each holds one number, read little-endian. The same 8 bytes can be an id, an amount or a short text, depending on what the contract means by them.',
+    },
+    contractMap: {
+      term: 'Contract map',
+      help: 'Storage a contract keeps beside its data stack: values filed under two keys. You can look up everything under a first key, or one value under both.',
+    },
+    activation: {
+      term: 'Activation amount',
+      help: 'The SIGNA a contract needs to receive in one transaction before it runs. Less than that only adds to its balance.',
+    },
+    codeHash: {
+      term: 'Code hash',
+      help: 'A fingerprint of the contract\'s code. Contracts with the same code hash run the same program, so they lay out their data the same way.',
+    },
   },
   console: {
     back: 'Start page',
@@ -154,6 +170,12 @@ export default {
       glossaryNoMatch: 'Nothing matches',
     },
     note: {
+      contract:
+        'A smart contract, live: what it holds, whether it runs, and what has gone in and out. Everything here refreshes with each block.',
+      contractData:
+        'Every variable of the contract, one row per 8-byte slot. A row that changed in the last block that changed anything is marked. Name a slot to remember what it holds.',
+      contractMaps:
+        'Look up what the contract filed under a first key, or one value under both keys. Keys can be numbers or addresses.',
       transactions:
         'Everything happening on the chain, newest first. Unconfirmed entries are waiting for the next block — forge one and watch them settle.',
       blocks:
@@ -474,6 +496,55 @@ export default {
       title: 'This is not the sandbox network',
       description:
         'The node reports {{network}}. The sandbox keeps passphrases in plain text and only does that on its own mock chain, so accounts and sending are switched off.',
+    },
+  },
+  inspector: {
+    title: 'Contract',
+    back: 'Back to the console',
+    notFound: 'There is no contract with this id on this chain.',
+    inspect: 'Inspect',
+    field: {
+      address: 'Address',
+      creator: 'Creator',
+      description: 'Description',
+      created: 'Created in block',
+      version: 'AT version',
+      balance: 'Balance',
+      status: 'Status',
+      nextBlock: 'Next run at block',
+    },
+    status: {
+      dead: 'dead',
+      frozen: 'frozen',
+      finished: 'finished',
+      stopped: 'waiting',
+      running: 'running',
+      idle: 'idle',
+    },
+    frozenHint: 'Its balance is below the activation amount, so it will not run until it receives more SIGNA.',
+    data: {
+      size: '{{bytes}} bytes · {{slots}} slots',
+      index: '#',
+      label: 'Label',
+      raw: 'Stored',
+      hex: 'Hex',
+      decimal: 'Decimal',
+      signed: 'Signed',
+      text: 'Text',
+      account: 'Account',
+      changed: 'changed in block {{height}}',
+      labelPlaceholder: 'name',
+      empty: 'This contract keeps no data.',
+    },
+    maps: {
+      key1: 'Key 1',
+      key2: 'Key 2 (optional)',
+      load: 'Look up',
+      invalidKey: 'A key is a number or an address',
+      none: 'Nothing is filed under this key.',
+      value: 'Value',
+      zeroNote: 'The node answers 0 for an entry that was never set, so 0 can also mean "not set".',
+      recent: 'Recent',
     },
   },
   tour: {

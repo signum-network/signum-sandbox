@@ -31,6 +31,11 @@ export const GLOSSARY_TERMS = [
   'multiOut',
   'contact',
   'contract',
+  // The contract inspector's vocabulary.
+  'dataStack',
+  'contractMap',
+  'activation',
+  'codeHash',
 ] as const
 
 export type GlossaryTerm = (typeof GLOSSARY_TERMS)[number]

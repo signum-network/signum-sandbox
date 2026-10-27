@@ -89,6 +89,22 @@ export default {
       term: '智能合约',
       help: '驻留在账户上的程序：收到至少激活金额时运行，并以 8 字节为一块从附件中读取参数。它的账户 ID 就是部署它的交易 ID。',
     },
+    dataStack: {
+      term: '数据栈',
+      help: '合约的变量：一排 8 字节的槽位。每个槽位存一个数，按小端序读取。同样的 8 个字节可以是 id、金额或短文本，取决于合约如何使用它们。',
+    },
+    contractMap: {
+      term: '合约映射',
+      help: '合约在数据栈之外保存的存储：按两个键归档的值。你可以查询某个第一键下的全部内容，或两个键下的单个值。',
+    },
+    activation: {
+      term: '激活金额',
+      help: '合约在一笔交易中至少要收到多少 SIGNA 才会运行。少于此数只会增加它的余额。',
+    },
+    codeHash: {
+      term: '代码哈希',
+      help: '合约代码的指纹。代码哈希相同的合约运行同一个程序，因此数据布局也相同。',
+    },
   },
   console: {
     back: '起始页',
@@ -137,6 +153,12 @@ export default {
       glossaryNoMatch: '没有匹配项',
     },
     note: {
+      contract:
+        '实时查看一个智能合约：它持有什么、是否在运行、进出了什么。这里的一切都随每个区块刷新。',
+      contractData:
+        '合约的每个变量，每个 8 字节槽位一行。在最近一次有变化的区块中发生变化的行会被标记。给槽位起个名字，记住它存的是什么。',
+      contractMaps:
+        '查询合约在某个第一键下归档的内容，或两个键下的单个值。键可以是数字或地址。',
       transactions:
         '链上正在发生的一切，最新的在最前面。未确认的条目在等待下一个区块——铸造一个，看着它们落定。',
       blocks:
@@ -446,6 +468,55 @@ export default {
     guard: {
       title: '这不是沙盒网络',
       description: '节点报告为 {{network}}。沙盒以明文保存密语，且仅在自己的模拟链上这样做，因此账户和发送功能已关闭。',
+    },
+  },
+  inspector: {
+    title: '合约',
+    back: '返回控制台',
+    notFound: '此链上没有这个 id 的合约。',
+    inspect: '查看',
+    field: {
+      address: '地址',
+      creator: '创建者',
+      description: '描述',
+      created: '创建于区块',
+      version: 'AT 版本',
+      balance: '余额',
+      status: '状态',
+      nextBlock: '下次运行区块',
+    },
+    status: {
+      dead: '已失效',
+      frozen: '已冻结',
+      finished: '已结束',
+      stopped: '等待中',
+      running: '运行中',
+      idle: '空闲',
+    },
+    frozenHint: '余额低于激活金额，在收到更多 SIGNA 之前不会运行。',
+    data: {
+      size: '{{bytes}} 字节 · {{slots}} 个槽位',
+      index: '#',
+      label: '名称',
+      raw: '存储值',
+      hex: '十六进制',
+      decimal: '十进制',
+      signed: '有符号',
+      text: '文本',
+      account: '账户',
+      changed: '在区块 {{height}} 中变化',
+      labelPlaceholder: '名称',
+      empty: '这个合约没有数据。',
+    },
+    maps: {
+      key1: '键 1',
+      key2: '键 2（可选）',
+      load: '查询',
+      invalidKey: '键必须是数字或地址',
+      none: '此键下没有内容。',
+      value: '值',
+      zeroNote: '对于从未设置的条目，节点会返回 0，所以 0 也可能表示“未设置”。',
+      recent: '最近',
     },
   },
   tour: {

@@ -89,6 +89,22 @@ export default {
       term: 'Contrato inteligente',
       help: 'Um programa que vive numa conta: executa quando recebe pelo menos o seu valor de ativação e lê os argumentos do anexo em blocos de 8 bytes. O seu id de conta é o id da transação que o implementou.',
     },
+    dataStack: {
+      term: 'Pilha de dados',
+      help: 'As variáveis de um contrato: uma fileira de slots de 8 bytes. Cada um guarda um número, lido em little-endian. Os mesmos 8 bytes podem ser um id, um valor ou um texto curto, conforme o que o contrato quer dizer com eles.',
+    },
+    contractMap: {
+      term: 'Mapa do contrato',
+      help: 'Armazenamento que um contrato mantém ao lado da sua pilha de dados: valores arquivados sob duas chaves. Você pode consultar tudo sob uma primeira chave, ou um valor sob ambas.',
+    },
+    activation: {
+      term: 'Valor de ativação',
+      help: 'Os SIGNA que um contrato precisa receber numa única transação antes de executar. Menos do que isso só aumenta o saldo.',
+    },
+    codeHash: {
+      term: 'Hash do código',
+      help: 'Uma impressão digital do código do contrato. Contratos com o mesmo hash de código executam o mesmo programa, então organizam os dados da mesma forma.',
+    },
   },
   console: {
     back: 'Página inicial',
@@ -137,6 +153,12 @@ export default {
       glossaryNoMatch: 'Sem correspondências',
     },
     note: {
+      contract:
+        'Um contrato inteligente, ao vivo: o que ele guarda, se está executando e o que entrou e saiu. Tudo aqui se atualiza a cada bloco.',
+      contractData:
+        'Cada variável do contrato, uma linha por slot de 8 bytes. A linha que mudou no último bloco que mudou algo fica marcada. Dê um nome a um slot para lembrar o que ele guarda.',
+      contractMaps:
+        'Consulte o que o contrato arquivou sob uma primeira chave, ou um valor sob as duas chaves. Chaves podem ser números ou endereços.',
       transactions:
         'Tudo o que acontece na cadeia, do mais recente para o mais antigo. As entradas não confirmadas esperam pelo próximo bloco — forja um e vê-as assentar.',
       blocks:
@@ -452,6 +474,55 @@ export default {
       title: 'Esta não é a rede do sandbox',
       description:
         'O nó reporta {{network}}. O sandbox guarda as frases-passe em texto simples e só o faz na sua própria cadeia simulada, por isso as contas e o envio estão desativados.',
+    },
+  },
+  inspector: {
+    title: 'Contrato',
+    back: 'Voltar ao console',
+    notFound: 'Não existe contrato com este id nesta cadeia.',
+    inspect: 'Inspecionar',
+    field: {
+      address: 'Endereço',
+      creator: 'Criador',
+      description: 'Descrição',
+      created: 'Criado no bloco',
+      version: 'Versão AT',
+      balance: 'Saldo',
+      status: 'Estado',
+      nextBlock: 'Próxima execução no bloco',
+    },
+    status: {
+      dead: 'morto',
+      frozen: 'congelado',
+      finished: 'finalizado',
+      stopped: 'aguardando',
+      running: 'executando',
+      idle: 'ocioso',
+    },
+    frozenHint: 'O saldo está abaixo do valor de ativação, então ele não executa até receber mais SIGNA.',
+    data: {
+      size: '{{bytes}} bytes · {{slots}} slots',
+      index: '#',
+      label: 'Nome',
+      raw: 'Armazenado',
+      hex: 'Hex',
+      decimal: 'Decimal',
+      signed: 'Com sinal',
+      text: 'Texto',
+      account: 'Conta',
+      changed: 'mudou no bloco {{height}}',
+      labelPlaceholder: 'nome',
+      empty: 'Este contrato não guarda dados.',
+    },
+    maps: {
+      key1: 'Chave 1',
+      key2: 'Chave 2 (opcional)',
+      load: 'Consultar',
+      invalidKey: 'Uma chave é um número ou um endereço',
+      none: 'Nada está arquivado sob esta chave.',
+      value: 'Valor',
+      zeroNote: 'O nó responde 0 para uma entrada que nunca foi definida, então 0 também pode significar "não definido".',
+      recent: 'Recentes',
     },
   },
   tour: {

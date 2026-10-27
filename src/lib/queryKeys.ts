@@ -10,7 +10,9 @@
  * Deliberately not everything. `networkInfo` is fixed for the life of a node,
  * an `asset`'s name and decimals never change, a `contract`'s activation amount is fixed at deployment, a decrypted message stays
  * decrypted, and `accountsWithName` answers a question about a name the user
- * typed rather than about the chain's latest state.
+ * typed rather than about the chain's latest state. The contract inspector
+ * reads the same contract under `contractState`, which does change with
+ * every block it runs in.
  */
 export const STALE_ON_BLOCK = [
   'blockchainStatus',
@@ -28,6 +30,10 @@ export const STALE_ON_BLOCK = [
   // ahead of the tip comes into existence.
   'txLookup',
   'blockLookup',
+  // What the contract inspector shows: the whole contract (balance, flags,
+  // data stack) and whichever map entries are open.
+  'contractState',
+  'contractMap',
 ] as const
 
 /** The unconfirmed pool changes on a pending transaction as well as a block. */
