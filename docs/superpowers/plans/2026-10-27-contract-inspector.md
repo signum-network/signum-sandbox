@@ -288,13 +288,13 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 Append to `src/lib/contractData.test.ts`. Add `contractPartyId` and `knownIds` to the import from `./contractData`, and add these imports at the top:
 
 ```ts
-import { deriveAccount } from './accounts'
 import { toAddress } from './recipient'
 ```
 
 ```ts
 describe('knownIds', () => {
-  const alice = deriveAccount('Alice', 'alice passphrase', 'TS')
+  // Only id and name are read, so no key derivation (and no crypto adapter) is needed.
+  const alice = { id: '9999', address: toAddress('9999', 'TS'), name: 'Alice', passphrase: '' }
   const contacts = {
     '1111': { name: 'Bob', kind: 'account' as const },
     '2222': { name: 'Registry', kind: 'contract' as const },

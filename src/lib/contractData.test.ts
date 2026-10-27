@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { changedSlots, contractStatus, toDataSlots } from './contractData'
+import {
+  changedSlots,
+  contractPartyId,
+  contractStatus,
+  knownIds,
+  toDataSlots,
+} from './contractData'
+import { toAddress } from './recipient'
 
 describe('toDataSlots', () => {
   it('splits machine data into 8-byte slots and reads them little-endian', () => {
@@ -73,5 +80,55 @@ describe('contractStatus', () => {
     expect(contractStatus({ ...flags, stopped: true, finished: true })).toBe('finished')
     expect(contractStatus({ ...flags, finished: true, frozen: true })).toBe('frozen')
     expect(contractStatus({ ...flags, frozen: true, dead: true })).toBe('dead')
+  })
+})
+
+describe('knownIds', () => {
+  // Only id and name are read, so no key derivation (and no crypto adapter) is needed.
+  const alice = { id: '9999', address: toAddress('9999', 'TS'), name: 'Alice', passphrase: '' }
+  const contacts = {
+    '1111': { name: 'Bob', kind: 'account' as const },
+    '2222': { name: 'Registry', kind: 'contract' as const },
+  }
+
+  it('names owned accounts, contacts and the extras', () => {
+    const known = knownIds([alice], contacts, [{ id: '3333', name: 'Creator', contract: false }])
+    expect(known.get(alice.id)).toEqual({ id: alice.id, name: 'Alice', contract: false })
+    expect(known.get('1111')).toEqual({ id: '1111', name: 'Bob', contract: false })
+    expect(known.get('2222')).toEqual({ id: '2222', name: 'Registry', contract: true })
+    expect(known.get('3333')?.name).toBe('Creator')
+  })
+
+  it('lets an owned account or a contact name win over an extra', () => {
+    const known = knownIds([alice], contacts, [
+      { id: alice.id, name: 'Creator', contract: false },
+      { id: '2222', name: 'This contract', contract: true },
+    ])
+    expect(known.get(alice.id)?.name).toBe('Alice')
+    expect(known.get('2222')?.name).toBe('Registry')
+  })
+
+  it('never knows zero, which is what an unset slot holds', () => {
+    expect(knownIds([], {}, [{ id: '0', name: 'x', contract: false }]).has('0')).toBe(false)
+  })
+})
+
+describe('contractPartyId', () => {
+  const contacts = { '2222': { name: 'Registry', kind: 'contract' as const } }
+  const registry = toAddress('2222', 'TS')
+
+  it('links a contract contact in either role', () => {
+    expect(contractPartyId(registry, 'recipient', 'payment', contacts)).toBe('2222')
+    expect(contractPartyId(registry, 'sender', 'message', contacts)).toBe('2222')
+  })
+
+  it('links the sender of a contract payment even when it is no contact', () => {
+    const other = toAddress('4444', 'TS')
+    expect(contractPartyId(other, 'sender', 'contractPayment', contacts)).toBe('4444')
+    expect(contractPartyId(other, 'recipient', 'contractPayment', contacts)).toBeNull()
+  })
+
+  it('does not link anyone else', () => {
+    expect(contractPartyId(toAddress('4444', 'TS'), 'recipient', 'payment', contacts)).toBeNull()
   })
 })

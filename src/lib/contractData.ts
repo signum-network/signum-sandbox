@@ -1,4 +1,8 @@
 import type { Contract } from '@signumjs/contracts'
+import type { Contacts } from './contacts'
+import type { SandboxAccount } from './accounts'
+import type { TxKind } from './txSummary'
+import { toComparableId } from './recipient'
 
 /**
  * One 8-byte variable of a contract, read every way a person might need it.
@@ -105,4 +109,52 @@ export function contractStatus(
   if (contract.stopped) return 'stopped'
   if (contract.running) return 'running'
   return 'idle'
+}
+
+export interface KnownId {
+  id: string
+  name: string
+  contract: boolean
+}
+
+/**
+ * Every id the page can put a name to without asking the chain: what the
+ * console already knows, plus what this contract says about itself. A slot
+ * is matched against this; a per-slot getAccount would be an N+1 on every
+ * block. Owned accounts and contacts win over the extras, because a name the
+ * person gave is the one they recognise. Zero is never an account: it is
+ * what every unset slot holds.
+ */
+export function knownIds(
+  accounts: SandboxAccount[],
+  contacts: Contacts,
+  extra: KnownId[],
+): Map<string, KnownId> {
+  const known = new Map<string, KnownId>()
+  for (const entry of extra) known.set(entry.id, entry)
+  for (const [id, contact] of Object.entries(contacts)) {
+    known.set(id, { id, name: contact.name, contract: contact.kind === 'contract' })
+  }
+  for (const account of accounts) {
+    known.set(account.id, { id: account.id, name: account.name, contract: false })
+  }
+  known.delete('0')
+  return known
+}
+
+/**
+ * The contract id behind a sender or recipient, when the row can tell it is
+ * one: a contact saved as a contract, or the sender of a contract payment,
+ * a subtype only a contract ever creates. Anyone else is not looked up.
+ */
+export function contractPartyId(
+  address: string,
+  role: 'sender' | 'recipient',
+  kind: TxKind,
+  contacts: Contacts,
+): string | null {
+  const id = toComparableId(address)
+  if (contacts[id]?.kind === 'contract') return id
+  if (role === 'sender' && kind === 'contractPayment') return id
+  return null
 }
