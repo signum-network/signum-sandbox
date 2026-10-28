@@ -493,13 +493,18 @@ export default {
     },
     status: {
       dead: 'tot',
-      frozen: 'eingefroren',
+      outOfFunds: 'ohne SIGNA',
       finished: 'beendet',
       stopped: 'wartet',
       running: 'läuft',
       idle: 'untätig',
     },
-    frozenHint: 'Sein Guthaben liegt unter dem Aktivierungsbetrag, deshalb läuft er erst wieder, wenn er mehr SIGNA bekommt.',
+    hint: {
+      outOfFunds: 'Ihm ist mitten im Lauf das SIGNA ausgegangen; er macht an derselben Stelle weiter.',
+      finished: 'Er ist am Ende angekommen und beginnt beim nächsten Aufruf wieder von vorn.',
+      stopped: 'Er hat angehalten und macht beim nächsten Aufruf an derselben Stelle weiter.',
+    },
+    wakesAt: 'Er läuft wieder, sobald sein Kontostand {{threshold}} SIGNA erreicht: sein letztes Guthaben plus den Aktivierungsbetrag.',
     data: {
       size: '{{bytes}} Bytes · {{slots}} Slots',
       index: '#',

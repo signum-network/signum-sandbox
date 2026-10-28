@@ -493,13 +493,18 @@ export default {
     },
     status: {
       dead: '停止済み',
-      frozen: '凍結',
+      outOfFunds: 'SIGNA 不足',
       finished: '終了',
       stopped: '待機中',
       running: '実行中',
       idle: 'アイドル',
     },
-    frozenHint: '残高が起動額を下回っているため、SIGNA を追加で受け取るまで実行されません。',
+    hint: {
+      outOfFunds: '実行の途中で SIGNA が尽きました。止まった位置から再開します。',
+      finished: '最後まで実行しました。次の呼び出しで最初からやり直します。',
+      stopped: '一時停止しました。次の呼び出しで止まった位置から再開します。',
+    },
+    wakesAt: '残高が {{threshold}} SIGNA（前回の残高＋起動額）に達すると再び実行されます。',
     data: {
       size: '{{bytes}} バイト · {{slots}} スロット',
       index: '#',

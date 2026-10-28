@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { Amount } from '@signumjs/util'
 import type { Account, Contract } from '@signumjs/core'
 import { nodeHost } from '@/lib/ledger'
-import { contractStatus, type ContractStatus } from '@/lib/contractData'
+import { contractStatus, wakeThreshold, type ContractStatus } from '@/lib/contractData'
 import { displayName, type Contacts } from '@/lib/contacts'
 import type { SandboxAccount } from '@/lib/accounts'
 import { Identicon } from '@/components/Identicon'
@@ -12,17 +12,22 @@ import { Term } from '@/components/console/Term'
 import { useValueFlash } from '@/motion'
 
 /**
- * Green while it can still run, amber while it waits for money, magenta once
- * nothing will make it run again.
+ * Amber for a run cut off for lack of SIGNA, magenta once nothing will make
+ * it run again. Finished is green: the next call starts it from the top.
  */
 const STATUS_COLOR: Record<ContractStatus, string> = {
   running: 'var(--green)',
   stopped: 'var(--green)',
+  finished: 'var(--green)',
   idle: 'var(--green)',
-  frozen: 'var(--amber)',
-  finished: 'var(--mag)',
+  outOfFunds: 'var(--amber)',
   dead: 'var(--mag)',
 }
+
+/** The statuses that need a sentence on what happens next. */
+const HINTED: ReadonlySet<ContractStatus> = new Set(['outOfFunds', 'finished', 'stopped'])
+
+const signa = (planck: string) => `${Amount.fromPlanck(planck).getSigna()} SIGNA`
 
 /** Who the contract is, what it holds, and whether it runs. */
 export function ContractHeader({
@@ -39,7 +44,10 @@ export function ContractHeader({
   const { t } = useTranslation()
   const status = contractStatus(contract)
 
-  const balance = `${Amount.fromPlanck(contract.balanceNQT).getSigna()} SIGNA`
+  const threshold = wakeThreshold(contract)
+  // The account's balance, not getAT's: that one is the balance after the
+  // last run, so a payment would not show until the contract runs again.
+  const balance = signa(account?.balanceNQT ?? contract.balanceNQT)
   const balanceFlash = useValueFlash(balance)
   const statusFlash = useValueFlash(status)
   // One flash for the whole holdings block, as in the watch view.
@@ -84,14 +92,21 @@ export function ContractHeader({
         )}
       </Row>
       <Row label={<Term id="activation" />}>
-        {Amount.fromPlanck(contract.minActivation).getSigna()} SIGNA
+        {signa(contract.minActivation)}
       </Row>
       <Row label={t('inspector.field.status')}>
         <span ref={statusFlash} style={{ color: STATUS_COLOR[status] }}>
           {t(`inspector.status.${status}`)}
         </span>
-        {status === 'frozen' && (
-          <span className="block text-[12px] text-[var(--muted)]">{t('inspector.frozenHint')}</span>
+        {HINTED.has(status) && (
+          <span className="block text-[12px] text-[var(--muted)]">
+            {t(`inspector.hint.${status}`)}
+          </span>
+        )}
+        {threshold && status !== 'dead' && (
+          <span className="block text-[12px] text-[var(--muted)]">
+            {t('inspector.wakesAt', { threshold: Amount.fromPlanck(threshold).getSigna() })}
+          </span>
         )}
       </Row>
       <Row label={t('inspector.field.nextBlock')}>{contract.nextBlock}</Row>

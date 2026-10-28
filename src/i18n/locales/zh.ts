@@ -487,13 +487,18 @@ export default {
     },
     status: {
       dead: '已失效',
-      frozen: '已冻结',
+      outOfFunds: 'SIGNA 不足',
       finished: '已结束',
       stopped: '等待中',
       running: '运行中',
       idle: '空闲',
     },
-    frozenHint: '余额低于激活金额，在收到更多 SIGNA 之前不会运行。',
+    hint: {
+      outOfFunds: '运行中途 SIGNA 用尽，将从停下的位置继续。',
+      finished: '已运行到结尾，下次调用时从头开始。',
+      stopped: '已暂停，下次调用时从停下的位置继续。',
+    },
+    wakesAt: '余额达到 {{threshold}} SIGNA（上次余额加激活金额）时会再次运行。',
     data: {
       size: '{{bytes}} 字节 · {{slots}} 个槽位',
       index: '#',

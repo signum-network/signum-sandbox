@@ -515,13 +515,18 @@ export default {
     },
     status: {
       dead: 'dead',
-      frozen: 'frozen',
+      outOfFunds: 'out of SIGNA',
       finished: 'finished',
       stopped: 'waiting',
       running: 'running',
       idle: 'idle',
     },
-    frozenHint: 'Its balance is below the activation amount, so it will not run until it receives more SIGNA.',
+    hint: {
+      outOfFunds: 'It ran out of SIGNA in the middle of a run and continues where it stopped.',
+      finished: 'It reached its end and starts again from the top when it is called next.',
+      stopped: 'It paused and continues where it stopped when it is called next.',
+    },
+    wakesAt: 'It runs again once its balance reaches {{threshold}} SIGNA: its last balance plus the activation amount.',
     data: {
       size: '{{bytes}} bytes · {{slots}} slots',
       index: '#',

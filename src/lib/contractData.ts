@@ -94,21 +94,38 @@ export function changedSlots(previous: DataSlot[] | null, next: DataSlot[]): Set
   return changed
 }
 
-export type ContractStatus = 'dead' | 'frozen' | 'finished' | 'stopped' | 'running' | 'idle'
+export type ContractStatus = 'dead' | 'outOfFunds' | 'finished' | 'stopped' | 'running' | 'idle'
 
 /**
- * One word for the node's five flags, which can be set together. The most
- * final one wins: a dead contract that is also frozen is, above all, dead.
+ * One word for the node's five flags, which can be set together.
+ *
+ * `frozen` is not a status of its own. The node sets it on every FIN and STP
+ * as well as when a step cannot be paid for, and it means only "do not run
+ * again until the activation amount has come in". Next to finished or
+ * stopped that is the ordinary wait for the next call. Next to running it
+ * means the run was cut off for lack of SIGNA, which is the one case worth a
+ * warning. Dead is final and wins over everything.
  */
 export function contractStatus(
   contract: Pick<Contract, 'dead' | 'frozen' | 'finished' | 'stopped' | 'running'>,
 ): ContractStatus {
   if (contract.dead) return 'dead'
-  if (contract.frozen) return 'frozen'
   if (contract.finished) return 'finished'
   if (contract.stopped) return 'stopped'
-  if (contract.running) return 'running'
+  if (contract.running) return contract.frozen ? 'outOfFunds' : 'running'
   return 'idle'
+}
+
+/**
+ * The balance, in planck, at which a frozen contract is picked up again, or
+ * null when it is not frozen. The node's own test (SqlATStore) is the account
+ * balance minus the balance after the last run, against the activation amount.
+ */
+export function wakeThreshold(
+  contract: Pick<Contract, 'frozen' | 'prevBalanceNQT' | 'minActivation'>,
+): string | null {
+  if (!contract.frozen) return null
+  return (BigInt(contract.prevBalanceNQT) + BigInt(contract.minActivation)).toString()
 }
 
 export interface KnownId {

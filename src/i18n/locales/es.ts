@@ -492,13 +492,18 @@ export default {
     },
     status: {
       dead: 'muerto',
-      frozen: 'congelado',
+      outOfFunds: 'sin SIGNA',
       finished: 'terminado',
       stopped: 'esperando',
       running: 'en ejecución',
       idle: 'inactivo',
     },
-    frozenHint: 'Su saldo está por debajo del importe de activación, así que no se ejecutará hasta que reciba más SIGNA.',
+    hint: {
+      outOfFunds: 'Se quedó sin SIGNA en mitad de una ejecución y continúa donde se detuvo.',
+      finished: 'Llegó a su final y vuelve a empezar desde el principio en la próxima llamada.',
+      stopped: 'Se detuvo y continúa donde lo dejó en la próxima llamada.',
+    },
+    wakesAt: 'Se ejecuta de nuevo cuando su saldo alcanza {{threshold}} SIGNA: su último saldo más el importe de activación.',
     data: {
       size: '{{bytes}} bytes · {{slots}} ranuras',
       index: '#',

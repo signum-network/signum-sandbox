@@ -491,13 +491,18 @@ export default {
     },
     status: {
       dead: '종료됨',
-      frozen: '동결됨',
+      outOfFunds: 'SIGNA 부족',
       finished: '완료됨',
       stopped: '대기 중',
       running: '실행 중',
       idle: '유휴',
     },
-    frozenHint: '잔액이 활성화 금액보다 적어서 SIGNA를 더 받기 전까지 실행되지 않습니다.',
+    hint: {
+      outOfFunds: '실행 도중 SIGNA가 바닥났으며, 멈춘 지점부터 계속합니다.',
+      finished: '끝까지 실행했으며, 다음 호출 시 처음부터 다시 시작합니다.',
+      stopped: '일시 정지했으며, 다음 호출 시 멈춘 지점부터 계속합니다.',
+    },
+    wakesAt: '잔액이 {{threshold}} SIGNA(직전 잔액 + 활성화 금액)에 도달하면 다시 실행됩니다.',
     data: {
       size: '{{bytes}}바이트 · 슬롯 {{slots}}개',
       index: '#',

@@ -4,6 +4,7 @@ import {
   contractPartyId,
   contractStatus,
   knownIds,
+  wakeThreshold,
   toDataSlots,
 } from './contractData'
 import { toAddress } from './recipient'
@@ -75,11 +76,33 @@ describe('contractStatus', () => {
     expect(contractStatus(flags)).toBe('idle')
   })
 
-  it('takes the most final flag', () => {
-    expect(contractStatus({ ...flags, running: true, stopped: true })).toBe('stopped')
+  it('reads frozen beside finished or stopped as the ordinary wait for the next call', () => {
+    // The node sets frozen on every FIN and STP, so it says nothing on its own.
+    expect(contractStatus({ ...flags, finished: true, frozen: true })).toBe('finished')
+    expect(contractStatus({ ...flags, stopped: true, frozen: true })).toBe('stopped')
+  })
+
+  it('reads frozen while running as a run that ran out of SIGNA', () => {
+    expect(contractStatus({ ...flags, running: true, frozen: true })).toBe('outOfFunds')
+  })
+
+  it('puts dead above everything, and finished above stopped', () => {
+    expect(contractStatus({ ...flags, running: true, frozen: true, dead: true })).toBe('dead')
     expect(contractStatus({ ...flags, stopped: true, finished: true })).toBe('finished')
-    expect(contractStatus({ ...flags, finished: true, frozen: true })).toBe('frozen')
-    expect(contractStatus({ ...flags, frozen: true, dead: true })).toBe('dead')
+    expect(contractStatus({ ...flags, running: true, stopped: true })).toBe('stopped')
+    expect(contractStatus({ ...flags, running: true })).toBe('running')
+  })
+})
+
+describe('wakeThreshold', () => {
+  const contract = { frozen: true, prevBalanceNQT: '2206600000', minActivation: '300000000' }
+
+  it('is the last balance plus the activation amount, as the node checks it', () => {
+    expect(wakeThreshold(contract)).toBe('2506600000')
+  })
+
+  it('is null for a contract that is not frozen', () => {
+    expect(wakeThreshold({ ...contract, frozen: false })).toBeNull()
   })
 })
 

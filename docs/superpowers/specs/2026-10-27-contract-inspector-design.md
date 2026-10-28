@@ -40,7 +40,10 @@ Checked against the working tree, the installed packages and the running sandbox
 3. **Header: identity, money, state.**
    - **Identity:** name, description, address/id, creator (shown through `displayName`, so a sandbox account or contact shows its name), creation block, `atVersion`, `machineCodeHashId`.
    - **Money:** SIGNA balance (`balanceNQT`), held tokens (from `getAccount`), and activation cost (`minActivation`).
-   - **State:** one status, derived by a pure `contractStatus(contract)` in this precedence: `dead` > `frozen` > `finished` > `stopped` > `running` > `idle`. Also `nextBlock`. `frozen` means the balance is below the activation amount, and the page says that in one sentence because it is the most common surprise.
+   - **State:** one status, derived by a pure `contractStatus(contract)` in this precedence: `dead` > `finished` > `stopped` > `running` (`outOfFunds` when also `frozen`) > `idle`. Also `nextBlock`.
+   - **`frozen` is not a status.** Verified in signum-node (`AtMachineProcessor`, `AtController`, `SqlATStore`): the node sets it on every `FIN`/`FIZ` and `STP`/`STZ` and when a step cannot be paid for, and clears it at the start of the next run. It only means "do not run again until the activation amount has come in". Next to `finished` or `stopped` that is the ordinary wait for the next call (green). Next to `running` the run was cut off for lack of SIGNA (`outOfFunds`, amber). `finished` is not final: the next call starts the contract from the top. Only `dead` is final.
+   - **Wake threshold:** while `frozen`, the page says at which balance the contract runs again: `prevBalanceNQT + minActivation`, the node's own check. A pure `wakeThreshold(contract)` computes it.
+   - **Balance:** taken from `getAccount`, not `getAT`. `getAT`'s `balanceNQT` is the balance after the last run, so a payment would not show until the contract runs.
 
 4. **Recent transactions, by direction.** As in `WatchView`: incoming (calls) and outgoing (what the contract paid or sent) side by side, using the same queries (`receivedBy`, `sentBy`, both already in `STALE_ON_BLOCK`). `WatchView`'s private `Direction` list moves to its own file so both views share it. Its row click becomes optional. The inspector has no console to jump into, so its rows are not clickable until the console is addressable.
 
@@ -79,7 +82,7 @@ export interface DataSlot {
 export function toDataSlots(contract: Pick<Contract, 'machineData'>): DataSlot[]
 export function changedSlots(previous: DataSlot[] | null, next: DataSlot[]): Set<number>
 
-export type ContractStatus = 'dead' | 'frozen' | 'finished' | 'stopped' | 'running' | 'idle'
+export type ContractStatus = 'dead' | 'outOfFunds' | 'finished' | 'stopped' | 'running' | 'idle'
 export function contractStatus(contract: Contract): ContractStatus
 ```
 
