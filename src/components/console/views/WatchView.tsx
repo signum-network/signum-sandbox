@@ -2,19 +2,17 @@ import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { Amount } from '@signumjs/util'
 import type { ReactNode } from 'react'
-import type { Transaction } from '@signumjs/core'
 import { ledger, nodeHost } from '@/lib/ledger'
 import { isUnknownAccount } from '@/lib/accountStatus'
 import { src44Fields } from '@/lib/payload'
-import { summarize } from '@/lib/txSummary'
 import { displayName, type Contacts } from '@/lib/contacts'
 import type { SandboxAccount } from '@/lib/accounts'
 import { Identicon } from '@/components/Identicon'
-import { ConsoleButton, RowButton } from '../ConsoleButton'
+import { ConsoleButton } from '../ConsoleButton'
 import { Row, Holding } from './AccountFields'
+import { Direction } from './Direction'
 import { Term } from '@/components/console/Term'
-import { useArrivals, useValueFlash } from '@/motion'
-import { cn } from '@/lib/utils'
+import { useValueFlash } from '@/motion'
 
 /** How much of each direction the view shows before it stops being a summary. */
 const RECENT = 10
@@ -39,66 +37,6 @@ function ChangingRow({
     <Row label={label}>
       <span ref={flash}>{value}</span>
     </Row>
-  )
-}
-
-function Direction({
-  label,
-  transactions,
-  accounts,
-  contacts,
-  onSelectTransaction,
-}: {
-  label: string
-  transactions: Transaction[] | undefined
-  accounts: SandboxAccount[]
-  contacts: Contacts
-  onSelectTransaction: (transactionId: string) => void
-}) {
-  const { t } = useTranslation()
-  // Ten rows, no pager and no filter, so the snapshot is only ever about what
-  // came in since the last one.
-  const arrived = useArrivals({
-    ids: transactions?.map((tx) => tx.transaction) ?? [],
-    page: 0,
-    filter: '',
-  })
-
-  return (
-    <div className="flex-1">
-      <div className="mb-1 text-[11px] uppercase tracking-[2px] text-[var(--blue3)]">{label}</div>
-      {transactions?.length ? (
-        <ul>
-          {transactions.map((tx) => {
-            const summary = summarize(tx)
-            const other = summary.recipientRS ?? summary.senderRS
-            return (
-              <li
-                key={tx.transaction}
-                className={cn('border-b', arrived.has(tx.transaction) && 'motion-arrive')}
-                style={{ borderColor: 'var(--border2)' }}
-              >
-                <div>
-                  <RowButton
-                    className="w-full py-1 text-left text-[13px]"
-                    onClick={() => onSelectTransaction(tx.transaction)}
-                  >
-                    <span className="text-[var(--blue3)]">{t(`console.kind.${summary.kind}`)}</span>
-                    <span className="text-[var(--muted)]">
-                      {' '}
-                      {other ? displayName(other, accounts, contacts) : '—'}
-                      {summary.amountSigna ? ` · ${summary.amountSigna} SIGNA` : ''}
-                    </span>
-                  </RowButton>
-                </div>
-              </li>
-            )
-          })}
-        </ul>
-      ) : (
-        <p className="text-[13px] text-[var(--muted)]">{t('console.watch.nothing')}</p>
-      )}
-    </div>
   )
 }
 

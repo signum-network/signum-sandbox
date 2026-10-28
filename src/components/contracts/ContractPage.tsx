@@ -6,6 +6,12 @@ import { Unreachable } from '@/components/startpage'
 import { BeginnerMode } from '@/components/console/BeginnerMode'
 import { useBeginner } from '@/hooks/useBeginner'
 import { useNodeState } from '@/hooks/useNodeState'
+import { useAccounts } from '@/hooks/useAccounts'
+import { useContacts } from '@/hooks/useContacts'
+import { useContractInspector } from '@/hooks/useContractInspector'
+import { ViewNote } from '@/components/console/ViewNote'
+import { Direction } from '@/components/console/views/Direction'
+import { ContractHeader } from './ContractHeader'
 import { toAccountId } from '@/lib/recipient'
 import { cn } from '@/lib/utils'
 
@@ -16,6 +22,50 @@ function parseContractId(param: string): string | null {
   } catch {
     return null
   }
+}
+
+/**
+ * Everything below the page's own header, for an id that parses. A component
+ * of its own so the queries never run for one that does not.
+ */
+function ContractBody({ contractId, height }: { contractId: string; height: number | null }) {
+  const { t } = useTranslation()
+  const { accounts } = useAccounts()
+  const { contacts } = useContacts()
+  const inspector = useContractInspector(contractId, height)
+
+  if (inspector.notFound) {
+    return <p className="text-[13px] text-[var(--muted)]">{t('inspector.notFound')}</p>
+  }
+  if (!inspector.contract) {
+    return <p className="text-[13px] text-[var(--muted)]">…</p>
+  }
+
+  return (
+    <div className="text-[13px]">
+      <ViewNote id="contract" terms={['contract', 'activation', 'codeHash']} />
+      <ContractHeader
+        contract={inspector.contract}
+        account={inspector.account}
+        accounts={accounts}
+        contacts={contacts}
+      />
+      <div className="mt-4 flex flex-wrap gap-6">
+        <Direction
+          label={t('console.watch.incoming')}
+          transactions={inspector.incoming}
+          accounts={accounts}
+          contacts={contacts}
+        />
+        <Direction
+          label={t('console.watch.outgoing')}
+          transactions={inspector.outgoing}
+          accounts={accounts}
+          contacts={contacts}
+        />
+      </div>
+    </div>
+  )
 }
 
 /**
@@ -67,7 +117,7 @@ export function ContractPage({ param }: { param: string }) {
         {contractId === null ? (
           <p className="text-[13px] text-[var(--muted)]">{t('inspector.notFound')}</p>
         ) : (
-          <p className="text-[13px] text-[var(--muted)]">{contractId}</p>
+          <ContractBody contractId={contractId} height={state.height ?? null} />
         )}
       </div>
     </BeginnerMode>
