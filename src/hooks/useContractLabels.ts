@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import {
   parseContractLabels,
   serializeContractLabels,
@@ -16,11 +16,12 @@ const STORAGE_KEY = 'signum-sandbox.contractLabels.v1'
  * set in quick succession cannot overwrite each other with a stale store.
  */
 export function useContractLabels(codeHash: string | null) {
-  const [all, setAll] = useState<ContractLabels>({})
-
-  useEffect(() => {
-    setAll(parseContractLabels(window.localStorage.getItem(STORAGE_KEY)))
-  }, [])
+  // Read on the first render, not in an effect: the label inputs are
+  // uncontrolled, so a table drawn from a cached contract before the effect
+  // ran would keep its empty defaults.
+  const [all, setAll] = useState<ContractLabels>(() =>
+    parseContractLabels(window.localStorage.getItem(STORAGE_KEY)),
+  )
 
   const setLabel = useCallback(
     (index: number, label: string) => {

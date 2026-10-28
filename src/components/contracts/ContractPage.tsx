@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from '@tanstack/react-router'
 import { AppHeader } from '@/components/AppHeader'
@@ -9,9 +10,13 @@ import { useNodeState } from '@/hooks/useNodeState'
 import { useAccounts } from '@/hooks/useAccounts'
 import { useContacts } from '@/hooks/useContacts'
 import { useContractInspector } from '@/hooks/useContractInspector'
+import { useContractLabels } from '@/hooks/useContractLabels'
 import { ViewNote } from '@/components/console/ViewNote'
 import { Direction } from '@/components/console/views/Direction'
 import { ContractHeader } from './ContractHeader'
+import { DataStackTable } from './DataStackTable'
+import { knownIds, type KnownId } from '@/lib/contractData'
+import { displayName } from '@/lib/contacts'
 import { toAccountId } from '@/lib/recipient'
 import { cn } from '@/lib/utils'
 
@@ -30,14 +35,31 @@ function parseContractId(param: string): string | null {
  */
 function ContractBody({ contractId, height }: { contractId: string; height: number | null }) {
   const { t } = useTranslation()
-  const { accounts } = useAccounts()
+  const { accounts, addressPrefix } = useAccounts()
   const { contacts } = useContacts()
   const inspector = useContractInspector(contractId, height)
+  const contract = inspector.contract
+  const { labels, setLabel } = useContractLabels(contract?.machineCodeHashId ?? null)
+  // The contract itself and its creator, on top of what the console knows.
+  const known = useMemo(
+    () =>
+      contract
+        ? knownIds(accounts, contacts, [
+            { id: contract.at, name: contract.name, contract: true },
+            {
+              id: contract.creator,
+              name: displayName(contract.creatorRS, accounts, contacts),
+              contract: false,
+            },
+          ])
+        : new Map<string, KnownId>(),
+    [contract, accounts, contacts],
+  )
 
   if (inspector.notFound) {
     return <p className="text-[13px] text-[var(--muted)]">{t('inspector.notFound')}</p>
   }
-  if (!inspector.contract) {
+  if (!contract) {
     return <p className="text-[13px] text-[var(--muted)]">…</p>
   }
 
@@ -45,10 +67,22 @@ function ContractBody({ contractId, height }: { contractId: string; height: numb
     <div className="text-[13px]">
       <ViewNote id="contract" terms={['contract', 'activation', 'codeHash']} />
       <ContractHeader
-        contract={inspector.contract}
+        contract={contract}
         account={inspector.account}
         accounts={accounts}
         contacts={contacts}
+      />
+      <div className="mt-4">
+        <ViewNote id="contractData" terms={['dataStack']} />
+      </div>
+      <DataStackTable
+        slots={inspector.slots}
+        changed={inspector.changed}
+        labels={labels}
+        onLabel={setLabel}
+        known={known}
+        addressPrefix={addressPrefix}
+        codeHash={contract.machineCodeHashId}
       />
       <div className="mt-4 flex flex-wrap gap-6">
         <Direction
