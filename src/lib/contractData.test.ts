@@ -4,6 +4,7 @@ import {
   contractPartyId,
   contractStatus,
   knownIds,
+  stackLayout,
   wakeThreshold,
   toDataSlots,
 } from './contractData'
@@ -28,6 +29,11 @@ describe('toDataSlots', () => {
     expect(toDataSlots('c3a4c3b600000000')[0].text).toBe('äö')
   })
 
+  it('has no text for a single character, which is a small number far more often than a word', () => {
+    expect(toDataSlots('5500000000000000')[0].text).toBeNull()
+    expect(toDataSlots('e282ac0000000000')[0].text).toBeNull()
+  })
+
   it('has no text for zeros, control characters or invalid UTF-8', () => {
     expect(toDataSlots('0000000000000000')[0].text).toBeNull()
     expect(toDataSlots('0100000000000000')[0].text).toBeNull()
@@ -44,6 +50,25 @@ describe('toDataSlots', () => {
   it('accepts upper-case hex and an empty stack', () => {
     expect(toDataSlots('0A00000000000000')[0].decimal).toBe('10')
     expect(toDataSlots('')).toEqual([])
+  })
+})
+
+describe('stackLayout', () => {
+  // The header of the Construct contract on the sandbox chain: version 3,
+  // 38 code pages, 8 data pages, one page each of call and user stack.
+  const header = '0300' + '0000' + '2600' + '0800' + '0100' + '0100'
+
+  it('reads where the data ends and the two stacks begin, in slots', () => {
+    expect(stackLayout(header + 'ff'.repeat(16))).toEqual({
+      dataSlots: 256,
+      callStackSlots: 32,
+      userStackSlots: 32,
+    })
+  })
+
+  it('is null for creation bytes too short to hold a header', () => {
+    expect(stackLayout('0300')).toBeNull()
+    expect(stackLayout('')).toBeNull()
   })
 })
 

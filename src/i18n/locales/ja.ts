@@ -507,6 +507,11 @@ export default {
     wakesAt: '残高が {{threshold}} SIGNA（前回の残高＋起動額）に達すると再び実行されます。',
     data: {
       size: '{{bytes}} バイト · {{slots}} スロット',
+      sizeWithStack: '{{bytes}} バイト · {{slots}} スロット + スタック {{stackBytes}} バイト',
+      showStack: 'スタックを表示',
+      hideStack: 'スタックを隠す',
+      callStack: 'コールスタック',
+      userStack: 'ユーザースタック',
       index: '#',
       label: '名前',
       raw: '格納値',

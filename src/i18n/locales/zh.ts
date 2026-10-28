@@ -501,6 +501,11 @@ export default {
     wakesAt: '余额达到 {{threshold}} SIGNA（上次余额加激活金额）时会再次运行。',
     data: {
       size: '{{bytes}} 字节 · {{slots}} 个槽位',
+      sizeWithStack: '{{bytes}} 字节 · {{slots}} 个槽位 + {{stackBytes}} 字节栈',
+      showStack: '显示栈',
+      hideStack: '隐藏栈',
+      callStack: '调用栈',
+      userStack: '用户栈',
       index: '#',
       label: '名称',
       raw: '存储值',

@@ -1,9 +1,11 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import type { DataSlot, KnownId } from '@/lib/contractData'
+import type { DataSlot, KnownId, StackLayout } from '@/lib/contractData'
 import { toAddress } from '@/lib/recipient'
 import { Identicon } from '@/components/Identicon'
 import { Term } from '@/components/console/Term'
 import { useValueFlash } from '@/motion'
+import { RowButton } from '@/components/console/ConsoleButton'
 import { InspectLink } from './InspectLink'
 
 const COLUMNS = ['index', 'label', 'raw', 'hex', 'decimal', 'signed', 'text', 'account'] as const
@@ -85,9 +87,31 @@ function SlotRow({
   )
 }
 
-/** A contract's data stack, one row per 8-byte slot. */
+/** A row that names the part of memory the rows below it belong to. */
+function GroupRow({ label }: { label: string }) {
+  return (
+    <tr>
+      <td
+        colSpan={COLUMNS.length}
+        className="px-2 pb-1 pt-3 font-sans text-[11px] uppercase tracking-[1px] text-[var(--blue3)]"
+      >
+        {label}
+      </td>
+    </tr>
+  )
+}
+
+/**
+ * A contract's data stack, one row per 8-byte slot.
+ *
+ * The node hands over the whole memory, so the call and user stacks come
+ * after the variables. They are what the contract was doing mid-run rather
+ * than what it keeps, so they stay folded away until asked for. Without a
+ * layout every slot is shown as data.
+ */
 export function DataStackTable({
   slots,
+  layout,
   changed,
   labels,
   onLabel,
@@ -96,6 +120,7 @@ export function DataStackTable({
   codeHash,
 }: {
   slots: DataSlot[]
+  layout: StackLayout | null
   changed: Changed
   labels: Record<number, string>
   onLabel: (index: number, label: string) => void
@@ -104,6 +129,28 @@ export function DataStackTable({
   codeHash: string
 }) {
   const { t } = useTranslation()
+  const [showStack, setShowStack] = useState(false)
+
+  const dataCount = layout ? Math.min(layout.dataSlots, slots.length) : slots.length
+  const data = slots.slice(0, dataCount)
+  const callStack = layout ? slots.slice(dataCount, dataCount + layout.callStackSlots) : []
+  const userStack = layout ? slots.slice(dataCount + layout.callStackSlots) : []
+  const stackSlots = callStack.length + userStack.length
+
+  const rows = (part: DataSlot[]) =>
+    part.map((slot) => (
+      <SlotRow
+        // The code hash in the key resets the inputs when the code, and so
+        // the meaning of every slot, is a different one.
+        key={`${codeHash}-${slot.index}`}
+        slot={slot}
+        label={labels[slot.index] ?? ''}
+        onLabel={onLabel}
+        known={known}
+        addressPrefix={addressPrefix}
+        changed={changed}
+      />
+    ))
 
   return (
     <div className="mt-4">
@@ -111,8 +158,22 @@ export function DataStackTable({
         <span className="text-[11px] uppercase tracking-[2px] text-[var(--blue3)]">
           <Term id="dataStack" />
         </span>
-        <span className="text-[12px] text-[var(--muted)]">
-          {t('inspector.data.size', { bytes: slots.length * 8, slots: slots.length })}
+        <span className="flex items-baseline gap-3 text-[12px] text-[var(--muted)]">
+          {stackSlots > 0
+            ? t('inspector.data.sizeWithStack', {
+                bytes: data.length * 8,
+                slots: data.length,
+                stackBytes: stackSlots * 8,
+              })
+            : t('inspector.data.size', { bytes: data.length * 8, slots: data.length })}
+          {stackSlots > 0 && (
+            <RowButton
+              className="text-[var(--blue3)] underline"
+              onClick={() => setShowStack((shown) => !shown)}
+            >
+              {t(showStack ? 'inspector.data.hideStack' : 'inspector.data.showStack')}
+            </RowButton>
+          )}
         </span>
       </div>
       {slots.length === 0 ? (
@@ -133,19 +194,19 @@ export function DataStackTable({
               </tr>
             </thead>
             <tbody>
-              {slots.map((slot) => (
-                <SlotRow
-                  // The code hash in the key resets the inputs when the code,
-                  // and so the meaning of every slot, is a different one.
-                  key={`${codeHash}-${slot.index}`}
-                  slot={slot}
-                  label={labels[slot.index] ?? ''}
-                  onLabel={onLabel}
-                  known={known}
-                  addressPrefix={addressPrefix}
-                  changed={changed}
-                />
-              ))}
+              {rows(data)}
+              {showStack && callStack.length > 0 && (
+                <>
+                  <GroupRow label={t('inspector.data.callStack')} />
+                  {rows(callStack)}
+                </>
+              )}
+              {showStack && userStack.length > 0 && (
+                <>
+                  <GroupRow label={t('inspector.data.userStack')} />
+                  {rows(userStack)}
+                </>
+              )}
             </tbody>
           </table>
         </div>

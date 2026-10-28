@@ -505,6 +505,11 @@ export default {
     wakesAt: '잔액이 {{threshold}} SIGNA(직전 잔액 + 활성화 금액)에 도달하면 다시 실행됩니다.',
     data: {
       size: '{{bytes}}바이트 · 슬롯 {{slots}}개',
+      sizeWithStack: '{{bytes}}바이트 · {{slots}}개 슬롯 + 스택 {{stackBytes}}바이트',
+      showStack: '스택 보기',
+      hideStack: '스택 숨기기',
+      callStack: '호출 스택',
+      userStack: '사용자 스택',
       index: '#',
       label: '이름',
       raw: '저장값',

@@ -42,7 +42,10 @@ function textOf(bytes: number[]): string | null {
     const text = utf8.decode(new Uint8Array(bytes.slice(0, end)))
     // A number that happens to decode is not text: a slot holding 1 would
     // otherwise show an invisible \u0001.
-    return /[\u0000-\u001f\u007f-\u009f]/.test(text) ? null : text
+    if (/[\u0000-\u001f\u007f-\u009f]/.test(text)) return null
+    // One character is a small number far more often than a word: 85 would
+    // otherwise read "U" in every counter that passes it.
+    return [...text].length < 2 ? null : text
   } catch {
     return null
   }
@@ -79,6 +82,37 @@ export function toDataSlots(machineData: string): DataSlot[] {
     })
   }
   return slots
+}
+
+/** A page of AT memory is 256 bytes, so 32 slots. */
+const PAGE_SLOTS = 32
+
+/** How a contract's memory divides: its variables, then its two stacks. */
+export interface StackLayout {
+  dataSlots: number
+  callStackSlots: number
+  userStackSlots: number
+}
+
+/**
+ * Where a contract's data ends and its stacks begin, read from the creation
+ * bytes of its deployment.
+ *
+ * getAT's machineData is the whole memory: the data pages, then the call
+ * stack, then the user stack. Only the header written at deployment says
+ * where one ends: six little-endian shorts for version, a reserved field,
+ * and the code, data, call stack and user stack page counts.
+ */
+export function stackLayout(creationBytes: string): StackLayout | null {
+  if (creationBytes.length < 24) return null
+  // Little-endian: the low byte comes first.
+  const short = (n: number) =>
+    parseInt(creationBytes.slice(n * 4 + 2, n * 4 + 4) + creationBytes.slice(n * 4, n * 4 + 2), 16)
+  return {
+    dataSlots: short(3) * PAGE_SLOTS,
+    callStackSlots: short(4) * PAGE_SLOTS,
+    userStackSlots: short(5) * PAGE_SLOTS,
+  }
 }
 
 /**

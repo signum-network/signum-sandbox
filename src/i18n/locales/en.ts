@@ -529,6 +529,11 @@ export default {
     wakesAt: 'It runs again once its balance reaches {{threshold}} SIGNA: its last balance plus the activation amount.',
     data: {
       size: '{{bytes}} bytes · {{slots}} slots',
+      sizeWithStack: '{{bytes}} bytes · {{slots}} slots + {{stackBytes}} bytes stack',
+      showStack: 'Show the stacks',
+      hideStack: 'Hide the stacks',
+      callStack: 'Call stack',
+      userStack: 'User stack',
       index: '#',
       label: 'Label',
       raw: 'Stored',

@@ -507,6 +507,11 @@ export default {
     wakesAt: 'Він знову запуститься, коли баланс досягне {{threshold}} SIGNA: останній баланс плюс сума активації.',
     data: {
       size: '{{bytes}} байтів · {{slots}} слотів',
+      sizeWithStack: '{{bytes}} байтів · {{slots}} слотів + {{stackBytes}} байтів стеку',
+      showStack: 'Показати стеки',
+      hideStack: 'Сховати стеки',
+      callStack: 'Стек викликів',
+      userStack: 'Стек користувача',
       index: '#',
       label: 'Назва',
       raw: 'Зберігається',

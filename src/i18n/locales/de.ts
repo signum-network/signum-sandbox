@@ -507,6 +507,11 @@ export default {
     wakesAt: 'Er läuft wieder, sobald sein Kontostand {{threshold}} SIGNA erreicht: sein letztes Guthaben plus den Aktivierungsbetrag.',
     data: {
       size: '{{bytes}} Bytes · {{slots}} Slots',
+      sizeWithStack: '{{bytes}} Bytes · {{slots}} Slots + {{stackBytes}} Bytes Stack',
+      showStack: 'Stacks zeigen',
+      hideStack: 'Stacks verbergen',
+      callStack: 'Call-Stack',
+      userStack: 'User-Stack',
       index: '#',
       label: 'Name',
       raw: 'Gespeichert',

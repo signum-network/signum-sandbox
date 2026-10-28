@@ -507,6 +507,11 @@ export default {
     wakesAt: 'Executa novamente quando o saldo atingir {{threshold}} SIGNA: o último saldo mais o valor de ativação.',
     data: {
       size: '{{bytes}} bytes · {{slots}} slots',
+      sizeWithStack: '{{bytes}} bytes · {{slots}} slots + {{stackBytes}} bytes de pilha',
+      showStack: 'Mostrar as pilhas',
+      hideStack: 'Ocultar as pilhas',
+      callStack: 'Pilha de chamadas',
+      userStack: 'Pilha do usuário',
       index: '#',
       label: 'Nome',
       raw: 'Armazenado',

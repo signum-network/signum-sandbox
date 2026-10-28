@@ -10,7 +10,8 @@
  * Deliberately not everything. `networkInfo` is fixed for the life of a node,
  * an `asset`'s name and decimals never change, a `contract`'s activation amount is fixed at deployment, a decrypted message stays
  * decrypted, and `accountsWithName` answers a question about a name the user
- * typed rather than about the chain's latest state. The contract inspector
+ * typed rather than about the chain's latest state. A `contractCreation` is
+ * the deployment itself, and its creation bytes never change. The contract inspector
  * reads the same contract under `contractState`, which does change with
  * every block it runs in.
  */

@@ -18,6 +18,7 @@ const NEVER_STALE = [
   'networkInfo', // fixed for the life of a node
   'asset', // a token's name and decimals do not change
   'contract', // a contract's activation amount and name are fixed at deployment
+  'contractCreation', // a deployment's creation bytes, and so its memory layout, never change
   'decrypt', // a decrypted message stays decrypted
   'accountsWithName', // answers about a typed name, not about chain state
 ]

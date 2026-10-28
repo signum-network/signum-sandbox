@@ -506,6 +506,11 @@ export default {
     wakesAt: 'Se ejecuta de nuevo cuando su saldo alcanza {{threshold}} SIGNA: su último saldo más el importe de activación.',
     data: {
       size: '{{bytes}} bytes · {{slots}} ranuras',
+      sizeWithStack: '{{bytes}} bytes · {{slots}} ranuras + {{stackBytes}} bytes de pila',
+      showStack: 'Mostrar las pilas',
+      hideStack: 'Ocultar las pilas',
+      callStack: 'Pila de llamadas',
+      userStack: 'Pila de usuario',
       index: '#',
       label: 'Nombre',
       raw: 'Almacenado',

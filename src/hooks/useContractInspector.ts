@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { ledger } from '@/lib/ledger'
 import { isUnknownAccount } from '@/lib/accountStatus'
-import { changedSlots, toDataSlots, type DataSlot } from '@/lib/contractData'
+import { changedSlots, stackLayout, toDataSlots, type DataSlot } from '@/lib/contractData'
 
 /** How much of each direction the page shows, the same as the watch view. */
 const RECENT = 10
@@ -10,7 +10,8 @@ const RECENT = 10
 /**
  * Everything the inspector shows about one contract, and what changed.
  *
- * Every key here is in STALE_ON_BLOCK, so a new block refetches all of it.
+ * Every key here but the deployment is in STALE_ON_BLOCK, so a new block
+ * refetches all of it.
  * Most refetches answer what is already on screen, so the marker is replaced
  * only when a slot actually differs. Otherwise "changed in block N" would be
  * wiped by the next quiet block, before anyone could read it.
@@ -55,6 +56,19 @@ export function useContractInspector(contractId: string, height: number | null) 
     retry: false,
   })
 
+  // A contract's id is the id of the transaction that deployed it, and its
+  // creation bytes never change, so this is read once. Until it arrives, or
+  // if it cannot be read, every slot counts as data.
+  const creation = useQuery({
+    queryKey: ['contractCreation', contractId],
+    queryFn: () => ledger.transaction.getTransaction(contractId),
+    enabled: found,
+    staleTime: Infinity,
+    retry: false,
+  })
+  const creationBytes: string = creation.data?.attachment?.creationBytes ?? ''
+  const layout = useMemo(() => stackLayout(creationBytes), [creationBytes])
+
   const machineData = state.data?.machineData ?? ''
   const slots = useMemo(() => toDataSlots(machineData), [machineData])
 
@@ -79,6 +93,7 @@ export function useContractInspector(contractId: string, height: number | null) 
     incoming: incoming.data?.transactions,
     outgoing: outgoing.data?.transactions,
     slots,
+    layout,
     changed,
   }
 }

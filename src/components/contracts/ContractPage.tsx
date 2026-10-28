@@ -77,6 +77,7 @@ function ContractBody({ contractId, height }: { contractId: string; height: numb
       </div>
       <DataStackTable
         slots={inspector.slots}
+        layout={inspector.layout}
         changed={inspector.changed}
         labels={labels}
         onLabel={setLabel}

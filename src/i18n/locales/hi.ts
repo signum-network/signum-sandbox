@@ -507,6 +507,11 @@ export default {
     wakesAt: 'बैलेंस {{threshold}} SIGNA (पिछला बैलेंस और सक्रियण राशि) तक पहुँचने पर यह फिर चलेगा।',
     data: {
       size: '{{bytes}} बाइट · {{slots}} स्लॉट',
+      sizeWithStack: '{{bytes}} बाइट · {{slots}} स्लॉट + {{stackBytes}} बाइट स्टैक',
+      showStack: 'स्टैक दिखाएँ',
+      hideStack: 'स्टैक छिपाएँ',
+      callStack: 'कॉल स्टैक',
+      userStack: 'यूज़र स्टैक',
       index: '#',
       label: 'नाम',
       raw: 'संग्रहीत',
