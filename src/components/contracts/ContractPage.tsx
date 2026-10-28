@@ -52,12 +52,14 @@ function ContractBody({ contractId, height }: { contractId: string; height: numb
       />
       <div className="mt-4 flex flex-wrap gap-6">
         <Direction
+          direction="incoming"
           label={t('console.watch.incoming')}
           transactions={inspector.incoming}
           accounts={accounts}
           contacts={contacts}
         />
         <Direction
+          direction="outgoing"
           label={t('console.watch.outgoing')}
           transactions={inspector.outgoing}
           accounts={accounts}

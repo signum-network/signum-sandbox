@@ -53,3 +53,17 @@ export function summarize(tx: Transaction): TxSummary {
           : Amount.fromPlanck(planck).getSigna(),
   }
 }
+
+/**
+ * The other side of a transaction, seen from one account's list of it.
+ *
+ * Incoming means the account is the recipient, so the one worth naming is the
+ * sender; outgoing is the other way round. Reading the recipient first for
+ * both made every incoming row name the account whose list it was in.
+ */
+export function counterparty(
+  summary: TxSummary,
+  direction: 'incoming' | 'outgoing',
+): string | null {
+  return direction === 'incoming' ? summary.senderRS : summary.recipientRS
+}

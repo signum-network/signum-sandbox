@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import type { ReactNode } from 'react'
 import type { Transaction } from '@signumjs/core'
-import { summarize } from '@/lib/txSummary'
+import { counterparty, summarize } from '@/lib/txSummary'
 import { displayName, type Contacts } from '@/lib/contacts'
 import type { SandboxAccount } from '@/lib/accounts'
 import { RowButton } from '../ConsoleButton'
@@ -15,12 +15,14 @@ import { cn } from '@/lib/utils'
  * row that cannot open does not pretend to.
  */
 export function Direction({
+  direction,
   label,
   transactions,
   accounts,
   contacts,
   onSelectTransaction,
 }: {
+  direction: 'incoming' | 'outgoing'
   label: string
   transactions: Transaction[] | undefined
   accounts: SandboxAccount[]
@@ -43,7 +45,7 @@ export function Direction({
         <ul>
           {transactions.map((tx) => {
             const summary = summarize(tx)
-            const other = summary.recipientRS ?? summary.senderRS
+            const other = counterparty(summary, direction)
             const content: ReactNode = (
               <>
                 <span className="text-[var(--blue3)]">{t(`console.kind.${summary.kind}`)}</span>

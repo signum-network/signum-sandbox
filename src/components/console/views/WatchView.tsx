@@ -167,6 +167,7 @@ export function WatchView({
 
           <div className="mt-4 flex flex-wrap gap-6">
             <Direction
+              direction="incoming"
               label={t('console.watch.incoming')}
               transactions={incoming.data?.transactions}
               accounts={accounts}
@@ -174,6 +175,7 @@ export function WatchView({
               onSelectTransaction={onSelectTransaction}
             />
             <Direction
+              direction="outgoing"
               label={t('console.watch.outgoing')}
               transactions={outgoing.data?.transactions}
               accounts={accounts}
