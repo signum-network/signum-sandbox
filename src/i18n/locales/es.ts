@@ -476,6 +476,15 @@ export default {
     },
   },
   inspector: {
+    tab: {
+      data: 'Datos',
+      callStack: 'Pila de llamadas',
+      userStack: 'Pila de usuario',
+      maps: 'Mapas',
+      activity: 'Actividad',
+    },
+    search: 'Valor, dirección, texto o etiqueta',
+    page: 'Página',
     title: 'Contrato',
     back: 'Volver a la consola',
     notFound: 'No hay ningún contrato con este id en esta cadena.',

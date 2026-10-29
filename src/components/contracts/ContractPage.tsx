@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from '@tanstack/react-router'
 import { AppHeader } from '@/components/AppHeader'
@@ -16,7 +16,8 @@ import { Direction } from '@/components/console/views/Direction'
 import { ContractHeader } from './ContractHeader'
 import { DataStackTable } from './DataStackTable'
 import { ContractMaps } from './ContractMaps'
-import { knownIds, type KnownId } from '@/lib/contractData'
+import { ContractTabs, type ContractTab, type TabState } from './ContractTabs'
+import { knownIds, type DataSlot, type KnownId } from '@/lib/contractData'
 import { displayName } from '@/lib/contacts'
 import { toAccountId } from '@/lib/recipient'
 import { cn } from '@/lib/utils'
@@ -28,6 +29,15 @@ function parseContractId(param: string): string | null {
   } catch {
     return null
   }
+}
+
+/** A tab's content, scrolling inside the panel rather than growing the page. */
+function Scroll({ children }: { children: ReactNode }) {
+  return (
+    <div className="themed-scroll console-scroll min-h-0 flex-1 overflow-y-auto pr-2">
+      {children}
+    </div>
+  )
 }
 
 /**
@@ -65,6 +75,23 @@ function ContractBody({ contractId, height }: { contractId: string; height: numb
     [contract, accounts, contacts],
   )
 
+  const [tab, setTab] = useState<ContractTab>('data')
+  const [query, setQuery] = useState('')
+
+  // The node hands over the whole memory; the creation header says where the
+  // variables end and the two stacks begin. Without it all of it is data.
+  const sections = useMemo(() => {
+    const slots = inspector.slots
+    const layout = inspector.layout
+    const dataCount = layout ? Math.min(layout.dataSlots, slots.length) : slots.length
+    const callEnd = layout ? dataCount + layout.callStackSlots : dataCount
+    return {
+      data: slots.slice(0, dataCount),
+      callStack: slots.slice(dataCount, callEnd),
+      userStack: slots.slice(callEnd),
+    } satisfies Record<'data' | 'callStack' | 'userStack', DataSlot[]>
+  }, [inspector.slots, inspector.layout])
+
   if (inspector.notFound) {
     return <p className="text-[13px] text-[var(--muted)]">{t('inspector.notFound')}</p>
   }
@@ -72,21 +99,23 @@ function ContractBody({ contractId, height }: { contractId: string; height: numb
     return <p className="text-[13px] text-[var(--muted)]">…</p>
   }
 
-  return (
-    <div className="text-[13px]">
-      <ViewNote id="contract" terms={['contract', 'activation', 'codeHash']} />
-      <ContractHeader
-        contract={contract}
-        account={inspector.account}
-        accounts={accounts}
-        contacts={contacts}
-      />
-      <div className="mt-4">
-        <ViewNote id="contractData" terms={['dataStack']} />
-      </div>
+  // A stack tab only for a stack the contract has.
+  const tabs: TabState[] = [
+    { id: 'data' },
+    ...(sections.callStack.length > 0 ? [{ id: 'callStack' as const }] : []),
+    ...(sections.userStack.length > 0 ? [{ id: 'userStack' as const }] : []),
+    { id: 'maps' },
+    { id: 'activity' },
+  ]
+  const shown = tabs.some((entry) => entry.id === tab) ? tab : 'data'
+
+  // The note speaks of the contract's variables, which only the data tab holds.
+  const memory = (slots: DataSlot[], note: boolean) => (
+    <Scroll>
+      {note && <ViewNote id="contractData" terms={['dataStack']} />}
       <DataStackTable
-        slots={inspector.slots}
-        layout={inspector.layout}
+        slots={slots}
+        layout={null}
         changed={inspector.changed}
         labels={labels}
         onLabel={(index, label) => setMeta(index, { label })}
@@ -94,25 +123,60 @@ function ContractBody({ contractId, height }: { contractId: string; height: numb
         addressPrefix={addressPrefix}
         codeHash={contract.machineCodeHashId}
       />
-      <div className="mt-4">
-        <ViewNote id="contractMaps" terms={['contractMap']} />
+    </Scroll>
+  )
+
+  return (
+    <div className="flex min-h-0 flex-1 flex-col text-[13px]">
+      <div className="shrink-0">
+        <ViewNote id="contract" terms={['contract', 'activation', 'codeHash']} />
+        <ContractHeader
+          contract={contract}
+          account={inspector.account}
+          accounts={accounts}
+          contacts={contacts}
+        />
       </div>
-      <ContractMaps contractId={contractId} known={known} addressPrefix={addressPrefix} />
-      <div className="mt-4 flex flex-wrap gap-6">
-        <Direction
-          direction="incoming"
-          label={t('console.watch.incoming')}
-          transactions={inspector.incoming}
-          accounts={accounts}
-          contacts={contacts}
+      <div
+        className="mt-4 flex min-h-[320px] flex-1 flex-col border p-3"
+        style={{ borderColor: 'var(--border2)' }}
+      >
+        <ContractTabs
+          tabs={tabs}
+          active={shown}
+          onSelect={setTab}
+          query={query}
+          onQuery={setQuery}
         />
-        <Direction
-          direction="outgoing"
-          label={t('console.watch.outgoing')}
-          transactions={inspector.outgoing}
-          accounts={accounts}
-          contacts={contacts}
-        />
+        {shown === 'data' && memory(sections.data, true)}
+        {shown === 'callStack' && memory(sections.callStack, false)}
+        {shown === 'userStack' && memory(sections.userStack, false)}
+        {shown === 'maps' && (
+          <Scroll>
+            <ViewNote id="contractMaps" terms={['contractMap']} />
+            <ContractMaps contractId={contractId} known={known} addressPrefix={addressPrefix} />
+          </Scroll>
+        )}
+        {shown === 'activity' && (
+          <Scroll>
+            <div className="flex flex-wrap gap-6">
+              <Direction
+                direction="incoming"
+                label={t('console.watch.incoming')}
+                transactions={inspector.incoming}
+                accounts={accounts}
+                contacts={contacts}
+              />
+              <Direction
+                direction="outgoing"
+                label={t('console.watch.outgoing')}
+                transactions={inspector.outgoing}
+                accounts={accounts}
+                contacts={contacts}
+              />
+            </div>
+          </Scroll>
+        )}
       </div>
     </div>
   )
@@ -142,7 +206,8 @@ export function ContractPage({ param }: { param: string }) {
 
   return (
     <BeginnerMode on={beginner.beginner}>
-      <div className={cn('mx-auto p-6', PAGE_WIDTH)}>
+      {/* Full height like the console, so the tab panel scrolls in place. */}
+      <div className={cn('mx-auto flex h-screen flex-col p-6', PAGE_WIDTH)}>
         <AppHeader
           networkName={state.networkName}
           version={state.version}
@@ -150,7 +215,7 @@ export function ContractPage({ param }: { param: string }) {
           scanning={state.scanning}
           homeLink
         />
-        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <div className="mb-3 flex shrink-0 flex-wrap items-center justify-between gap-2">
           <span className="text-[13px] uppercase tracking-[1px] text-[var(--blue3)]">
             {t('inspector.title')}
           </span>

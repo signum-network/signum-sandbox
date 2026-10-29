@@ -477,6 +477,15 @@ export default {
     },
   },
   inspector: {
+    tab: {
+      data: 'डेटा',
+      callStack: 'कॉल स्टैक',
+      userStack: 'यूज़र स्टैक',
+      maps: 'मैप',
+      activity: 'गतिविधि',
+    },
+    search: 'मान, पता, टेक्स्ट या लेबल',
+    page: 'पेज',
     title: 'कॉन्ट्रैक्ट',
     back: 'कंसोल पर वापस',
     notFound: 'इस चेन पर इस id का कोई कॉन्ट्रैक्ट नहीं है।',

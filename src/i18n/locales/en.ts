@@ -499,6 +499,15 @@ export default {
     },
   },
   inspector: {
+    tab: {
+      data: 'Data',
+      callStack: 'Call stack',
+      userStack: 'User stack',
+      maps: 'Maps',
+      activity: 'Activity',
+    },
+    search: 'Value, address, text or label',
+    page: 'Page',
     title: 'Contract',
     back: 'Back to the console',
     notFound: 'There is no contract with this id on this chain.',

@@ -475,6 +475,15 @@ export default {
     },
   },
   inspector: {
+    tab: {
+      data: '데이터',
+      callStack: '호출 스택',
+      userStack: '사용자 스택',
+      maps: '맵',
+      activity: '활동',
+    },
+    search: '값, 주소, 텍스트 또는 라벨',
+    page: '페이지',
     title: '컨트랙트',
     back: '콘솔로 돌아가기',
     notFound: '이 체인에는 이 id의 컨트랙트가 없습니다.',

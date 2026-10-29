@@ -477,6 +477,15 @@ export default {
     },
   },
   inspector: {
+    tab: {
+      data: 'データ',
+      callStack: 'コールスタック',
+      userStack: 'ユーザースタック',
+      maps: 'マップ',
+      activity: 'アクティビティ',
+    },
+    search: '値、アドレス、テキスト、ラベル',
+    page: 'ページ',
     title: 'コントラクト',
     back: 'コンソールに戻る',
     notFound: 'このチェーンにはこの id のコントラクトはありません。',

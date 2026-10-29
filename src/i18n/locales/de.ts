@@ -477,6 +477,15 @@ export default {
     },
   },
   inspector: {
+    tab: {
+      data: 'Daten',
+      callStack: 'Call-Stack',
+      userStack: 'User-Stack',
+      maps: 'Maps',
+      activity: 'Aktivität',
+    },
+    search: 'Wert, Adresse, Text oder Label',
+    page: 'Seite',
     title: 'Contract',
     back: 'Zurück zur Konsole',
     notFound: 'Auf dieser Chain gibt es keinen Contract mit dieser ID.',

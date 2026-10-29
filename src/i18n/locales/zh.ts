@@ -471,6 +471,15 @@ export default {
     },
   },
   inspector: {
+    tab: {
+      data: '数据',
+      callStack: '调用栈',
+      userStack: '用户栈',
+      maps: '映射',
+      activity: '活动',
+    },
+    search: '值、地址、文本或标签',
+    page: '页',
     title: '合约',
     back: '返回控制台',
     notFound: '此链上没有这个 id 的合约。',
