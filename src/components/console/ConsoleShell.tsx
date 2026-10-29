@@ -7,6 +7,7 @@ import { useContacts } from '@/hooks/useContacts'
 import { useWatched } from '@/hooks/useWatched'
 import { useBeginner } from '@/hooks/useBeginner'
 import { useBlockPage, useChainFeed } from '@/hooks/useChainFeed'
+import { useContracts } from '@/hooks/useContracts'
 import { Unreachable } from '@/components/startpage'
 import { AppHeader } from '@/components/AppHeader'
 import { ConsoleButton, RowButton } from './ConsoleButton'
@@ -21,6 +22,7 @@ import { AccountsView } from './views/AccountsView'
 import { TransactionsView } from './views/TransactionsView'
 import { BlocksView } from './views/BlocksView'
 import { WatchView } from './views/WatchView'
+import { ContractsView } from './views/ContractsView'
 import { SearchField } from './views/SearchField'
 import { SendDrawer } from './drawers/SendDrawer'
 import { ChainDrawer } from './drawers/ChainDrawer'
@@ -39,7 +41,7 @@ import type { ConsoleTab, DrawerName } from '@/lib/consoleNav'
 
 export type { ConsoleTab, DrawerName }
 
-const TABS: ConsoleTab[] = ['transactions', 'blocks', 'accounts']
+const TABS: ConsoleTab[] = ['transactions', 'blocks', 'accounts', 'contracts']
 
 export function ConsoleShell() {
   const { t } = useTranslation()
@@ -58,6 +60,7 @@ export function ConsoleShell() {
   const [search, setSearch] = useState('')
   const [txPage, setTxPage] = useState(0)
   const [blockPage, setBlockPage] = useState(0)
+  const [contractPage, setContractPage] = useState(0)
   const [hideEmptyBlocks, setHideEmptyBlocks] = useState(false)
   // A page index belongs to the list it indexed. Narrowing the filter makes
   // the old position meaningless, so it goes back to the top rather than
@@ -66,6 +69,7 @@ export function ConsoleShell() {
     setSearch(value)
     setTxPage(0)
     setBlockPage(0)
+    setContractPage(0)
   }
   const query = interpret(search)
   // Handing one transaction to the stream: the stream owns payload decoding,
@@ -93,6 +97,8 @@ export function ConsoleShell() {
   // The page whose blocks are in hand, which trails the requested one for as
   // long as the request takes.
   const shownBlockPage = blocks.data?.page ?? blockPage
+  // Asked for only while the tab is open; a block refreshes it from there.
+  const contracts = useContracts(tab === 'contracts' && state.kind === 'ready')
 
   // Everything the tour is allowed to know, assembled from what the shell
   // already holds. No extra query: a tour that polls the node to decide
@@ -272,6 +278,20 @@ export function ConsoleShell() {
                           onSelectTransaction={showTransaction}
                         />
                       </div>
+                    </>
+                  )}
+                  {tab === 'contracts' && (
+                    <>
+                      <ViewNote id="contracts" terms={['contract', 'activation']} />
+                      <ContractsView
+                        contracts={contracts.data ?? []}
+                        loading={contracts.isPending}
+                        accounts={accounts.accounts}
+                        contacts={contacts.contacts}
+                        query={query}
+                        page={contractPage}
+                        onPage={setContractPage}
+                      />
                     </>
                   )}
                   {tab === 'accounts' && (

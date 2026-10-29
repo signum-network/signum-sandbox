@@ -108,7 +108,7 @@ export default {
   },
   console: {
     back: 'Página inicial',
-    tab: { transactions: 'Transações', blocks: 'Blocos', accounts: 'Contas' },
+    tab: { transactions: 'Transações', blocks: 'Blocos', accounts: 'Contas', contracts: 'Contratos' },
     search: { placeholder: 'Id, endereço ou nome' },
     forge: {
       action: 'Forjar',
@@ -153,6 +153,7 @@ export default {
       glossaryNoMatch: 'Sem correspondências',
     },
     note: {
+      contracts: 'Todos os contratos inteligentes da cadeia, o mais recente primeiro. Abra um para ver memória, mapas e atividade.',
       contract:
         'Um contrato inteligente, ao vivo: o que ele guarda, se está executando e o que entrou e saiu. Tudo aqui se atualiza a cada bloco.',
       contractData:
@@ -271,6 +272,7 @@ export default {
       cancelSubscription: 'Para um pagamento recorrente que criaste antes.',
     },
     blocks: { count: '{{count}} transações', empty: 'Vazio', forger: 'Forjador', none: 'Ainda não há blocos', noMatch: 'Nenhum bloco corresponde', hideEmpty: 'Ocultar vazios', hidden: '{{count}} vazios ocultos' },
+    contracts: { name: 'Nome', created: 'Criado', none: 'Ainda não há contratos na cadeia', noMatch: 'Nenhum contrato corresponde' },
     accounts: {
       create: 'Criar conta',
       import: 'Importar frase-passe',

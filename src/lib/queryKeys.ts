@@ -35,6 +35,8 @@ export const STALE_ON_BLOCK = [
   // data stack) and whichever map entries are open.
   'contractState',
   'contractMap',
+  // The contract list: a block can deploy a contract or change one's status.
+  'contracts',
 ] as const
 
 /** The unconfirmed pool changes on a pending transaction as well as a block. */

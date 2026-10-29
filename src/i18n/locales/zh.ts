@@ -108,7 +108,7 @@ export default {
   },
   console: {
     back: '起始页',
-    tab: { transactions: '交易', blocks: '区块', accounts: '账户' },
+    tab: { transactions: '交易', blocks: '区块', accounts: '账户', contracts: '合约' },
     search: { placeholder: 'Id、地址或名称' },
     forge: {
       action: '铸造',
@@ -153,6 +153,7 @@ export default {
       glossaryNoMatch: '没有匹配项',
     },
     note: {
+      contracts: '链上的所有智能合约，最新的在前。打开一个即可查看其内存、映射和活动。',
       contract:
         '实时查看一个智能合约：它持有什么、是否在运行、进出了什么。这里的一切都随每个区块刷新。',
       contractData:
@@ -271,6 +272,7 @@ export default {
       cancelSubscription: '停止你之前设置的定期付款。',
     },
     blocks: { count: '{{count}} 笔交易', empty: '空', forger: '铸块者', none: '暂无区块', noMatch: '没有匹配的区块', hideEmpty: '隐藏空区块', hidden: '已隐藏 {{count}} 个空区块' },
+    contracts: { name: '名称', created: '创建于', none: '链上还没有合约', noMatch: '没有匹配的合约' },
     accounts: {
       create: '创建账户',
       import: '导入密语',

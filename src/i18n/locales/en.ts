@@ -125,7 +125,7 @@ export default {
   },
   console: {
     back: 'Start page',
-    tab: { transactions: 'Transactions', blocks: 'Blocks', accounts: 'Accounts' },
+    tab: { transactions: 'Transactions', blocks: 'Blocks', accounts: 'Accounts', contracts: 'Contracts' },
     search: { placeholder: 'Id, address or name' },
     forge: {
       action: 'Forge',
@@ -170,6 +170,7 @@ export default {
       glossaryNoMatch: 'Nothing matches',
     },
     note: {
+      contracts: 'Every smart contract on the chain, newest first. Open one to see its memory, maps and activity.',
       contract:
         'A smart contract, live: what it holds, whether it runs, and what has gone in and out. Everything here refreshes with each block.',
       contractData:
@@ -296,6 +297,7 @@ export default {
       cancelSubscription: 'Stop a recurring payment you set up earlier.',
     },
     blocks: { count: '{{count}} transactions', empty: 'Empty', forger: 'Forger', none: 'No blocks yet', noMatch: 'No blocks match', hideEmpty: 'Hide empty', hidden: '{{count}} empty hidden' },
+    contracts: { name: 'Name', created: 'Created', none: 'No contracts on the chain yet', noMatch: 'No contracts match' },
     accounts: {
       create: 'Create account',
       import: 'Import passphrase',

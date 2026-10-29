@@ -15,7 +15,7 @@ import { useValueFlash } from '@/motion'
  * Amber for a run cut off for lack of SIGNA, magenta once nothing will make
  * it run again. Finished is green: the next call starts it from the top.
  */
-const STATUS_COLOR: Record<ContractStatus, string> = {
+export const STATUS_COLOR: Record<ContractStatus, string> = {
   running: 'var(--green)',
   stopped: 'var(--green)',
   finished: 'var(--green)',

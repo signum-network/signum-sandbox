@@ -108,7 +108,7 @@ export default {
   },
   console: {
     back: 'Початкова сторінка',
-    tab: { transactions: 'Транзакції', blocks: 'Блоки', accounts: 'Рахунки' },
+    tab: { transactions: 'Транзакції', blocks: 'Блоки', accounts: 'Рахунки', contracts: 'Контракти' },
     search: { placeholder: 'Id, адреса або назва' },
     forge: {
       action: 'Кувати',
@@ -153,6 +153,7 @@ export default {
       glossaryNoMatch: 'Нічого не знайдено',
     },
     note: {
+      contracts: 'Усі смарт-контракти в ланцюжку, нові згори. Відкрийте контракт, щоб побачити його пам\'ять, мапи й активність.',
       contract:
         'Смарт-контракт наживо: що в нього є, чи він працює, що надійшло і що пішло. Усе тут оновлюється з кожним блоком.',
       contractData:
@@ -271,6 +272,7 @@ export default {
       cancelSubscription: 'Припиніть регулярний платіж, який ви налаштували раніше.',
     },
     blocks: { count: '{{count}} транзакцій', empty: 'Порожньо', forger: 'Форджер', none: 'Ще немає блоків', noMatch: 'Немає відповідних блоків', hideEmpty: 'Сховати порожні', hidden: 'Сховано порожніх: {{count}}' },
+    contracts: { name: 'Назва', created: 'Створено', none: 'У ланцюжку ще немає контрактів', noMatch: 'Немає відповідних контрактів' },
     accounts: {
       create: 'Створити рахунок',
       import: 'Імпортувати парольну фразу',

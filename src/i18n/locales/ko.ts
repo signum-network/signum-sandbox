@@ -108,7 +108,7 @@ export default {
   },
   console: {
     back: '시작 페이지',
-    tab: { transactions: '트랜잭션', blocks: '블록', accounts: '계정' },
+    tab: { transactions: '트랜잭션', blocks: '블록', accounts: '계정', contracts: '컨트랙트' },
     search: { placeholder: 'Id, 주소 또는 이름' },
     forge: {
       action: '생성',
@@ -153,6 +153,7 @@ export default {
       glossaryNoMatch: '일치하는 것이 없습니다',
     },
     note: {
+      contracts: '체인의 모든 스마트 컨트랙트, 최신순. 하나를 열면 메모리, 맵, 활동을 볼 수 있습니다.',
       contract:
         '스마트 컨트랙트를 실시간으로: 무엇을 보유했는지, 실행 중인지, 무엇이 들어오고 나갔는지. 여기 모든 것은 블록마다 갱신됩니다.',
       contractData:
@@ -271,6 +272,7 @@ export default {
       cancelSubscription: '이전에 설정한 정기 결제를 중단합니다.',
     },
     blocks: { count: '트랜잭션 {{count}}건', empty: '비어 있음', forger: '포저', none: '아직 블록이 없습니다', noMatch: '일치하는 블록이 없습니다', hideEmpty: '빈 블록 숨기기', hidden: '빈 블록 {{count}}개 숨김' },
+    contracts: { name: '이름', created: '생성', none: '체인에 아직 컨트랙트가 없습니다', noMatch: '일치하는 컨트랙트가 없습니다' },
     accounts: {
       create: '계정 만들기',
       import: '패스프레이즈 가져오기',

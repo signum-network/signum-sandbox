@@ -108,7 +108,7 @@ export default {
   },
   console: {
     back: 'スタートページ',
-    tab: { transactions: '取引', blocks: 'ブロック', accounts: 'アカウント' },
+    tab: { transactions: '取引', blocks: 'ブロック', accounts: 'アカウント', contracts: 'コントラクト' },
     search: { placeholder: 'Id、アドレスまたは名前' },
     forge: {
       action: '生成',
@@ -153,6 +153,7 @@ export default {
       glossaryNoMatch: '一致するものがありません',
     },
     note: {
+      contracts: 'チェーン上のすべてのスマートコントラクト（新しい順）。開くとメモリ、マップ、アクティビティを確認できます。',
       contract:
         'スマートコントラクトをライブで：何を保有し、動いているか、何が出入りしたか。ここはすべてブロックごとに更新されます。',
       contractData:
@@ -271,6 +272,7 @@ export default {
       cancelSubscription: '以前に設定した定期支払いを停止します。',
     },
     blocks: { count: '{{count}} 件の取引', empty: '空', forger: 'フォージャー', none: 'まだブロックがありません', noMatch: '一致するブロックがありません', hideEmpty: '空を隠す', hidden: '空ブロック {{count}} 件を非表示' },
+    contracts: { name: '名前', created: '作成', none: 'チェーン上にまだコントラクトはありません', noMatch: '一致するコントラクトはありません' },
     accounts: {
       create: 'アカウントを作成',
       import: 'パスフレーズをインポート',

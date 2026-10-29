@@ -108,7 +108,7 @@ export default {
   },
   console: {
     back: 'Startseite',
-    tab: { transactions: 'Transaktionen', blocks: 'Blöcke', accounts: 'Accounts' },
+    tab: { transactions: 'Transaktionen', blocks: 'Blöcke', accounts: 'Accounts', contracts: 'Contracts' },
     search: { placeholder: 'ID, Adresse oder Name' },
     forge: {
       action: 'Forgen',
@@ -153,6 +153,7 @@ export default {
       glossaryNoMatch: 'Nichts gefunden',
     },
     note: {
+      contracts: 'Jeder Smart Contract auf der Chain, der neueste zuerst. Öffne einen, um Speicher, Maps und Aktivität zu sehen.',
       contract:
         'Ein Smart Contract, live: was er hält, ob er läuft und was hinein- und hinausgegangen ist. Alles hier aktualisiert sich mit jedem Block.',
       contractData:
@@ -271,6 +272,7 @@ export default {
       cancelSubscription: 'Eine wiederkehrende Zahlung wieder beenden.',
     },
     blocks: { count: '{{count}} Transaktionen', empty: 'Leer', forger: 'Forger', none: 'Noch keine Blöcke', noMatch: 'Keine passenden Blöcke', hideEmpty: 'Leere ausblenden', hidden: '{{count}} leere ausgeblendet' },
+    contracts: { name: 'Name', created: 'Erstellt', none: 'Noch keine Contracts auf der Chain', noMatch: 'Keine Contracts passen' },
     accounts: {
       create: 'Account anlegen',
       import: 'Passphrase importieren',

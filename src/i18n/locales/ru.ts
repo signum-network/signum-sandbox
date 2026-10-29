@@ -108,7 +108,7 @@ export default {
   },
   console: {
     back: 'Начальная страница',
-    tab: { transactions: 'Транзакции', blocks: 'Блоки', accounts: 'Счета' },
+    tab: { transactions: 'Транзакции', blocks: 'Блоки', accounts: 'Счета', contracts: 'Контракты' },
     search: { placeholder: 'Id, адрес или имя' },
     forge: {
       action: 'Ковать',
@@ -153,6 +153,7 @@ export default {
       glossaryNoMatch: 'Ничего не найдено',
     },
     note: {
+      contracts: 'Все смарт-контракты в цепочке, новые сверху. Откройте контракт, чтобы увидеть его память, карты и активность.',
       contract:
         'Смарт-контракт вживую: что у него есть, работает ли он, что пришло и что ушло. Всё здесь обновляется с каждым блоком.',
       contractData:
@@ -271,6 +272,7 @@ export default {
       cancelSubscription: 'Остановите регулярный платёж, настроенный ранее.',
     },
     blocks: { count: '{{count}} транзакций', empty: 'Пусто', forger: 'Кузнец', none: 'Блоков пока нет', noMatch: 'Нет подходящих блоков', hideEmpty: 'Скрыть пустые', hidden: 'Скрыто пустых: {{count}}' },
+    contracts: { name: 'Имя', created: 'Создан', none: 'В цепочке пока нет контрактов', noMatch: 'Нет подходящих контрактов' },
     accounts: {
       create: 'Создать счёт',
       import: 'Импортировать кодовую фразу',

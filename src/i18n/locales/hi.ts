@@ -108,7 +108,7 @@ export default {
   },
   console: {
     back: 'प्रारंभ पृष्ठ',
-    tab: { transactions: 'लेनदेन', blocks: 'ब्लॉक', accounts: 'खाते' },
+    tab: { transactions: 'लेनदेन', blocks: 'ब्लॉक', accounts: 'खाते', contracts: 'कॉन्ट्रैक्ट' },
     search: { placeholder: 'Id, पता या नाम' },
     forge: {
       action: 'फ़ोर्ज करें',
@@ -153,6 +153,7 @@ export default {
       glossaryNoMatch: 'कुछ नहीं मिला',
     },
     note: {
+      contracts: 'चेन के सभी स्मार्ट कॉन्ट्रैक्ट, नए पहले। किसी को खोलकर उसकी मेमोरी, मैप और गतिविधि देखें।',
       contract:
         'एक स्मार्ट कॉन्ट्रैक्ट, लाइव: उसके पास क्या है, वह चल रहा है या नहीं, और क्या आया-गया। यहाँ सब कुछ हर ब्लॉक के साथ ताज़ा होता है।',
       contractData:
@@ -271,6 +272,7 @@ export default {
       cancelSubscription: 'पहले सेट किया गया नियमित भुगतान रोकें।',
     },
     blocks: { count: '{{count}} लेनदेन', empty: 'खाली', forger: 'फ़ोर्जर', none: 'अभी कोई ब्लॉक नहीं', noMatch: 'कोई ब्लॉक मेल नहीं खाता', hideEmpty: 'खाली छिपाएँ', hidden: '{{count}} खाली छिपाए गए' },
+    contracts: { name: 'नाम', created: 'बनाया गया', none: 'चेन पर अभी कोई कॉन्ट्रैक्ट नहीं', noMatch: 'कोई कॉन्ट्रैक्ट मेल नहीं खाता' },
     accounts: {
       create: 'खाता बनाएँ',
       import: 'पासफ़्रेज़ आयात करें',
