@@ -477,6 +477,23 @@ export default {
     },
   },
   inspector: {
+    reading: {
+      unsigned: 'अहस्ताक्षरित',
+      signed: 'हस्ताक्षरित',
+      string: 'स्ट्रिंग',
+      bool: 'bool',
+      address: 'पता',
+      hex: 'हेक्स',
+      stored: 'संग्रहीत',
+    },
+    type: {
+      label: 'ऐसे दिखाएँ',
+      none: 'हेक्स',
+      suggestAddress: 'इसमें {{name}} की id है। पते के रूप में दिखाएँ?',
+    },
+    detail: {
+      empty: 'हर तरह से देखने के लिए एक स्लॉट चुनें।',
+    },
     tab: {
       data: 'डेटा',
       callStack: 'कॉल स्टैक',
@@ -516,19 +533,7 @@ export default {
     wakesAt: 'बैलेंस {{threshold}} SIGNA (पिछला बैलेंस और सक्रियण राशि) तक पहुँचने पर यह फिर चलेगा।',
     data: {
       size: '{{bytes}} बाइट · {{slots}} स्लॉट',
-      sizeWithStack: '{{bytes}} बाइट · {{slots}} स्लॉट + {{stackBytes}} बाइट स्टैक',
-      showStack: 'स्टैक दिखाएँ',
-      hideStack: 'स्टैक छिपाएँ',
-      callStack: 'कॉल स्टैक',
-      userStack: 'यूज़र स्टैक',
-      index: '#',
       label: 'नाम',
-      raw: 'संग्रहीत',
-      hex: 'हेक्स',
-      decimal: 'दशमलव',
-      signed: 'चिह्नित',
-      text: 'टेक्स्ट',
-      account: 'खाता',
       changed: 'ब्लॉक {{height}} में बदला',
       labelPlaceholder: 'नाम',
       empty: 'यह कॉन्ट्रैक्ट कोई डेटा नहीं रखता।',

@@ -14,7 +14,7 @@ import { useContractLabels } from '@/hooks/useContractLabels'
 import { ViewNote } from '@/components/console/ViewNote'
 import { Direction } from '@/components/console/views/Direction'
 import { ContractHeader } from './ContractHeader'
-import { DataStackTable } from './DataStackTable'
+import { MemoryView } from './MemoryView'
 import { ContractMaps } from './ContractMaps'
 import { ContractTabs, type ContractTab, type TabState } from './ContractTabs'
 import { knownIds, type DataSlot, type KnownId } from '@/lib/contractData'
@@ -31,10 +31,12 @@ function parseContractId(param: string): string | null {
   }
 }
 
+const NO_MATCHES = new Set<number>()
+
 /** A tab's content, scrolling inside the panel rather than growing the page. */
 function Scroll({ children }: { children: ReactNode }) {
   return (
-    <div className="themed-scroll console-scroll min-h-0 flex-1 overflow-y-auto pr-2">
+    <div className="themed-scroll console-scroll max-h-[60vh] min-h-0 flex-1 overflow-y-auto pr-2 md:max-h-none">
       {children}
     </div>
   )
@@ -51,14 +53,6 @@ function ContractBody({ contractId, height }: { contractId: string; height: numb
   const inspector = useContractInspector(contractId, height)
   const contract = inspector.contract
   const { meta, setMeta } = useContractLabels(contract?.machineCodeHashId ?? null)
-  // The table reads plain labels until the memory view replaces it.
-  const labels = useMemo(
-    () =>
-      Object.fromEntries(
-        Object.entries(meta).flatMap(([index, m]) => (m.label ? [[index, m.label]] : [])),
-      ) as Record<number, string>,
-    [meta],
-  )
   // The contract itself and its creator, on top of what the console knows.
   const known = useMemo(
     () =>
@@ -100,10 +94,16 @@ function ContractBody({ contractId, height }: { contractId: string; height: numb
   }
 
   // A stack tab only for a stack the contract has.
+  const changedIn = (slots: DataSlot[]) =>
+    slots.some((slot) => inspector.changed?.indices.has(slot.index))
   const tabs: TabState[] = [
-    { id: 'data' },
-    ...(sections.callStack.length > 0 ? [{ id: 'callStack' as const }] : []),
-    ...(sections.userStack.length > 0 ? [{ id: 'userStack' as const }] : []),
+    { id: 'data', changed: changedIn(sections.data) },
+    ...(sections.callStack.length > 0
+      ? [{ id: 'callStack' as const, changed: changedIn(sections.callStack) }]
+      : []),
+    ...(sections.userStack.length > 0
+      ? [{ id: 'userStack' as const, changed: changedIn(sections.userStack) }]
+      : []),
     { id: 'maps' },
     { id: 'activity' },
   ]
@@ -111,19 +111,19 @@ function ContractBody({ contractId, height }: { contractId: string; height: numb
 
   // The note speaks of the contract's variables, which only the data tab holds.
   const memory = (slots: DataSlot[], note: boolean) => (
-    <Scroll>
+    <div className="flex min-h-0 flex-1 flex-col">
       {note && <ViewNote id="contractData" terms={['dataStack']} />}
-      <DataStackTable
+      <MemoryView
         slots={slots}
-        layout={null}
-        changed={inspector.changed}
-        labels={labels}
-        onLabel={(index, label) => setMeta(index, { label })}
+        meta={meta}
+        onMeta={setMeta}
         known={known}
         addressPrefix={addressPrefix}
+        changed={inspector.changed}
+        matches={NO_MATCHES}
         codeHash={contract.machineCodeHashId}
       />
-    </Scroll>
+    </div>
   )
 
   return (
@@ -206,8 +206,12 @@ export function ContractPage({ param }: { param: string }) {
 
   return (
     <BeginnerMode on={beginner.beginner}>
-      {/* Full height like the console, so the tab panel scrolls in place. */}
-      <div className={cn('mx-auto flex h-screen flex-col p-6', PAGE_WIDTH)}>
+      {/*
+        Full height like the console from md up, so the tab panel scrolls in
+        place. Below that the header alone fills the screen, so the page
+        flows and each list scrolls within a height of its own instead.
+      */}
+      <div className={cn('mx-auto flex flex-col p-6 md:h-screen', PAGE_WIDTH)}>
         <AppHeader
           networkName={state.networkName}
           version={state.version}

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { ConsoleButton } from '@/components/console/ConsoleButton'
 import { SearchField } from '@/components/console/views/SearchField'
 import { SPRINGS } from '@/motion'
+import { ChangedDot } from './MemoryView'
 
 export type ContractTab = 'data' | 'callStack' | 'userStack' | 'maps' | 'activity'
 
@@ -58,12 +59,7 @@ export function ContractTabs({
             >
               <span className="flex items-center gap-2">
                 {t(`inspector.tab.${id}`)}
-                {changed && (
-                  <span
-                    className="inline-block h-[6px] w-[6px] rounded-full"
-                    style={{ background: 'var(--amber)' }}
-                  />
-                )}
+                {changed && <ChangedDot />}
                 {hits ? (
                   <span className="tabular-nums text-[var(--blue3)]">{hits}</span>
                 ) : null}

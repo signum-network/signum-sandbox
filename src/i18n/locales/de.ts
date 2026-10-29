@@ -477,6 +477,23 @@ export default {
     },
   },
   inspector: {
+    reading: {
+      unsigned: 'unsigned',
+      signed: 'signed',
+      string: 'String',
+      bool: 'Bool',
+      address: 'Adresse',
+      hex: 'Hex',
+      stored: 'gespeichert',
+    },
+    type: {
+      label: 'Anzeigen als',
+      none: 'Hex',
+      suggestAddress: 'Enthält die ID von {{name}}. Als Adresse anzeigen?',
+    },
+    detail: {
+      empty: 'Wähle einen Slot, um ihn auf jede Art zu lesen.',
+    },
     tab: {
       data: 'Daten',
       callStack: 'Call-Stack',
@@ -516,19 +533,7 @@ export default {
     wakesAt: 'Er läuft wieder, sobald sein Kontostand {{threshold}} SIGNA erreicht: sein letztes Guthaben plus den Aktivierungsbetrag.',
     data: {
       size: '{{bytes}} Bytes · {{slots}} Slots',
-      sizeWithStack: '{{bytes}} Bytes · {{slots}} Slots + {{stackBytes}} Bytes Stack',
-      showStack: 'Stacks zeigen',
-      hideStack: 'Stacks verbergen',
-      callStack: 'Call-Stack',
-      userStack: 'User-Stack',
-      index: '#',
       label: 'Name',
-      raw: 'Gespeichert',
-      hex: 'Hex',
-      decimal: 'Dezimal',
-      signed: 'Mit Vorzeichen',
-      text: 'Text',
-      account: 'Konto',
       changed: 'geändert in Block {{height}}',
       labelPlaceholder: 'Name',
       empty: 'Dieser Contract hält keine Daten.',

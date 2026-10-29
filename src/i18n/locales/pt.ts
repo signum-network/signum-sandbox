@@ -477,6 +477,23 @@ export default {
     },
   },
   inspector: {
+    reading: {
+      unsigned: 'sem sinal',
+      signed: 'com sinal',
+      string: 'string',
+      bool: 'bool',
+      address: 'endereço',
+      hex: 'hex',
+      stored: 'armazenado',
+    },
+    type: {
+      label: 'Mostrar como',
+      none: 'Hex',
+      suggestAddress: 'Contém o id de {{name}}. Mostrar como endereço?',
+    },
+    detail: {
+      empty: 'Escolha um slot para vê-lo de todas as formas.',
+    },
     tab: {
       data: 'Dados',
       callStack: 'Pilha de chamadas',
@@ -516,19 +533,7 @@ export default {
     wakesAt: 'Executa novamente quando o saldo atingir {{threshold}} SIGNA: o último saldo mais o valor de ativação.',
     data: {
       size: '{{bytes}} bytes · {{slots}} slots',
-      sizeWithStack: '{{bytes}} bytes · {{slots}} slots + {{stackBytes}} bytes de pilha',
-      showStack: 'Mostrar as pilhas',
-      hideStack: 'Ocultar as pilhas',
-      callStack: 'Pilha de chamadas',
-      userStack: 'Pilha do usuário',
-      index: '#',
       label: 'Nome',
-      raw: 'Armazenado',
-      hex: 'Hex',
-      decimal: 'Decimal',
-      signed: 'Com sinal',
-      text: 'Texto',
-      account: 'Conta',
       changed: 'mudou no bloco {{height}}',
       labelPlaceholder: 'nome',
       empty: 'Este contrato não guarda dados.',

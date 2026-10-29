@@ -499,6 +499,23 @@ export default {
     },
   },
   inspector: {
+    reading: {
+      unsigned: 'unsigned',
+      signed: 'signed',
+      string: 'string',
+      bool: 'bool',
+      address: 'address',
+      hex: 'hex',
+      stored: 'stored',
+    },
+    type: {
+      label: 'Show as',
+      none: 'Hex',
+      suggestAddress: 'Holds the id of {{name}}. Show it as an address?',
+    },
+    detail: {
+      empty: 'Pick a slot to see it every way.',
+    },
     tab: {
       data: 'Data',
       callStack: 'Call stack',
@@ -538,19 +555,7 @@ export default {
     wakesAt: 'It runs again once its balance reaches {{threshold}} SIGNA: its last balance plus the activation amount.',
     data: {
       size: '{{bytes}} bytes · {{slots}} slots',
-      sizeWithStack: '{{bytes}} bytes · {{slots}} slots + {{stackBytes}} bytes stack',
-      showStack: 'Show the stacks',
-      hideStack: 'Hide the stacks',
-      callStack: 'Call stack',
-      userStack: 'User stack',
-      index: '#',
       label: 'Label',
-      raw: 'Stored',
-      hex: 'Hex',
-      decimal: 'Decimal',
-      signed: 'Signed',
-      text: 'Text',
-      account: 'Account',
       changed: 'changed in block {{height}}',
       labelPlaceholder: 'name',
       empty: 'This contract keeps no data.',

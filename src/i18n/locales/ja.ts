@@ -477,6 +477,23 @@ export default {
     },
   },
   inspector: {
+    reading: {
+      unsigned: '符号なし',
+      signed: '符号付き',
+      string: '文字列',
+      bool: 'bool',
+      address: 'アドレス',
+      hex: '16進',
+      stored: '格納値',
+    },
+    type: {
+      label: '表示形式',
+      none: '16進',
+      suggestAddress: '{{name}} の ID を保持しています。アドレスとして表示しますか？',
+    },
+    detail: {
+      empty: 'スロットを選ぶと、あらゆる読み方で表示します。',
+    },
     tab: {
       data: 'データ',
       callStack: 'コールスタック',
@@ -516,19 +533,7 @@ export default {
     wakesAt: '残高が {{threshold}} SIGNA（前回の残高＋起動額）に達すると再び実行されます。',
     data: {
       size: '{{bytes}} バイト · {{slots}} スロット',
-      sizeWithStack: '{{bytes}} バイト · {{slots}} スロット + スタック {{stackBytes}} バイト',
-      showStack: 'スタックを表示',
-      hideStack: 'スタックを隠す',
-      callStack: 'コールスタック',
-      userStack: 'ユーザースタック',
-      index: '#',
       label: '名前',
-      raw: '格納値',
-      hex: '16 進',
-      decimal: '10 進',
-      signed: '符号付き',
-      text: 'テキスト',
-      account: 'アカウント',
       changed: 'ブロック {{height}} で変化',
       labelPlaceholder: '名前',
       empty: 'このコントラクトはデータを持っていません。',

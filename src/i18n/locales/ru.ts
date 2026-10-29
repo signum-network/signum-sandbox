@@ -477,6 +477,23 @@ export default {
     },
   },
   inspector: {
+    reading: {
+      unsigned: 'без знака',
+      signed: 'со знаком',
+      string: 'строка',
+      bool: 'bool',
+      address: 'адрес',
+      hex: 'hex',
+      stored: 'как хранится',
+    },
+    type: {
+      label: 'Показать как',
+      none: 'Hex',
+      suggestAddress: 'Содержит id {{name}}. Показать как адрес?',
+    },
+    detail: {
+      empty: 'Выберите слот, чтобы увидеть все его прочтения.',
+    },
     tab: {
       data: 'Данные',
       callStack: 'Стек вызовов',
@@ -516,19 +533,7 @@ export default {
     wakesAt: 'Он снова запустится, когда баланс достигнет {{threshold}} SIGNA: последний баланс плюс сумма активации.',
     data: {
       size: '{{bytes}} байт · {{slots}} слотов',
-      sizeWithStack: '{{bytes}} байт · {{slots}} слотов + {{stackBytes}} байт стека',
-      showStack: 'Показать стеки',
-      hideStack: 'Скрыть стеки',
-      callStack: 'Стек вызовов',
-      userStack: 'Пользовательский стек',
-      index: '#',
       label: 'Имя',
-      raw: 'Хранится',
-      hex: 'Hex',
-      decimal: 'Десятичное',
-      signed: 'Со знаком',
-      text: 'Текст',
-      account: 'Аккаунт',
       changed: 'изменён в блоке {{height}}',
       labelPlaceholder: 'имя',
       empty: 'Этот контракт не хранит данных.',

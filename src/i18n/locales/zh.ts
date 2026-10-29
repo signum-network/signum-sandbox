@@ -471,6 +471,23 @@ export default {
     },
   },
   inspector: {
+    reading: {
+      unsigned: '无符号',
+      signed: '有符号',
+      string: '字符串',
+      bool: '布尔',
+      address: '地址',
+      hex: '十六进制',
+      stored: '存储',
+    },
+    type: {
+      label: '显示为',
+      none: '十六进制',
+      suggestAddress: '包含 {{name}} 的 id。显示为地址？',
+    },
+    detail: {
+      empty: '选择一个槽位以查看其所有解读。',
+    },
     tab: {
       data: '数据',
       callStack: '调用栈',
@@ -510,19 +527,7 @@ export default {
     wakesAt: '余额达到 {{threshold}} SIGNA（上次余额加激活金额）时会再次运行。',
     data: {
       size: '{{bytes}} 字节 · {{slots}} 个槽位',
-      sizeWithStack: '{{bytes}} 字节 · {{slots}} 个槽位 + {{stackBytes}} 字节栈',
-      showStack: '显示栈',
-      hideStack: '隐藏栈',
-      callStack: '调用栈',
-      userStack: '用户栈',
-      index: '#',
       label: '名称',
-      raw: '存储值',
-      hex: '十六进制',
-      decimal: '十进制',
-      signed: '有符号',
-      text: '文本',
-      account: '账户',
       changed: '在区块 {{height}} 中变化',
       labelPlaceholder: '名称',
       empty: '这个合约没有数据。',

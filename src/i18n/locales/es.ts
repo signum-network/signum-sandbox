@@ -476,6 +476,23 @@ export default {
     },
   },
   inspector: {
+    reading: {
+      unsigned: 'sin signo',
+      signed: 'con signo',
+      string: 'cadena',
+      bool: 'bool',
+      address: 'dirección',
+      hex: 'hex',
+      stored: 'almacenado',
+    },
+    type: {
+      label: 'Mostrar como',
+      none: 'Hex',
+      suggestAddress: 'Contiene el id de {{name}}. ¿Mostrarlo como dirección?',
+    },
+    detail: {
+      empty: 'Elige una ranura para verla de todas las formas.',
+    },
     tab: {
       data: 'Datos',
       callStack: 'Pila de llamadas',
@@ -515,19 +532,7 @@ export default {
     wakesAt: 'Se ejecuta de nuevo cuando su saldo alcanza {{threshold}} SIGNA: su último saldo más el importe de activación.',
     data: {
       size: '{{bytes}} bytes · {{slots}} ranuras',
-      sizeWithStack: '{{bytes}} bytes · {{slots}} ranuras + {{stackBytes}} bytes de pila',
-      showStack: 'Mostrar las pilas',
-      hideStack: 'Ocultar las pilas',
-      callStack: 'Pila de llamadas',
-      userStack: 'Pila de usuario',
-      index: '#',
       label: 'Nombre',
-      raw: 'Almacenado',
-      hex: 'Hex',
-      decimal: 'Decimal',
-      signed: 'Con signo',
-      text: 'Texto',
-      account: 'Cuenta',
       changed: 'cambió en el bloque {{height}}',
       labelPlaceholder: 'nombre',
       empty: 'Este contrato no guarda datos.',

@@ -475,6 +475,23 @@ export default {
     },
   },
   inspector: {
+    reading: {
+      unsigned: '부호 없음',
+      signed: '부호 있음',
+      string: '문자열',
+      bool: 'bool',
+      address: '주소',
+      hex: '16진수',
+      stored: '저장값',
+    },
+    type: {
+      label: '표시 형식',
+      none: '16진수',
+      suggestAddress: '{{name}}의 id를 담고 있습니다. 주소로 표시할까요?',
+    },
+    detail: {
+      empty: '슬롯을 선택하면 모든 방식으로 읽어 보여줍니다.',
+    },
     tab: {
       data: '데이터',
       callStack: '호출 스택',
@@ -514,19 +531,7 @@ export default {
     wakesAt: '잔액이 {{threshold}} SIGNA(직전 잔액 + 활성화 금액)에 도달하면 다시 실행됩니다.',
     data: {
       size: '{{bytes}}바이트 · 슬롯 {{slots}}개',
-      sizeWithStack: '{{bytes}}바이트 · {{slots}}개 슬롯 + 스택 {{stackBytes}}바이트',
-      showStack: '스택 보기',
-      hideStack: '스택 숨기기',
-      callStack: '호출 스택',
-      userStack: '사용자 스택',
-      index: '#',
       label: '이름',
-      raw: '저장값',
-      hex: '16진수',
-      decimal: '10진수',
-      signed: '부호 있음',
-      text: '텍스트',
-      account: '계정',
       changed: '블록 {{height}}에서 변경됨',
       labelPlaceholder: '이름',
       empty: '이 컨트랙트는 데이터가 없습니다.',
