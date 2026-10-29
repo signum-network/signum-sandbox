@@ -40,7 +40,15 @@ function ContractBody({ contractId, height }: { contractId: string; height: numb
   const { contacts } = useContacts()
   const inspector = useContractInspector(contractId, height)
   const contract = inspector.contract
-  const { labels, setLabel } = useContractLabels(contract?.machineCodeHashId ?? null)
+  const { meta, setMeta } = useContractLabels(contract?.machineCodeHashId ?? null)
+  // The table reads plain labels until the memory view replaces it.
+  const labels = useMemo(
+    () =>
+      Object.fromEntries(
+        Object.entries(meta).flatMap(([index, m]) => (m.label ? [[index, m.label]] : [])),
+      ) as Record<number, string>,
+    [meta],
+  )
   // The contract itself and its creator, on top of what the console knows.
   const known = useMemo(
     () =>
@@ -81,7 +89,7 @@ function ContractBody({ contractId, height }: { contractId: string; height: numb
         layout={inspector.layout}
         changed={inspector.changed}
         labels={labels}
-        onLabel={setLabel}
+        onLabel={(index, label) => setMeta(index, { label })}
         known={known}
         addressPrefix={addressPrefix}
         codeHash={contract.machineCodeHashId}
