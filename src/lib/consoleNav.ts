@@ -20,12 +20,16 @@ export interface ConsoleSearch {
  * reads values as JSON, so a bare numeric id arrives as a number that has
  * already lost its last digits; only a string is trusted. Links carry the
  * address for that reason.
+ *
+ * `watch` is always present, if only as undefined: the router lays this
+ * result over the root route's unvalidated search, so a key left out would
+ * let the raw value through.
  */
 export function parseConsoleSearch(search: Record<string, unknown>): ConsoleSearch {
-  if (typeof search.watch !== 'string') return {}
+  if (typeof search.watch !== 'string') return { watch: undefined }
   try {
     return { watch: toAccountId(search.watch) }
   } catch {
-    return {}
+    return { watch: undefined }
   }
 }

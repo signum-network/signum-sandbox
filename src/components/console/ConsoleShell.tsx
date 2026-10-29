@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
+import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { useNodeState } from '@/hooks/useNodeState'
 import { useAccounts } from '@/hooks/useAccounts'
@@ -43,8 +44,10 @@ export type { ConsoleTab, DrawerName }
 
 const TABS: ConsoleTab[] = ['transactions', 'blocks', 'accounts', 'contracts']
 
-export function ConsoleShell() {
+/** `watch`: an account a link asked the console to watch, as a numeric id. */
+export function ConsoleShell({ watch }: { watch?: string } = {}) {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const [tab, setTab] = useState<ConsoleTab>('transactions')
   const [drawer, setDrawer] = useState<DrawerName>(null)
   const { state, nodeAddress, connected } = useNodeState()
@@ -116,6 +119,17 @@ export function ConsoleShell() {
     drawer,
   }
   const tour = useTour(observation)
+
+  // A link asked for an account to be watched. Applied after useWatched has
+  // read the stored one, so the link wins, and then taken out of the URL:
+  // left in, a reload after "stop watching" would start watching again.
+  const watchAccount = watched.watch
+  useEffect(() => {
+    if (!watch) return
+    watchAccount(watch)
+    setTab('watch')
+    void navigate({ to: '/console', search: {}, replace: true })
+  }, [watch, watchAccount, navigate])
 
   // A step that points at the Send drawer opens it. Only when the step
   // changes: reopening it on every render would make the close button useless.
