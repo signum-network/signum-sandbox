@@ -280,7 +280,10 @@ export function ContractPage({ param }: { param: string }) {
         {contractId === null ? (
           <p className="text-[13px] text-[var(--muted)]">{t('inspector.notFound')}</p>
         ) : (
-          <ContractBody contractId={contractId} height={state.height ?? null} />
+          // Keyed by the contract: moving to another one through a link must
+          // not carry over the search, the open map lookup, or the slots that
+          // the next block's changes are measured against.
+          <ContractBody key={contractId} contractId={contractId} height={state.height ?? null} />
         )}
       </div>
     </BeginnerMode>
