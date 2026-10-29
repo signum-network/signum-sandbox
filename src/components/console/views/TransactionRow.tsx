@@ -10,6 +10,8 @@ import { ConsoleButton, RowButton } from '../ConsoleButton'
 import { displayName, type Contacts, type ResolveContactError } from '@/lib/contacts'
 import { addressPrefixOf, toAddress, toComparableId } from '@/lib/recipient'
 import { summarize } from '@/lib/txSummary'
+import { contractPartyId } from '@/lib/contractData'
+import { InspectLink } from '@/components/contracts/InspectLink'
 import { transactionDid } from '@/lib/did'
 import { CopyLink, DidLink } from '@/components/console/DidLink'
 import { Term } from '@/components/console/Term'
@@ -90,16 +92,19 @@ function Detail({ label, children }: { label: ReactNode; children: ReactNode }) 
 
 /**
  * An account on one of those lines: the picture, the address, and the name if
- * the console has one for it.
+ * the console has one for it. A party known to be a contract also leads into
+ * the inspector.
  */
 function Party({
   label,
   address,
   name,
+  contractId,
 }: {
   label: string
   address: string
   name: string | null
+  contractId?: string | null
 }) {
   return (
     <Detail label={label}>
@@ -107,6 +112,7 @@ function Party({
         <Identicon value={address} size={16} />
         <span className="break-all">{address}</span>
         {name && name !== address && <span className="text-[var(--muted)]">· {name}</span>}
+        {contractId && <InspectLink contractId={contractId} />}
       </span>
     </Detail>
   )
@@ -274,13 +280,33 @@ export function TransactionRow({
                 cannot carry two pictures each.
               */}
               {summary.senderRS && (
-                <Party label={t('console.send.from')} address={summary.senderRS} name={senderName} />
+                <Party
+                  label={t('console.send.from')}
+                  address={summary.senderRS}
+                  name={senderName}
+                  contractId={contractPartyId(summary.senderRS, 'sender', summary.kind, contacts)}
+                />
               )}
               {summary.recipientRS && (
                 <Party
                   label={t('console.send.to')}
                   address={summary.recipientRS}
                   name={recipientName}
+                  contractId={contractPartyId(
+                    summary.recipientRS,
+                    'recipient',
+                    summary.kind,
+                    contacts,
+                  )}
+                />
+              )}
+              {/* A deployment names no recipient, so its contract takes that line. */}
+              {deployedContract && (
+                <Party
+                  label={t('console.tx.contract')}
+                  address={deployedContract}
+                  name={displayName(deployedContract, accounts, contacts)}
+                  contractId={item.tx.transaction ?? null}
                 />
               )}
               {summary.amountSigna && (

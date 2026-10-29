@@ -6,6 +6,7 @@ import { Identicon } from '@/components/Identicon'
 import { ConsoleButton } from '../ConsoleButton'
 import { Term } from '../Term'
 import { toAddress } from '@/lib/recipient'
+import { InspectLink } from '@/components/contracts/InspectLink'
 
 
 export function ContactList({
@@ -112,6 +113,7 @@ export function ContactList({
             )}
             <span className="text-[var(--muted)]">{c.address}</span>
             <span className="ml-auto flex items-center gap-2">
+              {c.isContract && <InspectLink contractId={c.id} />}
               <ConsoleButton active={watchedId === c.id} onClick={() => onWatch(c.id)}>
                 {t('console.watch.watch')}
               </ConsoleButton>

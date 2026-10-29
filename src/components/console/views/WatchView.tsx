@@ -11,6 +11,7 @@ import { Identicon } from '@/components/Identicon'
 import { ConsoleButton } from '../ConsoleButton'
 import { Row, Holding } from './AccountFields'
 import { Direction } from './Direction'
+import { InspectLink } from '@/components/contracts/InspectLink'
 import { Term } from '@/components/console/Term'
 import { useValueFlash } from '@/motion'
 
@@ -125,7 +126,8 @@ export function WatchView({
           {name}
         </span>
         <span className="text-[13px] text-[var(--muted)]">{address}</span>
-        <span className="ml-auto">
+        <span className="ml-auto flex items-center gap-3">
+          {chain?.isAT && <InspectLink contractId={accountId} />}
           <ConsoleButton onClick={onUnwatch}>{t('console.watch.stop')}</ConsoleButton>
         </span>
       </div>
