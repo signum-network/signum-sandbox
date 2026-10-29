@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from 'react'
+import { useCallback, useMemo, useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from '@tanstack/react-router'
 import { AppHeader } from '@/components/AppHeader'
@@ -21,6 +21,10 @@ import { knownIds, slotMatches, type DataSlot, type KnownId } from '@/lib/contra
 import { displayName } from '@/lib/contacts'
 import { toAccountId } from '@/lib/recipient'
 import { cn } from '@/lib/utils'
+
+/** The tabs that show a part of the contract's memory, in memory order. */
+type Section = 'data' | 'callStack' | 'userStack'
+const SECTIONS: Section[] = ['data', 'callStack', 'userStack']
 
 /** The contract id a URL names, or null when it names none. */
 function parseContractId(param: string): string | null {
@@ -90,25 +94,54 @@ function ContractBody({ contractId, height }: { contractId: string; height: numb
       data: slots.slice(0, dataCount),
       callStack: slots.slice(dataCount, callEnd),
       userStack: slots.slice(callEnd),
-    } satisfies Record<'data' | 'callStack' | 'userStack', DataSlot[]>
+    } satisfies Record<Section, DataSlot[]>
   }, [inspector.slots, inspector.layout])
 
-  // Which slots of each section the search finds, labels included.
-  const matches = useMemo(() => {
-    const find = (slots: DataSlot[]) =>
+  // Which slots of each section a query finds, labels included.
+  const find = useCallback(
+    (slots: DataSlot[], search: string) =>
       new Set(
         slots
           .filter((slot) =>
-            slotMatches(slot, query, { addressPrefix, known, label: meta[slot.index]?.label }),
+            slotMatches(slot, search, { addressPrefix, known, label: meta[slot.index]?.label }),
           )
           .map((slot) => slot.index),
-      )
-    return {
-      data: find(sections.data),
-      callStack: find(sections.callStack),
-      userStack: find(sections.userStack),
-    }
-  }, [sections, query, addressPrefix, known, meta])
+      ),
+    [addressPrefix, known, meta],
+  )
+  const matches = useMemo(
+    () => ({
+      data: find(sections.data, query),
+      callStack: find(sections.callStack, query),
+      userStack: find(sections.userStack, query),
+    }),
+    [sections, query, find],
+  )
+
+  // The selected slot of each memory tab, kept here so a search can move it.
+  const [selected, setSelected] = useState<Record<Section, number | null>>({
+    data: null,
+    callStack: null,
+    userStack: null,
+  })
+  const [jump, setJump] = useState(0)
+
+  // A new query selects the first hit of each memory tab, and leaves the
+  // open tab as it is. The hits are counted again on every block; only a
+  // new query moves the selection, so a block never pulls the list away.
+  const changeQuery = (next: string) => {
+    setQuery(next)
+    setSelected((previous) => {
+      const moved = { ...previous }
+      for (const section of SECTIONS) {
+        const [first] = find(sections[section], next)
+        if (first !== undefined) moved[section] = first
+      }
+      return moved
+    })
+    setJump((count) => count + 1)
+  }
+
   const [mapHits, setMapHits] = useState(0)
 
   if (inspector.notFound) {
@@ -147,7 +180,7 @@ function ContractBody({ contractId, height }: { contractId: string; height: numb
   const shown = tabs.some((entry) => entry.id === tab) ? tab : 'data'
 
   // The note speaks of the contract's variables, which only the data tab holds.
-  const memory = (section: 'data' | 'callStack' | 'userStack', note: boolean) => (
+  const memory = (section: Section, note: boolean) => (
     <Pane open={shown === section}>
       {note && <ViewNote id="contractData" terms={['dataStack']} />}
       <MemoryView
@@ -158,7 +191,9 @@ function ContractBody({ contractId, height }: { contractId: string; height: numb
         addressPrefix={addressPrefix}
         changed={inspector.changed}
         matches={matches[section]}
-        query={query}
+        selected={selected[section]}
+        onSelect={(index) => setSelected((previous) => ({ ...previous, [section]: index }))}
+        jump={jump}
         codeHash={contract.machineCodeHashId}
       />
     </Pane>
@@ -184,7 +219,7 @@ function ContractBody({ contractId, height }: { contractId: string; height: numb
           active={shown}
           onSelect={setTab}
           query={query}
-          onQuery={setQuery}
+          onQuery={changeQuery}
         />
         {memory('data', true)}
         {sections.callStack.length > 0 && memory('callStack', false)}

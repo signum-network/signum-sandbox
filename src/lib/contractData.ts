@@ -85,7 +85,7 @@ export function toDataSlots(machineData: string): DataSlot[] {
 }
 
 /** A page of AT memory is 256 bytes, so 32 slots. */
-const PAGE_SLOTS = 32
+export const PAGE_SLOTS = 32
 
 /** How a contract's memory divides: its variables, then its two stacks. */
 export interface StackLayout {

@@ -1,6 +1,13 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, type KeyboardEvent } from 'react'
 import { useTranslation } from 'react-i18next'
-import { slotValue, toPages, type DataSlot, type KnownId } from '@/lib/contractData'
+import {
+  moveSlot,
+  PAGE_SLOTS,
+  slotValue,
+  toPages,
+  type DataSlot,
+  type KnownId,
+} from '@/lib/contractData'
 import type { SlotMeta } from '@/lib/contractLabels'
 import { RowButton } from '@/components/console/ConsoleButton'
 import { useValueFlash } from '@/motion'
@@ -98,6 +105,9 @@ function SlotRow({
  * The list shows one value per slot, in the type the person set for it, or
  * hex when none is set. Guessing would be wrong too often: a slot is a long,
  * and whether it is a counter, a flag or an account only the code knows.
+ *
+ * The page shown is the one holding the selected slot, so the detail panel
+ * never shows a slot from a page out of sight.
  */
 export function MemoryView({
   slots,
@@ -107,7 +117,9 @@ export function MemoryView({
   addressPrefix,
   changed,
   matches,
-  query,
+  selected,
+  onSelect,
+  jump,
   codeHash,
 }: {
   slots: DataSlot[]
@@ -117,40 +129,46 @@ export function MemoryView({
   addressPrefix: string
   changed: Changed
   matches: Set<number>
-  query: string
+  /** The selected slot's index; null selects the first one. */
+  selected: number | null
+  onSelect: (index: number) => void
+  /**
+   * Counts jumps from outside, to a search hit. A jump to the slot that is
+   * already selected changes nothing else and must still scroll.
+   */
+  jump: number
   codeHash: string
 }) {
   const { t } = useTranslation()
   const pages = toPages(slots)
-  const [page, setPage] = useState(0)
-  const [selected, setSelected] = useState<number | null>(null)
+  const position = Math.max(
+    0,
+    slots.findIndex((slot) => slot.index === selected),
+  )
+  const selectedSlot = slots[position]
+  const page = Math.floor(position / PAGE_SLOTS)
+  const current = pages[page] ?? []
 
-  // A new query opens the first hit. Only a new query: the hits are counted
-  // again on every block, and a refresh must not pull the list away from
-  // where someone is reading.
+  // Keep the selected row in the list's view, whether the selection came
+  // from a key, a page number or a search. A new block selects nothing and
+  // so never pulls the list away from where someone is reading.
   const list = useRef<HTMLUListElement>(null)
-  // Counts jumps rather than flagging one: a jump to the slot that is already
-  // selected changes no page and no selection, and must still scroll.
-  const [jumps, setJumps] = useState(0)
   useEffect(() => {
-    const first = slots.find((slot) => matches.has(slot.index))
-    if (!first) return
-    setPage(pages.findIndex((slotsOfPage) => slotsOfPage.includes(first)))
-    setSelected(first.index)
-    setJumps((count) => count + 1)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query])
-  // Once the page with the hit is drawn, scroll the hit into the list's view.
-  useEffect(() => {
-    if (jumps === 0) return
     list.current
-      ?.querySelector(`[data-index="${selected}"]`)
+      ?.querySelector(`[data-index="${selectedSlot?.index}"]`)
       ?.scrollIntoView({ block: 'nearest' })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [jumps])
+  }, [selectedSlot?.index, jump])
 
-  const current = pages[Math.min(page, pages.length - 1)] ?? []
-  const selectedSlot = slots.find((slot) => slot.index === selected) ?? current[0]
+  const onKeyDown = (event: KeyboardEvent<HTMLUListElement>) => {
+    const next = moveSlot(slots.length, position, event.key)
+    if (next === null) return
+    event.preventDefault()
+    // The focused row may be on the page that is about to go; the list
+    // keeps the focus so the next key still arrives.
+    list.current?.focus({ preventScroll: true })
+    onSelect(slots[next].index)
+  }
 
   if (slots.length === 0) {
     return <p className="text-[var(--muted)]">{t('inspector.data.empty')}</p>
@@ -172,7 +190,7 @@ export function MemoryView({
                     'flex items-center gap-1 tabular-nums',
                     number === page ? 'text-[var(--blue3)] underline' : 'text-[var(--muted)]',
                   )}
-                  onClick={() => setPage(number)}
+                  onClick={() => onSelect(slotsOfPage[0].index)}
                 >
                   {number}
                   {changedHere && <ChangedDot />}
@@ -184,7 +202,9 @@ export function MemoryView({
         )}
         <ul
           ref={list}
-          className="themed-scroll console-scroll max-h-[50vh] min-h-0 flex-1 overflow-y-auto pr-2 md:max-h-none"
+          tabIndex={0}
+          onKeyDown={onKeyDown}
+          className="themed-scroll console-scroll max-h-[50vh] min-h-0 flex-1 overflow-y-auto pr-2 outline-none md:max-h-none"
         >
           {current.map((slot) => (
             <SlotRow
@@ -196,7 +216,7 @@ export function MemoryView({
               changed={changed}
               hit={matches.has(slot.index)}
               selected={slot.index === selectedSlot?.index}
-              onSelect={() => setSelected(slot.index)}
+              onSelect={() => onSelect(slot.index)}
             />
           ))}
         </ul>
