@@ -11,12 +11,16 @@ export const actionButton =
   'border px-2 py-[1px] text-[12px] uppercase tracking-[1px] text-[var(--blue3)]'
 export const actionBorder = { borderColor: 'var(--border2)' }
 
-/** One labelled line of an account's detail, so every line lines up. */
+/**
+ * One labelled line of an account's detail, so every line lines up. The value
+ * takes the room beside the label and wraps there; only when less than 200px
+ * are left does it move under the label.
+ */
 export function Row({ label, children }: { label: ReactNode; children: ReactNode }) {
   return (
     <div className="flex flex-wrap items-baseline gap-3 py-[2px]">
       <span className="min-w-[132px] text-[var(--muted)]">{label}</span>
-      <span>{children}</span>
+      <span className="min-w-0 grow basis-[200px]">{children}</span>
     </div>
   )
 }

@@ -65,61 +65,66 @@ export function ContractHeader({
         <CopyLink value={contract.at} />
       </div>
 
-      {contract.description && (
-        <Row label={t('inspector.field.description')}>{contract.description}</Row>
-      )}
-      <Row label={t('inspector.field.creator')}>
-        {displayName(contract.creatorRS, accounts, contacts)}{' '}
-        <span className="text-[var(--muted)]">{contract.creatorRS}</span>
-      </Row>
-      <Row label={t('inspector.field.created')}>{contract.creationBlock}</Row>
-      <Row label={t('inspector.field.version')}>{contract.atVersion}</Row>
-      <Row label={<Term id="codeHash" />}>
-        <span className="font-mono">{contract.machineCodeHashId}</span>
-      </Row>
-      <Row label={t('inspector.field.balance')}>
-        <span ref={balanceFlash}>{balance}</span>
-      </Row>
-      <Row label={<Term id="token">{t('console.accounts.holdings')}</Term>}>
-        {account?.assetBalances?.length ? (
-          <span ref={holdingsFlash} className="flex flex-col gap-[2px]">
-            {account.assetBalances.map((b) => (
-              <Holding key={b.asset} assetId={b.asset} quantityQNT={b.balanceQNT} />
-            ))}
-          </span>
-        ) : (
-          t('console.accounts.noHoldings')
-        )}
-      </Row>
-      <Row label={<Term id="activation" />}>
-        {signa(contract.minActivation)}
-      </Row>
-      <Row label={t('inspector.field.status')}>
-        <span ref={statusFlash} style={{ color: STATUS_COLOR[status] }}>
-          {t(`inspector.status.${status}`)}
-        </span>
-        {HINTED.has(status) && (
-          <span className="block text-[12px] text-[var(--muted)]">
-            {t(`inspector.hint.${status}`)}
-          </span>
-        )}
-        {threshold && status !== 'dead' && (
-          <span className="block text-[12px] text-[var(--muted)]">
-            {t('inspector.wakesAt', { threshold: Amount.fromPlanck(threshold).getSigna() })}
-          </span>
-        )}
-      </Row>
-      <Row label={t('inspector.field.nextBlock')}>{contract.nextBlock}</Row>
-      <Row label={t('console.tx.raw')}>
-        <a
-          className="text-[var(--blue3)] underline"
-          target="_blank"
-          rel="noreferrer"
-          href={`${nodeHost}/api?requestType=getAT&at=${contract.at}`}
-        >
-          ↗ getAT
-        </a>
-      </Row>
+      {/* What the contract is on the left, how it stands on the right. */}
+      <div className="grid gap-x-8 md:grid-cols-2">
+        <div>
+          {contract.description && (
+            <Row label={t('inspector.field.description')}>{contract.description}</Row>
+          )}
+          <Row label={t('inspector.field.creator')}>
+            {displayName(contract.creatorRS, accounts, contacts)}{' '}
+            <span className="text-[var(--muted)]">{contract.creatorRS}</span>
+          </Row>
+          <Row label={t('inspector.field.created')}>{contract.creationBlock}</Row>
+          <Row label={t('inspector.field.version')}>{contract.atVersion}</Row>
+          <Row label={<Term id="codeHash" />}>
+            <span className="font-mono">{contract.machineCodeHashId}</span>
+          </Row>
+          <Row label={t('console.tx.raw')}>
+            <a
+              className="text-[var(--blue3)] underline"
+              target="_blank"
+              rel="noreferrer"
+              href={`${nodeHost}/api?requestType=getAT&at=${contract.at}`}
+            >
+              ↗ getAT
+            </a>
+          </Row>
+        </div>
+        <div>
+          <Row label={t('inspector.field.balance')}>
+            <span ref={balanceFlash}>{balance}</span>
+          </Row>
+          <Row label={<Term id="token">{t('console.accounts.holdings')}</Term>}>
+            {account?.assetBalances?.length ? (
+              <span ref={holdingsFlash} className="flex flex-col gap-[2px]">
+                {account.assetBalances.map((b) => (
+                  <Holding key={b.asset} assetId={b.asset} quantityQNT={b.balanceQNT} />
+                ))}
+              </span>
+            ) : (
+              t('console.accounts.noHoldings')
+            )}
+          </Row>
+          <Row label={<Term id="activation" />}>{signa(contract.minActivation)}</Row>
+          <Row label={t('inspector.field.status')}>
+            <span ref={statusFlash} style={{ color: STATUS_COLOR[status] }}>
+              {t(`inspector.status.${status}`)}
+            </span>
+            {HINTED.has(status) && (
+              <span className="block text-[12px] text-[var(--muted)]">
+                {t(`inspector.hint.${status}`)}
+              </span>
+            )}
+            {threshold && status !== 'dead' && (
+              <span className="block text-[12px] text-[var(--muted)]">
+                {t('inspector.wakesAt', { threshold: Amount.fromPlanck(threshold).getSigna() })}
+              </span>
+            )}
+          </Row>
+          <Row label={t('inspector.field.nextBlock')}>{contract.nextBlock}</Row>
+        </div>
+      </div>
     </div>
   )
 }
