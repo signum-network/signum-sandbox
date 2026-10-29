@@ -223,6 +223,45 @@ export function toPages(slots: DataSlot[]): DataSlot[][] {
 }
 
 /**
+ * The hit to step to from a slot, or null when there are none. `hits` are
+ * slot indices in ascending order. A step starts at a slot, not at a hit, so
+ * it still works when a block changes which slots match. Both ways wrap.
+ */
+export function stepHit(hits: number[], from: number | null, direction: 1 | -1): number | null {
+  if (hits.length === 0) return null
+  if (direction === 1) {
+    return hits.find((hit) => from === null || hit > from) ?? hits[0]
+  }
+  return [...hits].reverse().find((hit) => from === null || hit < from) ?? hits[hits.length - 1]
+}
+
+/**
+ * Where a key moves the selection among `count` slots, by position, or null
+ * for a key it ignores. A page move keeps the row; moves stop at the ends.
+ */
+export function moveSlot(count: number, position: number, key: string): number | null {
+  const clamp = (next: number) => Math.max(0, Math.min(count - 1, next))
+  switch (key) {
+    case 'ArrowDown':
+      return clamp(position + 1)
+    case 'ArrowUp':
+      return clamp(position - 1)
+    case 'ArrowRight':
+    case 'PageDown':
+      return clamp(position + PAGE_SLOTS)
+    case 'ArrowLeft':
+    case 'PageUp':
+      return clamp(position - PAGE_SLOTS)
+    case 'Home':
+      return 0
+    case 'End':
+      return count - 1
+    default:
+      return null
+  }
+}
+
+/**
  * The slots whose stored bytes differ. Nothing on first sight: a stack
  * appearing for the first time did not change, it arrived.
  */

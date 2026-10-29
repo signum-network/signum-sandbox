@@ -4,11 +4,13 @@ import {
   contractPartyId,
   contractStatus,
   knownIds,
+  moveSlot,
   slotMatches,
   slotOfValue,
   slotReadings,
   slotValue,
   stackLayout,
+  stepHit,
   toPages,
   wakeThreshold,
   toDataSlots,
@@ -302,5 +304,75 @@ describe('toPages', () => {
   it('keeps a partial last page', () => {
     const pages = toPages(toDataSlots('00'.repeat(8 * 40)))
     expect(pages.map((page) => page.length)).toEqual([32, 8])
+  })
+})
+
+describe('stepHit', () => {
+  const hits = [3, 40, 70]
+
+  it('has nowhere to go without hits', () => {
+    expect(stepHit([], 5, 1)).toBeNull()
+    expect(stepHit([], null, -1)).toBeNull()
+  })
+
+  it('steps from a hit to its neighbours', () => {
+    expect(stepHit(hits, 40, 1)).toBe(70)
+    expect(stepHit(hits, 40, -1)).toBe(3)
+  })
+
+  it('steps from a slot between hits to the nearest one that way', () => {
+    expect(stepHit(hits, 10, 1)).toBe(40)
+    expect(stepHit(hits, 10, -1)).toBe(3)
+  })
+
+  it('starts at the first or the last hit from nowhere', () => {
+    expect(stepHit(hits, null, 1)).toBe(3)
+    expect(stepHit(hits, null, -1)).toBe(70)
+  })
+
+  it('wraps around both ways', () => {
+    expect(stepHit(hits, 70, 1)).toBe(3)
+    expect(stepHit(hits, 80, 1)).toBe(3)
+    expect(stepHit(hits, 3, -1)).toBe(70)
+    expect(stepHit(hits, 0, -1)).toBe(70)
+  })
+
+  it('steps from a single hit to itself', () => {
+    expect(stepHit([7], 7, 1)).toBe(7)
+    expect(stepHit([7], 7, -1)).toBe(7)
+  })
+})
+
+describe('moveSlot', () => {
+  // Two full pages and a partial third: positions 0–79.
+  const count = 80
+
+  it('moves by a row, across page edges, and stops at the ends', () => {
+    expect(moveSlot(count, 5, 'ArrowDown')).toBe(6)
+    expect(moveSlot(count, 31, 'ArrowDown')).toBe(32)
+    expect(moveSlot(count, 32, 'ArrowUp')).toBe(31)
+    expect(moveSlot(count, 0, 'ArrowUp')).toBe(0)
+    expect(moveSlot(count, 79, 'ArrowDown')).toBe(79)
+  })
+
+  it('moves by a page to the same row', () => {
+    for (const key of ['ArrowRight', 'PageDown']) expect(moveSlot(count, 5, key)).toBe(37)
+    for (const key of ['ArrowLeft', 'PageUp']) expect(moveSlot(count, 37, key)).toBe(5)
+  })
+
+  it('stops at the first or last slot when no full page is left', () => {
+    expect(moveSlot(count, 60, 'ArrowRight')).toBe(79)
+    expect(moveSlot(count, 79, 'PageDown')).toBe(79)
+    expect(moveSlot(count, 20, 'ArrowLeft')).toBe(0)
+  })
+
+  it('goes to either end with Home and End', () => {
+    expect(moveSlot(count, 40, 'Home')).toBe(0)
+    expect(moveSlot(count, 40, 'End')).toBe(79)
+  })
+
+  it('ignores other keys', () => {
+    expect(moveSlot(count, 40, 'a')).toBeNull()
+    expect(moveSlot(count, 40, 'Enter')).toBeNull()
   })
 })
