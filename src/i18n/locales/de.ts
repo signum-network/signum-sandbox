@@ -526,6 +526,7 @@ export default {
     },
     maps: {
       key1: 'Schlüssel 1',
+      key2Column: 'Schlüssel 2',
       key2: 'Schlüssel 2 (optional)',
       load: 'Nachschlagen',
       invalidKey: 'Ein Schlüssel ist eine Zahl oder eine Adresse',

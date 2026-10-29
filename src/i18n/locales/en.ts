@@ -548,6 +548,7 @@ export default {
     },
     maps: {
       key1: 'Key 1',
+      key2Column: 'Key 2',
       key2: 'Key 2 (optional)',
       load: 'Look up',
       invalidKey: 'A key is a number or an address',

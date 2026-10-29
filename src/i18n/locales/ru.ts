@@ -526,6 +526,7 @@ export default {
     },
     maps: {
       key1: 'Ключ 1',
+      key2Column: 'Ключ 2',
       key2: 'Ключ 2 (необязательно)',
       load: 'Найти',
       invalidKey: 'Ключ — это число или адрес',

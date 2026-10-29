@@ -526,6 +526,7 @@ export default {
     },
     maps: {
       key1: 'कुंजी 1',
+      key2Column: 'कुंजी 2',
       key2: 'कुंजी 2 (वैकल्पिक)',
       load: 'देखें',
       invalidKey: 'कुंजी एक संख्या या पता होती है',

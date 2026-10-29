@@ -526,6 +526,7 @@ export default {
     },
     maps: {
       key1: 'キー 1',
+      key2Column: 'キー 2',
       key2: 'キー 2（任意）',
       load: '参照',
       invalidKey: 'キーは数値かアドレスです',

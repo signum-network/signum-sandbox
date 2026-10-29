@@ -15,6 +15,7 @@ import { ViewNote } from '@/components/console/ViewNote'
 import { Direction } from '@/components/console/views/Direction'
 import { ContractHeader } from './ContractHeader'
 import { DataStackTable } from './DataStackTable'
+import { ContractMaps } from './ContractMaps'
 import { knownIds, type KnownId } from '@/lib/contractData'
 import { displayName } from '@/lib/contacts'
 import { toAccountId } from '@/lib/recipient'
@@ -85,6 +86,10 @@ function ContractBody({ contractId, height }: { contractId: string; height: numb
         addressPrefix={addressPrefix}
         codeHash={contract.machineCodeHashId}
       />
+      <div className="mt-4">
+        <ViewNote id="contractMaps" terms={['contractMap']} />
+      </div>
+      <ContractMaps contractId={contractId} known={known} addressPrefix={addressPrefix} />
       <div className="mt-4 flex flex-wrap gap-6">
         <Direction
           direction="incoming"

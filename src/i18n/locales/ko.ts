@@ -524,6 +524,7 @@ export default {
     },
     maps: {
       key1: '키 1',
+      key2Column: '키 2',
       key2: '키 2 (선택)',
       load: '조회',
       invalidKey: '키는 숫자나 주소입니다',

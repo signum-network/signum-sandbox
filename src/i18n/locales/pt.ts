@@ -526,6 +526,7 @@ export default {
     },
     maps: {
       key1: 'Chave 1',
+      key2Column: 'Chave 2',
       key2: 'Chave 2 (opcional)',
       load: 'Consultar',
       invalidKey: 'Uma chave é um número ou um endereço',

@@ -520,6 +520,7 @@ export default {
     },
     maps: {
       key1: '键 1',
+      key2Column: '键 2',
       key2: '键 2（可选）',
       load: '查询',
       invalidKey: '键必须是数字或地址',
