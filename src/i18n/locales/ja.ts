@@ -89,10 +89,26 @@ export default {
       term: 'スマートコントラクト',
       help: 'アカウント上で動くプログラムです。少なくともアクティベーション額を受け取ると実行され、添付データから 8 バイト単位で引数を読み取ります。そのアカウント ID は、デプロイしたトランザクションの ID です。',
     },
+    dataStack: {
+      term: 'データスタック',
+      help: 'コントラクトの変数：8 バイトのスロットの並び。各スロットは 1 つの数値をリトルエンディアンで保持します。同じ 8 バイトでも、コントラクトの扱い方次第で id、金額、短いテキストになります。',
+    },
+    contractMap: {
+      term: 'コントラクトマップ',
+      help: 'コントラクトがデータスタックとは別に持つストレージ：2 つのキーで管理される値。第 1 キーの下のすべて、または両方のキーで 1 つの値を参照できます。',
+    },
+    activation: {
+      term: '起動額',
+      help: 'コントラクトが実行されるために 1 回のトランザクションで受け取る必要のある SIGNA。それ未満だと残高が増えるだけです。',
+    },
+    codeHash: {
+      term: 'コードハッシュ',
+      help: 'コントラクトのコードの指紋。コードハッシュが同じコントラクトは同じプログラムを実行するので、データの配置も同じです。',
+    },
   },
   console: {
     back: 'スタートページ',
-    tab: { transactions: '取引', blocks: 'ブロック', accounts: 'アカウント' },
+    tab: { transactions: '取引', blocks: 'ブロック', accounts: 'アカウント', contracts: 'コントラクト' },
     search: { placeholder: 'Id、アドレスまたは名前' },
     forge: {
       action: '生成',
@@ -137,6 +153,13 @@ export default {
       glossaryNoMatch: '一致するものがありません',
     },
     note: {
+      contracts: 'チェーン上のすべてのスマートコントラクト（新しい順）。開くとメモリ、マップ、アクティビティを確認できます。',
+      contract:
+        'スマートコントラクトをライブで：何を保有し、動いているか、何が出入りしたか。ここはすべてブロックごとに更新されます。',
+      contractData:
+        'コントラクトのすべての変数を、8 バイトのスロットごとに 1 行で表示します。何かが変わった直近のブロックで変化した行に印が付きます。スロットに名前を付けると中身を覚えておけます。',
+      contractMaps:
+        '第 1 キーの下にコントラクトが保存した内容、または両方のキーで 1 つの値を参照します。キーは数値かアドレスです。',
       transactions:
         'チェーン上で起きていることのすべてを、新しい順に並べています。未確認のエントリは次のブロックを待っている状態です — ブロックを生成すれば、落ち着くところが見られます。',
       blocks:
@@ -249,6 +272,7 @@ export default {
       cancelSubscription: '以前に設定した定期支払いを停止します。',
     },
     blocks: { count: '{{count}} 件の取引', empty: '空', forger: 'フォージャー', none: 'まだブロックがありません', noMatch: '一致するブロックがありません', hideEmpty: '空を隠す', hidden: '空ブロック {{count}} 件を非表示' },
+    contracts: { name: '名前', created: '作成', none: 'チェーン上にまだコントラクトはありません', noMatch: '一致するコントラクトはありません' },
     accounts: {
       create: 'アカウントを作成',
       import: 'パスフレーズをインポート',
@@ -452,6 +476,81 @@ export default {
       title: 'これはサンドボックスネットワークではありません',
       description:
         'ノードは {{network}} を報告しています。サンドボックスはパスフレーズを平文で保持しており、それは自身のモックチェーン上でのみ行うため、アカウントと送信は無効になっています。',
+    },
+  },
+  inspector: {
+    reading: {
+      unsigned: '符号なし',
+      signed: '符号付き',
+      string: '文字列',
+      bool: 'bool',
+      address: 'アドレス',
+      hex: '16進',
+      stored: '格納値',
+    },
+    type: {
+      label: '表示形式',
+      none: '16進',
+      suggestAddress: '{{name}} の ID を保持しています。アドレスとして表示しますか？',
+    },
+    detail: {
+      empty: 'スロットを選ぶと、あらゆる読み方で表示します。',
+    },
+    tab: {
+      data: 'データ',
+      callStack: 'コールスタック',
+      userStack: 'ユーザースタック',
+      maps: 'マップ',
+      activity: 'アクティビティ',
+    },
+    search: '値、アドレス、テキスト、ラベル',
+    hit: { previous: '前の一致', next: '次の一致' },
+    page: 'ページ',
+    title: 'コントラクト',
+    back: 'コンソールに戻る',
+    notFound: 'このチェーンにはこの id のコントラクトはありません。',
+    inspect: '表示',
+    field: {
+      address: 'アドレス',
+      creator: '作成者',
+      description: '説明',
+      created: '作成ブロック',
+      version: 'AT バージョン',
+      balance: '残高',
+      status: '状態',
+      nextBlock: '次回実行ブロック',
+    },
+    status: {
+      dead: '停止済み',
+      outOfFunds: 'SIGNA 不足',
+      finished: '終了',
+      stopped: '待機中',
+      running: '実行中',
+      idle: 'アイドル',
+    },
+    hint: {
+      outOfFunds: '実行の途中で SIGNA が尽きました。止まった位置から再開します。',
+      finished: '最後まで実行しました。次の呼び出しで最初からやり直します。',
+      stopped: '一時停止しました。次の呼び出しで止まった位置から再開します。',
+    },
+    wakesAt: '残高が {{threshold}} SIGNA（前回の残高＋起動額）に達すると再び実行されます。',
+    data: {
+      size: '{{bytes}} バイト · {{slots}} スロット',
+      label: '名前',
+      changed: 'ブロック {{height}} で変化',
+      labelPlaceholder: '名前',
+      empty: 'このコントラクトはデータを持っていません。',
+    },
+    maps: {
+      key1: 'キー 1',
+      key2Column: 'キー 2',
+      key2: 'キー 2（任意）',
+      load: '参照',
+      invalidKey: 'キーは数値かアドレスです',
+      none: 'このキーには何も保存されていません。',
+      value: '値',
+      zeroNote: '一度も設定されていない項目にもノードは 0 を返すため、0 は「未設定」の意味でもありえます。',
+      recent: '最近',
     },
   },
   tour: {

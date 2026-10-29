@@ -1,3 +1,5 @@
+import { toAccountId } from './recipient'
+
 /**
  * Which stage is showing, and which drawer is open.
  *
@@ -5,5 +7,29 @@
  * to name a tab in its step definitions, and a pure module must not import a
  * React component to do it.
  */
-export type ConsoleTab = 'transactions' | 'blocks' | 'accounts' | 'watch'
+export type ConsoleTab = 'transactions' | 'blocks' | 'accounts' | 'contracts' | 'watch'
 export type DrawerName = 'send' | 'chain' | 'help' | null
+
+/** What a link can ask of the console: for now, which account to watch. */
+export interface ConsoleSearch {
+  watch?: string
+}
+
+/**
+ * The console's search parameters, keeping only what parses. The router
+ * reads values as JSON, so a bare numeric id arrives as a number that has
+ * already lost its last digits; only a string is trusted. Links carry the
+ * address for that reason.
+ *
+ * `watch` is always present, if only as undefined: the router lays this
+ * result over the root route's unvalidated search, so a key left out would
+ * let the raw value through.
+ */
+export function parseConsoleSearch(search: Record<string, unknown>): ConsoleSearch {
+  if (typeof search.watch !== 'string') return { watch: undefined }
+  try {
+    return { watch: toAccountId(search.watch) }
+  } catch {
+    return { watch: undefined }
+  }
+}

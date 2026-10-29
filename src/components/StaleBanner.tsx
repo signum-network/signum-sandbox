@@ -31,7 +31,7 @@ export function StaleBanner() {
   return (
     <div
       className="flex flex-wrap items-center justify-center gap-3 border-b px-4 py-2 text-[13px]"
-      style={{ borderColor: 'var(--blue2)', background: 'var(--bg2)', color: 'var(--fg)' }}
+      style={{ borderColor: 'var(--blue2)', background: 'var(--bg2)', color: 'var(--text)' }}
     >
       <span>{t('stale.message', { installed, running: __SANDBOX_VERSION__ })}</span>
       <ConsoleButton onClick={() => window.location.reload()}>{t('stale.reload')}</ConsoleButton>

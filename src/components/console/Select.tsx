@@ -68,7 +68,7 @@ export function Select({
         className="flex w-full items-center justify-between gap-2 border bg-transparent px-2 py-1 text-left text-[13px]"
         style={{
           borderColor: 'var(--border)',
-          color: current ? 'var(--fg)' : 'var(--muted)',
+          color: current ? 'var(--text)' : 'var(--muted)',
           opacity: disabled ? 0.5 : 1,
           cursor: disabled ? 'not-allowed' : 'pointer',
         }}
@@ -133,7 +133,7 @@ export function Select({
                 className="flex w-full items-center gap-2 px-2 py-1.5 text-left text-[13px]"
                 style={{
                   background: o.value === value ? 'rgba(255,255,255,.05)' : 'transparent',
-                  color: 'var(--fg)',
+                  color: 'var(--text)',
                 }}
                 whileHover={{ backgroundColor: 'rgba(255,255,255,.07)', color: 'var(--blue2)' }}
                 onHoverStart={() => play(sfx.tick)}

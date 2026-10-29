@@ -89,10 +89,26 @@ export default {
       term: 'Smart Contract',
       help: 'Ein Programm, das unter einem Account lebt: Es läuft, sobald es mindestens seine Aktivierungsgebühr erhält, und liest seine Argumente in 8-Byte-Blöcken aus dem Anhang. Seine Account-ID ist die ID der Transaktion, die ihn deployt hat.',
     },
+    dataStack: {
+      term: 'Datenstack',
+      help: 'Die Variablen eines Contracts: eine Reihe von 8-Byte-Slots. Jeder enthält eine Zahl, gelesen als Little-Endian. Dieselben 8 Bytes können eine ID, ein Betrag oder ein kurzer Text sein, je nachdem, was der Contract damit meint.',
+    },
+    contractMap: {
+      term: 'Contract-Map',
+      help: 'Speicher, den ein Contract neben seinem Datenstack führt: Werte, abgelegt unter zwei Schlüsseln. Du kannst alles unter einem ersten Schlüssel nachschlagen oder einen Wert unter beiden.',
+    },
+    activation: {
+      term: 'Aktivierungsbetrag',
+      help: 'Die SIGNA, die ein Contract in einer Transaktion bekommen muss, bevor er läuft. Weniger erhöht nur sein Guthaben.',
+    },
+    codeHash: {
+      term: 'Code-Hash',
+      help: 'Ein Fingerabdruck des Contract-Codes. Contracts mit demselben Code-Hash führen dasselbe Programm aus und legen ihre Daten gleich ab.',
+    },
   },
   console: {
     back: 'Startseite',
-    tab: { transactions: 'Transaktionen', blocks: 'Blöcke', accounts: 'Accounts' },
+    tab: { transactions: 'Transaktionen', blocks: 'Blöcke', accounts: 'Accounts', contracts: 'Contracts' },
     search: { placeholder: 'ID, Adresse oder Name' },
     forge: {
       action: 'Forgen',
@@ -137,6 +153,13 @@ export default {
       glossaryNoMatch: 'Nichts gefunden',
     },
     note: {
+      contracts: 'Jeder Smart Contract auf der Chain, der neueste zuerst. Öffne einen, um Speicher, Maps und Aktivität zu sehen.',
+      contract:
+        'Ein Smart Contract, live: was er hält, ob er läuft und was hinein- und hinausgegangen ist. Alles hier aktualisiert sich mit jedem Block.',
+      contractData:
+        'Jede Variable des Contracts, eine Zeile pro 8-Byte-Slot. Eine Zeile, die sich im letzten Block mit Änderungen geändert hat, ist markiert. Gib einem Slot einen Namen, um dir zu merken, was er enthält.',
+      contractMaps:
+        'Schlag nach, was der Contract unter einem ersten Schlüssel abgelegt hat, oder einen Wert unter beiden Schlüsseln. Schlüssel können Zahlen oder Adressen sein.',
       transactions:
         'Alles, was auf der Chain passiert, das Neueste zuerst. Unbestätigte Einträge warten auf den nächsten Block — forge einen und sieh zu, wie sie sich setzen.',
       blocks:
@@ -249,6 +272,7 @@ export default {
       cancelSubscription: 'Eine wiederkehrende Zahlung wieder beenden.',
     },
     blocks: { count: '{{count}} Transaktionen', empty: 'Leer', forger: 'Forger', none: 'Noch keine Blöcke', noMatch: 'Keine passenden Blöcke', hideEmpty: 'Leere ausblenden', hidden: '{{count}} leere ausgeblendet' },
+    contracts: { name: 'Name', created: 'Erstellt', none: 'Noch keine Contracts auf der Chain', noMatch: 'Keine Contracts passen' },
     accounts: {
       create: 'Account anlegen',
       import: 'Passphrase importieren',
@@ -452,6 +476,81 @@ export default {
       title: 'Das ist nicht das Sandbox-Netz',
       description:
         'Der Node meldet {{network}}. Die Sandbox hält Passphrases im Klartext und tut das nur auf ihrer eigenen Mock-Chain — Accounts und Senden sind deshalb abgeschaltet.',
+    },
+  },
+  inspector: {
+    reading: {
+      unsigned: 'unsigned',
+      signed: 'signed',
+      string: 'String',
+      bool: 'Bool',
+      address: 'Adresse',
+      hex: 'Hex',
+      stored: 'gespeichert',
+    },
+    type: {
+      label: 'Anzeigen als',
+      none: 'Hex',
+      suggestAddress: 'Enthält die ID von {{name}}. Als Adresse anzeigen?',
+    },
+    detail: {
+      empty: 'Wähle einen Slot, um ihn auf jede Art zu lesen.',
+    },
+    tab: {
+      data: 'Daten',
+      callStack: 'Call-Stack',
+      userStack: 'User-Stack',
+      maps: 'Maps',
+      activity: 'Aktivität',
+    },
+    search: 'Wert, Adresse, Text oder Label',
+    hit: { previous: 'Vorheriger Treffer', next: 'Nächster Treffer' },
+    page: 'Seite',
+    title: 'Contract',
+    back: 'Zurück zur Konsole',
+    notFound: 'Auf dieser Chain gibt es keinen Contract mit dieser ID.',
+    inspect: 'Ansehen',
+    field: {
+      address: 'Adresse',
+      creator: 'Ersteller',
+      description: 'Beschreibung',
+      created: 'Erstellt in Block',
+      version: 'AT-Version',
+      balance: 'Guthaben',
+      status: 'Status',
+      nextBlock: 'Nächster Lauf in Block',
+    },
+    status: {
+      dead: 'tot',
+      outOfFunds: 'ohne SIGNA',
+      finished: 'beendet',
+      stopped: 'wartet',
+      running: 'läuft',
+      idle: 'untätig',
+    },
+    hint: {
+      outOfFunds: 'Ihm ist mitten im Lauf das SIGNA ausgegangen; er macht an derselben Stelle weiter.',
+      finished: 'Er ist am Ende angekommen und beginnt beim nächsten Aufruf wieder von vorn.',
+      stopped: 'Er hat angehalten und macht beim nächsten Aufruf an derselben Stelle weiter.',
+    },
+    wakesAt: 'Er läuft wieder, sobald sein Kontostand {{threshold}} SIGNA erreicht: sein letztes Guthaben plus den Aktivierungsbetrag.',
+    data: {
+      size: '{{bytes}} Bytes · {{slots}} Slots',
+      label: 'Name',
+      changed: 'geändert in Block {{height}}',
+      labelPlaceholder: 'Name',
+      empty: 'Dieser Contract hält keine Daten.',
+    },
+    maps: {
+      key1: 'Schlüssel 1',
+      key2Column: 'Schlüssel 2',
+      key2: 'Schlüssel 2 (optional)',
+      load: 'Nachschlagen',
+      invalidKey: 'Ein Schlüssel ist eine Zahl oder eine Adresse',
+      none: 'Unter diesem Schlüssel ist nichts abgelegt.',
+      value: 'Wert',
+      zeroNote: 'Die Node antwortet 0 für einen Eintrag, der nie gesetzt wurde. 0 kann also auch „nicht gesetzt“ heißen.',
+      recent: 'Zuletzt',
     },
   },
   tour: {

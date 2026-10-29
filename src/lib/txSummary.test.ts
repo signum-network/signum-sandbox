@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { TransactionPaymentSubtype, TransactionType } from '@signumjs/core'
 import type { Transaction } from '@signumjs/core'
-import { summarize } from './txSummary'
+import { counterparty, summarize } from './txSummary'
 
 const tx = (type: number, subtype: number, extra: Partial<Transaction> = {}) =>
   ({
@@ -92,5 +92,19 @@ describe('summarize, multi-out', () => {
       },
     } as unknown as Transaction
     expect(summarize(tx).amountSigna).toBe('2')
+  })
+})
+
+describe('counterparty', () => {
+  it('is the sender for what came in, not the account itself', () => {
+    expect(counterparty(summarize(tx(0, 0)), 'incoming')).toBe('TS-AAAA')
+  })
+
+  it('is the recipient for what went out', () => {
+    expect(counterparty(summarize(tx(0, 0)), 'outgoing')).toBe('TS-BBBB')
+  })
+
+  it('is null when the transaction names no recipient', () => {
+    expect(counterparty(summarize(tx(0, 1, { recipientRS: undefined })), 'outgoing')).toBeNull()
   })
 })

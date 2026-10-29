@@ -89,10 +89,26 @@ export default {
       term: '스마트 컨트랙트',
       help: '계정에 사는 프로그램입니다. 최소 활성화 금액을 받으면 실행되고, 첨부 데이터에서 8바이트 단위로 인수를 읽습니다. 계정 ID는 이를 배포한 트랜잭션의 ID입니다.',
     },
+    dataStack: {
+      term: '데이터 스택',
+      help: '컨트랙트의 변수: 8바이트 슬롯의 나열입니다. 각 슬롯은 리틀 엔디언으로 읽는 숫자 하나를 담습니다. 같은 8바이트라도 컨트랙트가 어떻게 쓰느냐에 따라 id, 금액, 짧은 텍스트가 될 수 있습니다.',
+    },
+    contractMap: {
+      term: '컨트랙트 맵',
+      help: '컨트랙트가 데이터 스택 옆에 두는 저장소: 두 개의 키로 정리된 값들입니다. 첫 번째 키 아래의 모든 값이나, 두 키로 값 하나를 조회할 수 있습니다.',
+    },
+    activation: {
+      term: '활성화 금액',
+      help: '컨트랙트가 실행되려면 한 번의 트랜잭션으로 받아야 하는 SIGNA입니다. 그보다 적으면 잔액만 늘어납니다.',
+    },
+    codeHash: {
+      term: '코드 해시',
+      help: '컨트랙트 코드의 지문입니다. 코드 해시가 같은 컨트랙트는 같은 프로그램을 실행하므로 데이터 배치도 같습니다.',
+    },
   },
   console: {
     back: '시작 페이지',
-    tab: { transactions: '트랜잭션', blocks: '블록', accounts: '계정' },
+    tab: { transactions: '트랜잭션', blocks: '블록', accounts: '계정', contracts: '컨트랙트' },
     search: { placeholder: 'Id, 주소 또는 이름' },
     forge: {
       action: '생성',
@@ -137,6 +153,13 @@ export default {
       glossaryNoMatch: '일치하는 것이 없습니다',
     },
     note: {
+      contracts: '체인의 모든 스마트 컨트랙트, 최신순. 하나를 열면 메모리, 맵, 활동을 볼 수 있습니다.',
+      contract:
+        '스마트 컨트랙트를 실시간으로: 무엇을 보유했는지, 실행 중인지, 무엇이 들어오고 나갔는지. 여기 모든 것은 블록마다 갱신됩니다.',
+      contractData:
+        '컨트랙트의 모든 변수를 8바이트 슬롯마다 한 줄로 보여 줍니다. 무언가 바뀐 마지막 블록에서 바뀐 줄이 표시됩니다. 슬롯에 이름을 붙여 무엇을 담는지 기억하세요.',
+      contractMaps:
+        '컨트랙트가 첫 번째 키 아래에 저장한 내용, 또는 두 키로 값 하나를 조회합니다. 키는 숫자나 주소입니다.',
       transactions:
         '체인에서 일어나는 모든 일을 최신순으로 보여줍니다. 미확인 항목은 다음 블록을 기다리는 중입니다 — 블록을 하나 생성해 자리를 잡는 모습을 지켜보세요.',
       blocks:
@@ -249,6 +272,7 @@ export default {
       cancelSubscription: '이전에 설정한 정기 결제를 중단합니다.',
     },
     blocks: { count: '트랜잭션 {{count}}건', empty: '비어 있음', forger: '포저', none: '아직 블록이 없습니다', noMatch: '일치하는 블록이 없습니다', hideEmpty: '빈 블록 숨기기', hidden: '빈 블록 {{count}}개 숨김' },
+    contracts: { name: '이름', created: '생성', none: '체인에 아직 컨트랙트가 없습니다', noMatch: '일치하는 컨트랙트가 없습니다' },
     accounts: {
       create: '계정 만들기',
       import: '패스프레이즈 가져오기',
@@ -450,6 +474,81 @@ export default {
       title: '샌드박스 네트워크가 아닙니다',
       description:
         '노드가 {{network}}(으)로 보고합니다. 샌드박스는 패스프레이즈를 평문으로 저장하며 이는 오직 자체 모의 체인에서만 하는 일이므로, 계정과 전송 기능이 꺼져 있습니다.',
+    },
+  },
+  inspector: {
+    reading: {
+      unsigned: '부호 없음',
+      signed: '부호 있음',
+      string: '문자열',
+      bool: 'bool',
+      address: '주소',
+      hex: '16진수',
+      stored: '저장값',
+    },
+    type: {
+      label: '표시 형식',
+      none: '16진수',
+      suggestAddress: '{{name}}의 id를 담고 있습니다. 주소로 표시할까요?',
+    },
+    detail: {
+      empty: '슬롯을 선택하면 모든 방식으로 읽어 보여줍니다.',
+    },
+    tab: {
+      data: '데이터',
+      callStack: '호출 스택',
+      userStack: '사용자 스택',
+      maps: '맵',
+      activity: '활동',
+    },
+    search: '값, 주소, 텍스트 또는 라벨',
+    hit: { previous: '이전 결과', next: '다음 결과' },
+    page: '페이지',
+    title: '컨트랙트',
+    back: '콘솔로 돌아가기',
+    notFound: '이 체인에는 이 id의 컨트랙트가 없습니다.',
+    inspect: '살펴보기',
+    field: {
+      address: '주소',
+      creator: '생성자',
+      description: '설명',
+      created: '생성 블록',
+      version: 'AT 버전',
+      balance: '잔액',
+      status: '상태',
+      nextBlock: '다음 실행 블록',
+    },
+    status: {
+      dead: '종료됨',
+      outOfFunds: 'SIGNA 부족',
+      finished: '완료됨',
+      stopped: '대기 중',
+      running: '실행 중',
+      idle: '유휴',
+    },
+    hint: {
+      outOfFunds: '실행 도중 SIGNA가 바닥났으며, 멈춘 지점부터 계속합니다.',
+      finished: '끝까지 실행했으며, 다음 호출 시 처음부터 다시 시작합니다.',
+      stopped: '일시 정지했으며, 다음 호출 시 멈춘 지점부터 계속합니다.',
+    },
+    wakesAt: '잔액이 {{threshold}} SIGNA(직전 잔액 + 활성화 금액)에 도달하면 다시 실행됩니다.',
+    data: {
+      size: '{{bytes}}바이트 · 슬롯 {{slots}}개',
+      label: '이름',
+      changed: '블록 {{height}}에서 변경됨',
+      labelPlaceholder: '이름',
+      empty: '이 컨트랙트는 데이터가 없습니다.',
+    },
+    maps: {
+      key1: '키 1',
+      key2Column: '키 2',
+      key2: '키 2 (선택)',
+      load: '조회',
+      invalidKey: '키는 숫자나 주소입니다',
+      none: '이 키 아래에는 아무것도 없습니다.',
+      value: '값',
+      zeroNote: '노드는 한 번도 설정되지 않은 항목에도 0을 반환하므로, 0은 "설정되지 않음"을 뜻할 수도 있습니다.',
+      recent: '최근',
     },
   },
   tour: {

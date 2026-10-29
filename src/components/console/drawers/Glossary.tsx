@@ -52,7 +52,7 @@ export function Glossary() {
           return (
             <li key={id} className="border-b py-1" style={{ borderColor: 'var(--border2)' }}>
               <RowButton
-                className="flex w-full items-center gap-2 text-left text-[12px] text-[var(--fg)]"
+                className="flex w-full items-center gap-2 text-left text-[12px] text-[var(--text)]"
                 onClick={() => setOpened(opened === id ? null : id)}
               >
                 <span className="text-[var(--muted)]">{open ? '▾' : '▸'}</span>

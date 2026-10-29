@@ -142,7 +142,7 @@ export function Src44Form({
         className="themed-scroll console-scroll mb-2 max-h-32 overflow-auto border p-2 text-[12px]"
         style={{
           borderColor: json ? 'var(--border2)' : 'var(--mag)',
-          color: json ? 'var(--fg)' : 'var(--mag)',
+          color: json ? 'var(--text)' : 'var(--mag)',
         }}
       >
         {json ?? ('error' in result ? result.error : '')}

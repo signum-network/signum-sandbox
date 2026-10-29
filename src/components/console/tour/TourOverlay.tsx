@@ -222,7 +222,7 @@ export function TourOverlay({ tour }: { tour: TourStore }) {
                 className={
                   finale
                     ? 'mb-1 text-[15px] text-[var(--blue3)]'
-                    : 'mb-1 text-[13px] text-[var(--fg)]'
+                    : 'mb-1 text-[13px] text-[var(--text)]'
                 }
               >
                 {t(`tour.step.${step.id}.title`)}
@@ -253,7 +253,7 @@ export function TourOverlay({ tour }: { tour: TourStore }) {
                   // bloom is: once per visit.
                   transition={{ duration: seconds('base'), delay: 0.18 + index * 0.08 }}
                 >
-                  <p className="text-[12px] text-[var(--fg)]">{t(`tour.useCase.${id}.title`)}</p>
+                  <p className="text-[12px] text-[var(--text)]">{t(`tour.useCase.${id}.title`)}</p>
                   <p className="text-[12px] leading-relaxed text-[var(--muted)]">
                     {t(`tour.useCase.${id}.body`)}
                   </p>

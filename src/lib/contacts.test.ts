@@ -6,6 +6,7 @@ import { HttpError } from '@signumjs/http'
 import {
   addContact,
   displayName,
+  displayNameOfId,
   isContract,
   parseContacts,
   removeContact,
@@ -277,5 +278,24 @@ describe('resolveContact', () => {
         Promise.reject(new HttpError('http://node/api', 500, 'boom', { errorCode: 1 })),
       ),
     ).toEqual({ error: 'unreachable' })
+  })
+})
+
+describe('displayNameOfId', () => {
+  const contacts: Contacts = addContact({}, bob.id, named('Bob from the book'))
+  const stranger = account('Carol', 'sandbox-carol')
+  const prefix = stranger.address.split('-')[0]
+
+  it('names an account by its address, not its numeric id, when nothing else is known', () => {
+    const groups = stranger.address.split('-')
+    expect(displayNameOfId(stranger.id, prefix, [alice], contacts)).toBe(
+      `${groups[0]}-${groups[1]}…${groups[4]}`,
+    )
+  })
+
+  it('still prefers an own name, a contact name and an on-chain name', () => {
+    expect(displayNameOfId(alice.id, prefix, [alice], contacts)).toBe('Alice')
+    expect(displayNameOfId(bob.id, prefix, [alice], contacts)).toBe('Bob from the book')
+    expect(displayNameOfId(stranger.id, prefix, [alice], contacts, 'Carol Inc.')).toBe('Carol Inc.')
   })
 })

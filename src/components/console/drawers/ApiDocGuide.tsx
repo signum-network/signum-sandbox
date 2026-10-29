@@ -101,7 +101,7 @@ export function ApiDocGuide({
             */}
             <p className="mb-2 text-[13px] text-[var(--muted)]">
               {t('console.accounts.balance')} · {recipe.senderName}:{' '}
-              <span className="text-[var(--fg)]">
+              <span className="text-[var(--text)]">
                 <Balance id={recipe.sender} />
               </span>
             </p>

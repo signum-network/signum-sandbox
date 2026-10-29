@@ -3,8 +3,9 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as indexRoute } from './routes/index'
 import { Route as consoleRoute } from './routes/console'
 import { Route as scenariosRoute } from './routes/scenarios'
+import { Route as contractRoute } from './routes/contract'
 
-const routeTree = rootRoute.addChildren([indexRoute, consoleRoute, scenariosRoute])
+const routeTree = rootRoute.addChildren([indexRoute, consoleRoute, scenariosRoute, contractRoute])
 
 export const router = createRouter({
   routeTree,

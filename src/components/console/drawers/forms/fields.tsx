@@ -108,7 +108,7 @@ export function TextInput({
 }) {
   return (
     <input
-      className="w-full border bg-transparent px-2 py-1 text-[13px] text-[var(--fg)]"
+      className="w-full border bg-transparent px-2 py-1 text-[13px] text-[var(--text)]"
       style={border}
       value={value}
       placeholder={placeholder}
@@ -210,7 +210,7 @@ export function SuggestInput({
         </span>
       )}
       <input
-        className={`w-full border bg-transparent py-1 pr-2 text-[13px] text-[var(--fg)] ${leading ? 'pl-7' : 'pl-2'}`}
+        className={`w-full border bg-transparent py-1 pr-2 text-[13px] text-[var(--text)] ${leading ? 'pl-7' : 'pl-2'}`}
         style={border}
         value={value}
         placeholder={placeholder}
@@ -240,7 +240,7 @@ export function SuggestInput({
                 key={s.value}
                 type="button"
                 className="flex w-full items-center gap-2 px-2 py-1.5 text-left text-[13px]"
-                style={{ color: 'var(--fg)' }}
+                style={{ color: 'var(--text)' }}
                 whileHover={{ backgroundColor: 'rgba(255,255,255,.07)', color: 'var(--blue2)' }}
                 onHoverStart={() => play(sfx.tick)}
                 onClick={() => {
@@ -308,7 +308,7 @@ export function RecipientPicker({
 export function TextArea({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   return (
     <textarea
-      className="w-full border bg-transparent px-2 py-1 text-[13px] text-[var(--fg)]"
+      className="w-full border bg-transparent px-2 py-1 text-[13px] text-[var(--text)]"
       style={border}
       rows={3}
       value={value}

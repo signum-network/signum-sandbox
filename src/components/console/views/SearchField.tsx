@@ -12,6 +12,7 @@ export function SearchField({
   onChange,
   placeholder,
   fill,
+  onEnter,
 }: {
   value: string
   onChange: (value: string) => void
@@ -19,6 +20,8 @@ export function SearchField({
   placeholder?: string
   /** Takes the full width instead of the 240px the tab bar gives it. */
   fill?: boolean
+  /** Enter in the field; `backwards` when Shift is held. */
+  onEnter?: (backwards: boolean) => void
 }) {
   const { t } = useTranslation()
 
@@ -28,9 +31,14 @@ export function SearchField({
       style={{ borderColor: 'var(--border2)', ...(fill ? {} : { minWidth: 240 }) }}
     >
       <input
-        className="flex-1 bg-transparent text-[13px] text-[var(--fg)] outline-none"
+        className="flex-1 bg-transparent text-[13px] text-[var(--text)] outline-none"
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key !== 'Enter' || !onEnter) return
+          e.preventDefault()
+          onEnter(e.shiftKey)
+        }}
         placeholder={placeholder ?? t('console.search.placeholder')}
       />
       {value !== '' && (

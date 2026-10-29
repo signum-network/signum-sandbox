@@ -1,4 +1,4 @@
-import { toAccountId, toComparableId } from './recipient'
+import { toAccountId, toAddress, toComparableId } from './recipient'
 import { isUnknownAccount } from './accountStatus'
 import type { SandboxAccount } from './accounts'
 
@@ -172,4 +172,19 @@ export function displayName(
   if (onChainName && onChainName.trim().length > 0) return onChainName
 
   return shortenAddress(accountIdOrAddress)
+}
+
+/**
+ * displayName for an account known only by its numeric id, as the watched
+ * account is stored. Without a name the fallback is the shortened address:
+ * a shortened id says nothing anyone would recognise.
+ */
+export function displayNameOfId(
+  accountId: string,
+  addressPrefix: string,
+  accounts: SandboxAccount[],
+  contacts: Contacts,
+  onChainName?: string,
+): string {
+  return displayName(toAddress(accountId, addressPrefix), accounts, contacts, onChainName)
 }
