@@ -502,6 +502,7 @@ export default {
       activity: 'Atividade',
     },
     search: 'Valor, endereço, texto ou rótulo',
+    hit: { previous: 'Resultado anterior', next: 'Próximo resultado' },
     page: 'Página',
     title: 'Contrato',
     back: 'Voltar ao console',

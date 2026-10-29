@@ -496,6 +496,7 @@ export default {
       activity: '活动',
     },
     search: '值、地址、文本或标签',
+    hit: { previous: '上一个匹配', next: '下一个匹配' },
     page: '页',
     title: '合约',
     back: '返回控制台',

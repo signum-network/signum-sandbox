@@ -27,12 +27,17 @@ export function ContractTabs({
   onSelect,
   query,
   onQuery,
+  hitCount,
+  onStep,
 }: {
   tabs: TabState[]
   active: ContractTab
   onSelect: (tab: ContractTab) => void
   query: string
   onQuery: (query: string) => void
+  /** Where the selection stands among the memory's hits, while a query is set. */
+  hitCount: { position: number | null; total: number }
+  onStep: (direction: 1 | -1) => void
 }) {
   const { t } = useTranslation()
 
@@ -68,7 +73,35 @@ export function ContractTabs({
           </span>
         ))}
       </div>
-      <SearchField value={query} onChange={onQuery} placeholder={t('inspector.search')} />
+      <span className="flex items-center gap-2">
+        <SearchField
+          value={query}
+          onChange={onQuery}
+          placeholder={t('inspector.search')}
+          onEnter={(backwards) => onStep(backwards ? -1 : 1)}
+        />
+        {query.trim() !== '' && (
+          <>
+            <span className="min-w-[48px] text-right text-[12px] tabular-nums text-[var(--muted)]">
+              {hitCount.position ?? '–'} / {hitCount.total}
+            </span>
+            <ConsoleButton
+              disabled={hitCount.total === 0}
+              title={t('inspector.hit.previous')}
+              onClick={() => onStep(-1)}
+            >
+              ▲
+            </ConsoleButton>
+            <ConsoleButton
+              disabled={hitCount.total === 0}
+              title={t('inspector.hit.next')}
+              onClick={() => onStep(1)}
+            >
+              ▼
+            </ConsoleButton>
+          </>
+        )}
+      </span>
     </div>
   )
 }

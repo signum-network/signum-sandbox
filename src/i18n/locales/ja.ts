@@ -502,6 +502,7 @@ export default {
       activity: 'アクティビティ',
     },
     search: '値、アドレス、テキスト、ラベル',
+    hit: { previous: '前の一致', next: '次の一致' },
     page: 'ページ',
     title: 'コントラクト',
     back: 'コンソールに戻る',

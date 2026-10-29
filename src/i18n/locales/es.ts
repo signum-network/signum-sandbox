@@ -501,6 +501,7 @@ export default {
       activity: 'Actividad',
     },
     search: 'Valor, dirección, texto o etiqueta',
+    hit: { previous: 'Resultado anterior', next: 'Resultado siguiente' },
     page: 'Página',
     title: 'Contrato',
     back: 'Volver a la consola',

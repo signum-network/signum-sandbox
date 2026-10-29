@@ -500,6 +500,7 @@ export default {
       activity: '활동',
     },
     search: '값, 주소, 텍스트 또는 라벨',
+    hit: { previous: '이전 결과', next: '다음 결과' },
     page: '페이지',
     title: '컨트랙트',
     back: '콘솔로 돌아가기',

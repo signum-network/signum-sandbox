@@ -17,7 +17,7 @@ import { ContractHeader } from './ContractHeader'
 import { MemoryView } from './MemoryView'
 import { ContractMaps } from './ContractMaps'
 import { ContractTabs, type ContractTab, type TabState } from './ContractTabs'
-import { knownIds, slotMatches, type DataSlot, type KnownId } from '@/lib/contractData'
+import { knownIds, slotMatches, stepHit, type DataSlot, type KnownId } from '@/lib/contractData'
 import { displayName } from '@/lib/contacts'
 import { toAccountId } from '@/lib/recipient'
 import { cn } from '@/lib/utils'
@@ -179,6 +179,24 @@ function ContractBody({ contractId, height }: { contractId: string; height: numb
   ]
   const shown = tabs.some((entry) => entry.id === tab) ? tab : 'data'
 
+  // Stepping runs through the hits of all memory tabs in memory order,
+  // starting at the selected slot of the open one. Indices count from the
+  // start of the memory, so one sorted list covers all three.
+  const hits = SECTIONS.flatMap((section) => [...matches[section]])
+  const openSection = SECTIONS.find((section) => section === shown)
+  const from = openSection
+    ? (selected[openSection] ?? sections[openSection][0]?.index ?? null)
+    : null
+  const position = from === null ? -1 : hits.indexOf(from)
+  const step = (direction: 1 | -1) => {
+    const next = stepHit(hits, from, direction)
+    if (next === null) return
+    const section = SECTIONS.find((part) => sections[part].some((slot) => slot.index === next))!
+    setTab(section)
+    setSelected((previous) => ({ ...previous, [section]: next }))
+    setJump((count) => count + 1)
+  }
+
   // The note speaks of the contract's variables, which only the data tab holds.
   const memory = (section: Section, note: boolean) => (
     <Pane open={shown === section}>
@@ -220,6 +238,8 @@ function ContractBody({ contractId, height }: { contractId: string; height: numb
           onSelect={setTab}
           query={query}
           onQuery={changeQuery}
+          hitCount={{ position: position === -1 ? null : position + 1, total: hits.length }}
+          onStep={step}
         />
         {memory('data', true)}
         {sections.callStack.length > 0 && memory('callStack', false)}

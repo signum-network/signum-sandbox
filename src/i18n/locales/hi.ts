@@ -502,6 +502,7 @@ export default {
       activity: 'गतिविधि',
     },
     search: 'मान, पता, टेक्स्ट या लेबल',
+    hit: { previous: 'पिछला मिलान', next: 'अगला मिलान' },
     page: 'पेज',
     title: 'कॉन्ट्रैक्ट',
     back: 'कंसोल पर वापस',

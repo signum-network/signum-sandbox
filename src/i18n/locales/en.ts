@@ -524,6 +524,7 @@ export default {
       activity: 'Activity',
     },
     search: 'Value, address, text or label',
+    hit: { previous: 'Previous hit', next: 'Next hit' },
     page: 'Page',
     title: 'Contract',
     back: 'Back to the console',
