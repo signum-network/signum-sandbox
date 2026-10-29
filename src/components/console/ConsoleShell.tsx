@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useNavigate } from '@tanstack/react-router'
+import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { useNodeState } from '@/hooks/useNodeState'
 import { useAccounts } from '@/hooks/useAccounts'
@@ -13,7 +14,8 @@ import { Unreachable } from '@/components/startpage'
 import { AppHeader } from '@/components/AppHeader'
 import { ConsoleButton, RowButton } from './ConsoleButton'
 import { interpret, resolveQuery } from '@/lib/search'
-import { displayName } from '@/lib/contacts'
+import { displayNameOfId } from '@/lib/contacts'
+import { ledger } from '@/lib/ledger'
 import { cn } from '@/lib/utils'
 import { useNameLookup } from '@/hooks/useNameLookup'
 import { useBlockLookup, useTransactionLookup } from '@/hooks/useTransactionLookup'
@@ -120,6 +122,15 @@ export function ConsoleShell({ watch }: { watch?: string } = {}) {
   }
   const tour = useTour(observation)
 
+  // The watched account under the watch view's own key, so the tab can carry
+  // its on-chain name without a request of its own.
+  const watchedAccount = useQuery({
+    queryKey: ['account', watched.watchedId],
+    queryFn: () => ledger.account.getAccount({ accountId: watched.watchedId! }),
+    enabled: watched.watchedId !== null,
+    retry: false,
+  })
+
   // A link asked for an account to be watched. Applied after useWatched has
   // read the stored one, so the link wins, and then taken out of the URL:
   // left in, a reload after "stop watching" would start watching again.
@@ -204,7 +215,13 @@ export function ConsoleShell({ watch }: { watch?: string } = {}) {
                   }}
                 >
                   {name === 'watch'
-                    ? displayName(watched.watchedId ?? '', accounts.accounts, contacts.contacts)
+                    ? displayNameOfId(
+                        watched.watchedId ?? '',
+                        accounts.addressPrefix,
+                        accounts.accounts,
+                        contacts.contacts,
+                        watchedAccount.data?.name,
+                      )
                     : t(`console.tab.${name}`)}
                 </ConsoleButton>
               </span>
@@ -283,6 +300,7 @@ export function ConsoleShell({ watch }: { watch?: string } = {}) {
                       <div className="themed-scroll console-scroll min-h-0 flex-1 overflow-y-auto pr-2">
                         <WatchView
                         accountId={watched.watchedId}
+                        addressPrefix={accounts.addressPrefix}
                         accounts={accounts.accounts}
                         contacts={contacts.contacts}
                         onUnwatch={() => {

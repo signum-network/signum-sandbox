@@ -5,7 +5,8 @@ import type { ReactNode } from 'react'
 import { ledger, nodeHost } from '@/lib/ledger'
 import { isUnknownAccount } from '@/lib/accountStatus'
 import { src44Fields } from '@/lib/payload'
-import { displayName, type Contacts } from '@/lib/contacts'
+import { displayNameOfId, type Contacts } from '@/lib/contacts'
+import { toAddress } from '@/lib/recipient'
 import type { SandboxAccount } from '@/lib/accounts'
 import { Identicon } from '@/components/Identicon'
 import { ConsoleButton } from '../ConsoleButton'
@@ -52,12 +53,14 @@ function ChangingRow({
  */
 export function WatchView({
   accountId,
+  addressPrefix,
   accounts,
   contacts,
   onUnwatch,
   onSelectTransaction,
 }: {
   accountId: string
+  addressPrefix: string
   accounts: SandboxAccount[]
   contacts: Contacts
   onUnwatch: () => void
@@ -96,11 +99,11 @@ export function WatchView({
   })
 
   const chain = details.data
-  const address = chain?.accountRS ?? accountId
+  const address = chain?.accountRS ?? toAddress(accountId, addressPrefix)
   const description = chain?.description ? src44Fields(chain.description) : null
   const notOnChain = details.isError && isUnknownAccount(details.error)
 
-  const name = displayName(accountId, accounts, contacts, chain?.name)
+  const name = displayNameOfId(accountId, addressPrefix, accounts, contacts, chain?.name)
   const nameFlash = useValueFlash(name)
   const balance = chain ? `${Amount.fromPlanck(chain.balanceNQT).getSigna()} SIGNA` : null
   const balanceFlash = useValueFlash(balance)
