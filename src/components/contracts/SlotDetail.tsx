@@ -5,6 +5,7 @@ import type { SlotMeta } from '@/lib/contractLabels'
 import { Identicon } from '@/components/Identicon'
 import { ConsoleButton } from '@/components/console/ConsoleButton'
 import { InspectLink } from './InspectLink'
+import { WatchLink } from './WatchLink'
 
 const TYPES: SlotType[] = ['unsigned', 'signed', 'string', 'bool', 'address']
 
@@ -72,7 +73,12 @@ export function SlotDetail({
               <Identicon value={readings.address} size={14} />
               {readings.address}
               {account && <span className="font-sans text-[var(--muted)]">· {account.name}</span>}
-              {account?.contract && <InspectLink contractId={account.id} />}
+              {account &&
+                (account.contract ? (
+                  <InspectLink contractId={account.id} />
+                ) : (
+                  <WatchLink address={readings.address} />
+                ))}
             </span>
           )}
         </Reading>

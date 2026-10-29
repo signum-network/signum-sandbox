@@ -18,7 +18,7 @@ Commit: `feat: /console?watch=<address> opens the console watching that account`
 
 ### Task A3: `WatchLink` in the inspector
 
-Create `src/components/contracts/WatchLink.tsx` and use it in `SlotDetail`, `ContractMaps` and `ContractHeader`. Add `inspector.watch` in all ten languages.
+Create `src/components/contracts/WatchLink.tsx` and use it in `SlotDetail`, `ContractMaps` and `ContractHeader`. Its label reuses `console.watch.watch`, which every language already has.
 
 Commit: `feat: every account the inspector knows links to watching it in the console`
 

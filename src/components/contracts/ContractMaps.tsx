@@ -9,6 +9,7 @@ import { ConsoleButton, RowButton } from '@/components/console/ConsoleButton'
 import { Term } from '@/components/console/Term'
 import { useValueFlash } from '@/motion'
 import { InspectLink } from './InspectLink'
+import { WatchLink } from './WatchLink'
 
 /** How many key1 values the form offers again. Kept in state only. */
 const RECENT_KEYS = 5
@@ -36,7 +37,11 @@ function KnownValue({
         <>
           <Identicon value={toAddress(account.id, addressPrefix)} size={14} />
           {account.name}
-          {account.contract && <InspectLink contractId={account.id} />}
+          {account.contract ? (
+            <InspectLink contractId={account.id} />
+          ) : (
+            <WatchLink address={toAddress(account.id, addressPrefix)} />
+          )}
         </>
       )}
     </span>

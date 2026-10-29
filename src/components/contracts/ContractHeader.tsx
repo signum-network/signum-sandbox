@@ -10,6 +10,7 @@ import { CopyLink } from '@/components/console/DidLink'
 import { Row, Holding } from '@/components/console/views/AccountFields'
 import { Term } from '@/components/console/Term'
 import { useValueFlash } from '@/motion'
+import { WatchLink } from './WatchLink'
 
 /**
  * Amber for a run cut off for lack of SIGNA, magenta once nothing will make
@@ -73,7 +74,8 @@ export function ContractHeader({
           )}
           <Row label={t('inspector.field.creator')}>
             {displayName(contract.creatorRS, accounts, contacts)}{' '}
-            <span className="text-[var(--muted)]">{contract.creatorRS}</span>
+            <span className="text-[var(--muted)]">{contract.creatorRS}</span>{' '}
+            <WatchLink address={contract.creatorRS} />
           </Row>
           <Row label={t('inspector.field.created')}>{contract.creationBlock}</Row>
           <Row label={t('inspector.field.version')}>{contract.atVersion}</Row>
