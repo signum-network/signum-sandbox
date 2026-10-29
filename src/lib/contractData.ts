@@ -2,7 +2,7 @@ import type { Contract } from '@signumjs/contracts'
 import type { Contacts } from './contacts'
 import type { SandboxAccount } from './accounts'
 import type { TxKind } from './txSummary'
-import { toComparableId } from './recipient'
+import { toAddress, toComparableId } from './recipient'
 
 /**
  * One 8-byte variable of a contract, read every way a person might need it.
@@ -34,7 +34,7 @@ function bytesOf(raw: string): number[] {
   return bytes
 }
 
-function textOf(bytes: number[]): string | null {
+function textOf(bytes: number[], minChars: number): string | null {
   let end = bytes.length
   while (end > 0 && bytes[end - 1] === 0) end--
   if (end === 0) return null
@@ -43,9 +43,7 @@ function textOf(bytes: number[]): string | null {
     // A number that happens to decode is not text: a slot holding 1 would
     // otherwise show an invisible \u0001.
     if (/[\u0000-\u001f\u007f-\u009f]/.test(text)) return null
-    // One character is a small number far more often than a word: 85 would
-    // otherwise read "U" in every counter that passes it.
-    return [...text].length < 2 ? null : text
+    return [...text].length < minChars ? null : text
   } catch {
     return null
   }
@@ -78,7 +76,9 @@ export function toDataSlots(machineData: string): DataSlot[] {
       hex,
       decimal: unsigned.toString(),
       signed: unsigned >= TWO_63 ? (unsigned - TWO_64).toString() : null,
-      text: textOf(bytes),
+      // One character is a small number far more often than a word: 85 would
+      // otherwise read "U" in every counter that passes it.
+      text: textOf(bytes, 2),
     })
   }
   return slots
@@ -113,6 +113,113 @@ export function stackLayout(creationBytes: string): StackLayout | null {
     callStackSlots: short(4) * PAGE_SLOTS,
     userStackSlots: short(5) * PAGE_SLOTS,
   }
+}
+
+/** What a slot can be shown as, chosen by hand for each slot. */
+export type SlotType = 'unsigned' | 'signed' | 'string' | 'bool' | 'address'
+
+export interface SlotReadings {
+  unsigned: string
+  /** Always given, even when it equals the unsigned reading. */
+  signed: string
+  /** Printable UTF-8 of any length, a single character included. */
+  string: string | null
+  bool: boolean
+  /** Null for 0, which is no account. */
+  address: string | null
+  hex: string
+  stored: string
+}
+
+/**
+ * Every way to read one slot. Nothing here decides which is meant: only the
+ * contract's code knows that, so the person picks one (SlotType) instead.
+ */
+export function slotReadings(slot: DataSlot, addressPrefix: string): SlotReadings {
+  const zero = slot.decimal === '0'
+  return {
+    unsigned: slot.decimal,
+    signed: slot.signed ?? slot.decimal,
+    string: textOf(bytesOf(slot.raw), 1),
+    bool: !zero,
+    address: zero ? null : toAddress(slot.decimal, addressPrefix),
+    hex: slot.hex,
+    stored: slot.raw,
+  }
+}
+
+/**
+ * The value the slot list shows: the reading of the type set for the slot,
+ * or hex when none is set. A set type with no reading shows a dash rather
+ * than falling back to something the person did not ask for.
+ */
+export function slotValue(
+  slot: DataSlot,
+  type: SlotType | undefined,
+  addressPrefix: string,
+): string {
+  if (type === undefined) return slot.hex
+  const readings = slotReadings(slot, addressPrefix)
+  switch (type) {
+    case 'unsigned':
+      return readings.unsigned
+    case 'signed':
+      return readings.signed
+    case 'string':
+      return readings.string === null ? '—' : `"${readings.string}"`
+    case 'bool':
+      return String(readings.bool)
+    case 'address':
+      return readings.address ?? '—'
+  }
+}
+
+/**
+ * A map value, as the node answers it in decimal and possibly negative, as
+ * the slot that would hold it. Map entries then share the slots' readings
+ * and search instead of a second set of rules.
+ */
+export function slotOfValue(decimal: string): DataSlot {
+  let value = BigInt(decimal)
+  if (value < 0n) value += TWO_64
+  const hex = value.toString(16).padStart(SLOT_HEX, '0')
+  const stored = hex.match(/../g)!.reverse().join('')
+  return toDataSlots(stored)[0]
+}
+
+/**
+ * Whether a slot holds what a search asks for, in any of its readings, its
+ * address, the name of an account it holds, or its label. Case is ignored,
+ * and so is a leading 0x for the hex readings. An empty query matches
+ * nothing, so an empty search field marks nothing.
+ */
+export function slotMatches(
+  slot: DataSlot,
+  query: string,
+  context: { addressPrefix: string; known: Map<string, KnownId>; label?: string },
+): boolean {
+  const needle = query.trim().toLowerCase()
+  if (needle === '') return false
+  const hexNeedle = needle.replace(/^0x/, '')
+  if (hexNeedle !== '' && (slot.hex.includes(hexNeedle) || slot.raw.includes(hexNeedle))) {
+    return true
+  }
+  const readings = [
+    slot.decimal,
+    slot.signed,
+    slot.text,
+    slot.decimal === '0' ? null : toAddress(slot.decimal, context.addressPrefix),
+    context.known.get(slot.decimal)?.name,
+    context.label,
+  ]
+  return readings.some((reading) => reading?.toLowerCase().includes(needle))
+}
+
+/** Slots in the AT's own pages, each keeping its index. */
+export function toPages(slots: DataSlot[]): DataSlot[][] {
+  const pages: DataSlot[][] = []
+  for (let i = 0; i < slots.length; i += PAGE_SLOTS) pages.push(slots.slice(i, i + PAGE_SLOTS))
+  return pages
 }
 
 /**

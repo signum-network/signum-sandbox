@@ -4,7 +4,12 @@ import {
   contractPartyId,
   contractStatus,
   knownIds,
+  slotMatches,
+  slotOfValue,
+  slotReadings,
+  slotValue,
   stackLayout,
+  toPages,
   wakeThreshold,
   toDataSlots,
 } from './contractData'
@@ -178,5 +183,124 @@ describe('contractPartyId', () => {
 
   it('does not link anyone else', () => {
     expect(contractPartyId(toAddress('4444', 'TS'), 'recipient', 'payment', contacts)).toBeNull()
+  })
+})
+
+describe('slotReadings', () => {
+  const read = (machineData: string) => slotReadings(toDataSlots(machineData)[0], 'TS')
+
+  it('reads a short string in stored order', () => {
+    expect(read('6869000000000000').string).toBe('hi')
+  })
+
+  it('reads a single printable character, which the list would not call text', () => {
+    expect(read('5500000000000000').string).toBe('U')
+    expect(toDataSlots('5500000000000000')[0].text).toBeNull()
+  })
+
+  it('gives signed and unsigned even when they agree, and differ for -1', () => {
+    expect(read('0100000000000000')).toMatchObject({ unsigned: '1', signed: '1' })
+    expect(read('ffffffffffffffff')).toMatchObject({
+      unsigned: '18446744073709551615',
+      signed: '-1',
+    })
+  })
+
+  it('reads 0 as false and as no address', () => {
+    expect(read('0000000000000000')).toMatchObject({ bool: false, address: null, string: null })
+  })
+
+  it('reads anything else as true and as an address', () => {
+    const readings = read('5100ff4d27486770')
+    expect(readings.bool).toBe(true)
+    expect(readings.address).toBe(toAddress('8099521788498608209', 'TS'))
+    expect(readings).toMatchObject({ hex: '706748274dff0051', stored: '5100ff4d27486770' })
+  })
+})
+
+describe('slotValue', () => {
+  const slot = toDataSlots('6869000000000000')[0]
+
+  it('is hex when no type is set, because the list never guesses', () => {
+    expect(slotValue(slot, undefined, 'TS')).toBe('0000000000006968')
+  })
+
+  it('is the reading of the set type', () => {
+    expect(slotValue(slot, 'unsigned', 'TS')).toBe('26984')
+    expect(slotValue(slot, 'signed', 'TS')).toBe('26984')
+    expect(slotValue(slot, 'string', 'TS')).toBe('"hi"')
+    expect(slotValue(slot, 'bool', 'TS')).toBe('true')
+    expect(slotValue(slot, 'address', 'TS')).toBe(toAddress('26984', 'TS'))
+  })
+
+  it('says so when the set type has no reading, rather than falling back', () => {
+    const zero = toDataSlots('0000000000000000')[0]
+    expect(slotValue(zero, 'address', 'TS')).toBe('—')
+    expect(slotValue(toDataSlots('0100000000000000')[0], 'string', 'TS')).toBe('—')
+  })
+})
+
+describe('slotOfValue', () => {
+  it('turns a map value into the slot that would hold it', () => {
+    expect(slotOfValue('26984')).toMatchObject({ raw: '6869000000000000', text: 'hi' })
+  })
+
+  it('stores a negative value as its two complement', () => {
+    expect(slotOfValue('-1')).toMatchObject({ raw: 'ffffffffffffffff', signed: '-1' })
+  })
+})
+
+describe('slotMatches', () => {
+  const known = new Map([['8099521788498608209', { id: '8099521788498608209', name: 'Tester', contract: false }]])
+  const context = { addressPrefix: 'TS', known }
+  const greeting = toDataSlots('6869000000000000')[0]
+  const owner = toDataSlots('5100ff4d27486770')[0]
+  const minusOne = toDataSlots('ffffffffffffffff')[0]
+
+  it('matches nothing for an empty query', () => {
+    expect(slotMatches(greeting, '', context)).toBe(false)
+    expect(slotMatches(greeting, '   ', context)).toBe(false)
+  })
+
+  it('finds a value by its decimal, signed or not', () => {
+    expect(slotMatches(greeting, '2698', context)).toBe(true)
+    expect(slotMatches(minusOne, '-1', context)).toBe(true)
+  })
+
+  it('finds a value by its hex, with or without 0x, ignoring case', () => {
+    expect(slotMatches(owner, '0x7067', context)).toBe(true)
+    expect(slotMatches(owner, '4DFF', context)).toBe(true)
+    expect(slotMatches(owner, '5100ff', context)).toBe(true)
+  })
+
+  it('finds a string, ignoring case', () => {
+    expect(slotMatches(greeting, 'HI', context)).toBe(true)
+  })
+
+  it('finds an id by its address or by the name it is known under', () => {
+    const address = toAddress('8099521788498608209', 'TS')
+    expect(slotMatches(owner, address.toLowerCase(), context)).toBe(true)
+    expect(slotMatches(owner, 'test', context)).toBe(true)
+  })
+
+  it('finds a slot by its label', () => {
+    expect(slotMatches(greeting, 'greet', { ...context, label: 'greeting' })).toBe(true)
+  })
+
+  it('does not match what is not there', () => {
+    expect(slotMatches(greeting, 'zz', context)).toBe(false)
+  })
+})
+
+describe('toPages', () => {
+  it('splits into the AT pages of 32 slots, keeping each index', () => {
+    const pages = toPages(toDataSlots('00'.repeat(8 * 320)))
+    expect(pages).toHaveLength(10)
+    expect(pages[2][0].index).toBe(64)
+  })
+
+  it('keeps a partial last page', () => {
+    const pages = toPages(toDataSlots('00'.repeat(8 * 40)))
+    expect(pages.map((page) => page.length)).toEqual([32, 8])
   })
 })
