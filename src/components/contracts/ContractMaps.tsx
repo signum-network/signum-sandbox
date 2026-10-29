@@ -1,8 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { ledger } from '@/lib/ledger'
-import type { KnownId } from '@/lib/contractData'
+import { slotMatches, slotOfValue, type KnownId } from '@/lib/contractData'
 import { toAccountId, toAddress } from '@/lib/recipient'
 import { Identicon } from '@/components/Identicon'
 import { ConsoleButton, RowButton } from '@/components/console/ConsoleButton'
@@ -48,14 +48,20 @@ function MapRow({
   entry,
   known,
   addressPrefix,
+  hit,
 }: {
   entry: { key2: string; value: string }
   known: Map<string, KnownId>
   addressPrefix: string
+  hit: boolean
 }) {
   const flash = useValueFlash<HTMLTableRowElement>(entry.value)
   return (
-    <tr ref={flash} className="border-b" style={border}>
+    <tr
+      ref={flash}
+      className="border-b"
+      style={{ ...border, boxShadow: hit ? 'inset 2px 0 0 var(--blue3)' : undefined }}
+    >
       <td className="px-2 py-[2px]">
         <KnownValue value={entry.key2} known={known} addressPrefix={addressPrefix} />
       </td>
@@ -76,10 +82,16 @@ export function ContractMaps({
   contractId,
   known,
   addressPrefix,
+  query,
+  onHits,
 }: {
   contractId: string
   known: Map<string, KnownId>
   addressPrefix: string
+  /** The page's search; entries it finds by key2 or value are marked. */
+  query: string
+  /** How many of the loaded entries the search finds, for the tab's count. */
+  onHits: (hits: number) => void
 }) {
   const { t } = useTranslation()
   const [key1, setKey1] = useState('')
@@ -123,6 +135,27 @@ export function ContractMaps({
     enabled: submitted !== null,
     retry: false,
   })
+
+  // Only what the node has answered can be searched: maps cannot be listed
+  // without a key1. Entries go through the slots' own search, as slots.
+  const hits = useMemo(() => {
+    const found = new Set<string>()
+    for (const entry of result.data ?? []) {
+      const matches = (value: string) => {
+        try {
+          return slotMatches(slotOfValue(value), query, { addressPrefix, known })
+        } catch {
+          return false
+        }
+      }
+      if (matches(entry.key2) || matches(entry.value)) found.add(entry.key2)
+    }
+    return found
+  }, [result.data, query, addressPrefix, known])
+
+  useEffect(() => {
+    onHits(submitted ? hits.size : 0)
+  }, [hits, submitted, onHits])
 
   return (
     <div className="mt-4">
@@ -198,6 +231,7 @@ export function ContractMaps({
                 {result.data.map((entry) => (
                   <MapRow
                     key={entry.key2}
+                    hit={hits.has(entry.key2)}
                     entry={entry}
                     known={known}
                     addressPrefix={addressPrefix}

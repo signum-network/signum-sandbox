@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { slotValue, toPages, type DataSlot, type KnownId } from '@/lib/contractData'
 import type { SlotMeta } from '@/lib/contractLabels'
@@ -52,6 +52,7 @@ function SlotRow({
   return (
     <li
       ref={flash}
+      data-index={slot.index}
       style={{
         background: selected ? 'rgba(0,102,255,.18)' : undefined,
         boxShadow: marked
@@ -106,6 +107,7 @@ export function MemoryView({
   addressPrefix,
   changed,
   matches,
+  query,
   codeHash,
 }: {
   slots: DataSlot[]
@@ -115,12 +117,37 @@ export function MemoryView({
   addressPrefix: string
   changed: Changed
   matches: Set<number>
+  query: string
   codeHash: string
 }) {
   const { t } = useTranslation()
   const pages = toPages(slots)
   const [page, setPage] = useState(0)
   const [selected, setSelected] = useState<number | null>(null)
+
+  // A new query opens the first hit. Only a new query: the hits are counted
+  // again on every block, and a refresh must not pull the list away from
+  // where someone is reading.
+  const list = useRef<HTMLUListElement>(null)
+  // Counts jumps rather than flagging one: a jump to the slot that is already
+  // selected changes no page and no selection, and must still scroll.
+  const [jumps, setJumps] = useState(0)
+  useEffect(() => {
+    const first = slots.find((slot) => matches.has(slot.index))
+    if (!first) return
+    setPage(pages.findIndex((slotsOfPage) => slotsOfPage.includes(first)))
+    setSelected(first.index)
+    setJumps((count) => count + 1)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query])
+  // Once the page with the hit is drawn, scroll the hit into the list's view.
+  useEffect(() => {
+    if (jumps === 0) return
+    list.current
+      ?.querySelector(`[data-index="${selected}"]`)
+      ?.scrollIntoView({ block: 'nearest' })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [jumps])
 
   const current = pages[Math.min(page, pages.length - 1)] ?? []
   const selectedSlot = slots.find((slot) => slot.index === selected) ?? current[0]
@@ -155,7 +182,10 @@ export function MemoryView({
             })}
           </div>
         )}
-        <ul className="themed-scroll console-scroll max-h-[50vh] min-h-0 flex-1 overflow-y-auto pr-2 md:max-h-none">
+        <ul
+          ref={list}
+          className="themed-scroll console-scroll max-h-[50vh] min-h-0 flex-1 overflow-y-auto pr-2 md:max-h-none"
+        >
           {current.map((slot) => (
             <SlotRow
               key={slot.index}

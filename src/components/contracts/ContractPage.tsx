@@ -17,7 +17,7 @@ import { ContractHeader } from './ContractHeader'
 import { MemoryView } from './MemoryView'
 import { ContractMaps } from './ContractMaps'
 import { ContractTabs, type ContractTab, type TabState } from './ContractTabs'
-import { knownIds, type DataSlot, type KnownId } from '@/lib/contractData'
+import { knownIds, slotMatches, type DataSlot, type KnownId } from '@/lib/contractData'
 import { displayName } from '@/lib/contacts'
 import { toAccountId } from '@/lib/recipient'
 import { cn } from '@/lib/utils'
@@ -31,7 +31,14 @@ function parseContractId(param: string): string | null {
   }
 }
 
-const NO_MATCHES = new Set<number>()
+/**
+ * One tab's content. Every tab stays mounted and only the open one shows, so
+ * a map lookup, a page or a selection survives a look at another tab, and a
+ * tab that is not open can still count its search hits.
+ */
+function Pane({ open, children }: { open: boolean; children: ReactNode }) {
+  return <div className={cn('min-h-0 flex-1 flex-col', open ? 'flex' : 'hidden')}>{children}</div>
+}
 
 /** A tab's content, scrolling inside the panel rather than growing the page. */
 function Scroll({ children }: { children: ReactNode }) {
@@ -86,6 +93,24 @@ function ContractBody({ contractId, height }: { contractId: string; height: numb
     } satisfies Record<'data' | 'callStack' | 'userStack', DataSlot[]>
   }, [inspector.slots, inspector.layout])
 
+  // Which slots of each section the search finds, labels included.
+  const matches = useMemo(() => {
+    const find = (slots: DataSlot[]) =>
+      new Set(
+        slots
+          .filter((slot) =>
+            slotMatches(slot, query, { addressPrefix, known, label: meta[slot.index]?.label }),
+          )
+          .map((slot) => slot.index),
+      )
+    return {
+      data: find(sections.data),
+      callStack: find(sections.callStack),
+      userStack: find(sections.userStack),
+    }
+  }, [sections, query, addressPrefix, known, meta])
+  const [mapHits, setMapHits] = useState(0)
+
   if (inspector.notFound) {
     return <p className="text-[13px] text-[var(--muted)]">{t('inspector.notFound')}</p>
   }
@@ -97,33 +122,46 @@ function ContractBody({ contractId, height }: { contractId: string; height: numb
   const changedIn = (slots: DataSlot[]) =>
     slots.some((slot) => inspector.changed?.indices.has(slot.index))
   const tabs: TabState[] = [
-    { id: 'data', changed: changedIn(sections.data) },
+    { id: 'data', changed: changedIn(sections.data), hits: matches.data.size },
     ...(sections.callStack.length > 0
-      ? [{ id: 'callStack' as const, changed: changedIn(sections.callStack) }]
+      ? [
+          {
+            id: 'callStack' as const,
+            changed: changedIn(sections.callStack),
+            hits: matches.callStack.size,
+          },
+        ]
       : []),
     ...(sections.userStack.length > 0
-      ? [{ id: 'userStack' as const, changed: changedIn(sections.userStack) }]
+      ? [
+          {
+            id: 'userStack' as const,
+            changed: changedIn(sections.userStack),
+            hits: matches.userStack.size,
+          },
+        ]
       : []),
-    { id: 'maps' },
+    { id: 'maps', hits: mapHits },
     { id: 'activity' },
   ]
   const shown = tabs.some((entry) => entry.id === tab) ? tab : 'data'
 
   // The note speaks of the contract's variables, which only the data tab holds.
-  const memory = (slots: DataSlot[], note: boolean) => (
-    <div className="flex min-h-0 flex-1 flex-col">
+  const memory = (section: 'data' | 'callStack' | 'userStack', note: boolean) => (
+    <Pane open={shown === section}>
       {note && <ViewNote id="contractData" terms={['dataStack']} />}
       <MemoryView
-        slots={slots}
+        slots={sections[section]}
         meta={meta}
         onMeta={setMeta}
         known={known}
         addressPrefix={addressPrefix}
         changed={inspector.changed}
-        matches={NO_MATCHES}
+        matches={matches[section]}
+        query={query}
         codeHash={contract.machineCodeHashId}
       />
-    </div>
+    </Pane>
   )
 
   return (
@@ -148,16 +186,22 @@ function ContractBody({ contractId, height }: { contractId: string; height: numb
           query={query}
           onQuery={setQuery}
         />
-        {shown === 'data' && memory(sections.data, true)}
-        {shown === 'callStack' && memory(sections.callStack, false)}
-        {shown === 'userStack' && memory(sections.userStack, false)}
-        {shown === 'maps' && (
+        {memory('data', true)}
+        {sections.callStack.length > 0 && memory('callStack', false)}
+        {sections.userStack.length > 0 && memory('userStack', false)}
+        <Pane open={shown === 'maps'}>
           <Scroll>
             <ViewNote id="contractMaps" terms={['contractMap']} />
-            <ContractMaps contractId={contractId} known={known} addressPrefix={addressPrefix} />
+            <ContractMaps
+              contractId={contractId}
+              known={known}
+              addressPrefix={addressPrefix}
+              query={query}
+              onHits={setMapHits}
+            />
           </Scroll>
-        )}
-        {shown === 'activity' && (
+        </Pane>
+        <Pane open={shown === 'activity'}>
           <Scroll>
             <div className="flex flex-wrap gap-6">
               <Direction
@@ -176,7 +220,7 @@ function ContractBody({ contractId, height }: { contractId: string; height: numb
               />
             </div>
           </Scroll>
-        )}
+        </Pane>
       </div>
     </div>
   )
