@@ -519,7 +519,7 @@ export default {
       decimal: 'Dezimal',
       signed: 'Mit Vorzeichen',
       text: 'Text',
-      account: 'Account',
+      account: 'Konto',
       changed: 'geändert in Block {{height}}',
       labelPlaceholder: 'Name',
       empty: 'Dieser Contract hält keine Daten.',
