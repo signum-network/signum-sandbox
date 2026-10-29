@@ -28,7 +28,7 @@ export function SearchField({
       style={{ borderColor: 'var(--border2)', ...(fill ? {} : { minWidth: 240 }) }}
     >
       <input
-        className="flex-1 bg-transparent text-[13px] text-[var(--fg)] outline-none"
+        className="flex-1 bg-transparent text-[13px] text-[var(--text)] outline-none"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder ?? t('console.search.placeholder')}

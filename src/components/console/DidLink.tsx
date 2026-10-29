@@ -49,7 +49,7 @@ export function DidLink({ resolution }: { resolution: DidResolution }) {
   return (
     <span className="flex min-w-0 flex-col gap-1">
       <span className="flex flex-wrap items-center gap-2">
-        <code className="break-all text-[var(--fg)]">{did}</code>
+        <code className="break-all text-[var(--text)]">{did}</code>
         <CopyLink value={did} />
         <RowButton
           className="shrink-0 text-[12px] text-[var(--blue3)] underline"

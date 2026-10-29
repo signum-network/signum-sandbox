@@ -42,7 +42,7 @@ export function AccountsView({
     )
   }
 
-  const field = 'border bg-transparent px-2 py-1 text-[13px] text-[var(--fg)]'
+  const field = 'border bg-transparent px-2 py-1 text-[13px] text-[var(--text)]'
   const border = { borderColor: 'var(--border2)' }
 
   const shown = store.accounts.filter((account) =>

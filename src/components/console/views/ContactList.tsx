@@ -31,7 +31,7 @@ export function ContactList({
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<ResolveContactError | null>(null)
 
-  const field = 'border bg-transparent px-2 py-1 text-[13px] text-[var(--fg)]'
+  const field = 'border bg-transparent px-2 py-1 text-[13px] text-[var(--text)]'
   const border = { borderColor: 'var(--border2)' }
 
   const entries = Object.entries(contacts)
@@ -101,7 +101,7 @@ export function ContactList({
             style={{ borderColor: 'var(--border2)' }}
           >
             <Identicon value={c.address} />
-            <span className="font-bold text-[var(--fg)]">{c.name}</span>
+            <span className="font-bold text-[var(--text)]">{c.name}</span>
             {c.isContract && (
               <span
                 className="border px-1 text-[10px] uppercase tracking-[1px]"

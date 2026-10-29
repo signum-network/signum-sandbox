@@ -84,7 +84,7 @@ export function ChainDrawer({ height }: { height: number | null }) {
         </p>
         <p className="mt-1 text-[12px] text-[var(--muted)]">{t('console.chain.freshNote')}</p>
         <code
-          className="mt-1 block border p-2 text-[12px] text-[var(--fg)]"
+          className="mt-1 block border p-2 text-[12px] text-[var(--text)]"
           style={{ borderColor: 'var(--border2)' }}
         >
           {resetCommand(navigator.userAgent)}

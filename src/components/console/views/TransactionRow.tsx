@@ -47,7 +47,7 @@ function SaveContactField({
       <span className="min-w-[100px] text-[var(--muted)]">{label}</span>
       <span>{address}</span>
       <input
-        className="border bg-transparent px-2 py-[2px] text-[13px] text-[var(--fg)]"
+        className="border bg-transparent px-2 py-[2px] text-[13px] text-[var(--text)]"
         style={{ borderColor: 'var(--border2)' }}
         value={name}
         placeholder={t('console.accounts.localLabel')}
@@ -359,7 +359,7 @@ export function TransactionRow({
               */}
               <Detail label={t('console.tx.id')}>
                 <span className="flex flex-wrap items-center gap-2">
-                  <code className="break-all text-[var(--fg)]">{item.tx.transaction}</code>
+                  <code className="break-all text-[var(--text)]">{item.tx.transaction}</code>
                   <CopyLink value={item.tx.transaction ?? ''} />
                 </span>
               </Detail>

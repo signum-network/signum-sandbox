@@ -133,7 +133,7 @@ export function ScenarioPage() {
             ref={editor}
             className="themed-scroll console-scroll min-h-0 w-full flex-1 resize-none
               border bg-transparent p-3 font-mono text-[13px] leading-relaxed
-              text-[var(--fg)] outline-none"
+              text-[var(--text)] outline-none"
             style={{ borderColor: 'var(--border2)' }}
             spellCheck={false}
             value={scenario.source}
@@ -222,7 +222,7 @@ export function ScenarioPage() {
           <div className="mb-4">
             <input
               className="mb-1 w-full border bg-transparent px-2 py-1 text-[13px]
-                text-[var(--fg)] outline-none"
+                text-[var(--text)] outline-none"
               style={{ borderColor: 'var(--border2)' }}
               value={name}
               placeholder={t('console.scenario.nameIt')}
@@ -263,7 +263,7 @@ export function ScenarioPage() {
               {library.saved.map((entry) => (
                 <div key={entry.name} className="flex items-baseline justify-between gap-2">
                   <RowButton
-                    className="min-w-0 flex-1 truncate text-left text-[13px] text-[var(--fg)]
+                    className="min-w-0 flex-1 truncate text-left text-[13px] text-[var(--text)]
                       hover:text-[var(--blue3)]"
                     onClick={() => {
                       scenario.setSource(entry.source)
@@ -289,7 +289,7 @@ export function ScenarioPage() {
           {SCENARIOS.map(({ id, source }) => (
             <div key={id} className="mb-3">
               <div className="flex items-baseline justify-between gap-2">
-                <span className="text-[13px] text-[var(--fg)]">
+                <span className="text-[13px] text-[var(--text)]">
                   {t(`console.scenario.${id}.title`)}
                 </span>
                 <RowButton
