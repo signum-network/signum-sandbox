@@ -55,6 +55,15 @@ export function mergeFeed(
  */
 export const BLOCKS_PER_REQUEST = 100
 
+/** How many blocks a walk asks for first when it can splice onto the previous one. */
+export const PROBE_SIZE = 10
+
+/** One getBlocks call: the blocks of the range and, unless at genesis, where to continue. */
+export type FetchRange = (
+  firstIndex: number,
+  lastIndex: number,
+) => Promise<{ blocks: Block[]; nextIndex?: number }>
+
 export interface WalkTarget {
   /** Never fewer blocks than this, so the window at the tip is always there. */
   minBlocks: number
@@ -81,7 +90,7 @@ export interface WalkTarget {
  * walk starts over.
  */
 export async function walkBack(
-  fetchRange: (firstIndex: number, lastIndex: number) => Promise<Block[]>,
+  fetchRange: FetchRange,
   previous: Block[],
   target: WalkTarget,
 ): Promise<Block[]> {
@@ -90,18 +99,53 @@ export async function walkBack(
   let transactions = 0
   const enough = () => walked.length >= target.minBlocks && transactions >= target.minTransactions
 
-  for (let firstIndex = 0; !enough(); firstIndex += BLOCKS_PER_REQUEST) {
-    const chunk = await fetchRange(firstIndex, firstIndex + BLOCKS_PER_REQUEST - 1)
+  // With a previous walk, a new block is usually one or two blocks above it, so a
+  // small probe finds the splice point without asking for a hundred blocks.
+  let size = previous.length > 0 ? PROBE_SIZE : BLOCKS_PER_REQUEST
+  let firstIndex: number | undefined = 0
+  while (firstIndex !== undefined && !enough()) {
+    const { blocks: chunk, nextIndex } = await fetchRange(firstIndex, firstIndex + size - 1)
     for (const block of chunk) {
       const seen = known.get(block.block)
       if (seen !== undefined) return trim([...walked, ...previous.slice(seen)], target)
       walked.push(block)
       transactions += block.numberOfTransactions
     }
-    // A short page is the bottom of the chain.
-    if (chunk.length < BLOCKS_PER_REQUEST) break
+    firstIndex = next(chunk, nextIndex)
+    size = BLOCKS_PER_REQUEST
   }
   return trim(walked, target)
+}
+
+/**
+ * All blocks of the range `[firstIndex, lastIndex]`, newest first, or fewer at the
+ * bottom of the chain. A page the node cut short is completed from `nextIndex`, so a
+ * page of the Blocks tab does not skip the blocks after a heavy one.
+ */
+export async function fetchFullRange(
+  fetchRange: FetchRange,
+  firstIndex: number,
+  lastIndex: number,
+): Promise<Block[]> {
+  const blocks: Block[] = []
+  let from: number | undefined = firstIndex
+  while (from !== undefined && from <= lastIndex) {
+    const { blocks: chunk, nextIndex } = await fetchRange(from, lastIndex)
+    blocks.push(...chunk)
+    from = next(chunk, nextIndex)
+  }
+  return blocks
+}
+
+/**
+ * Where the next page starts. The node answers with `nextIndex` until the bottom of
+ * the chain, and since signum-node#1084 it may stop a page early once its blocks hold
+ * enough transactions, so a short page is not the bottom — a missing `nextIndex` is.
+ * An empty page ends the walk too, so a node that keeps answering with nothing can't
+ * keep it going.
+ */
+function next(chunk: Block[], nextIndex: number | undefined): number | undefined {
+  return chunk.length > 0 ? nextIndex : undefined
 }
 
 /**

@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 import type { Block } from '@signumjs/core'
 import {
   BLOCKS_PER_REQUEST,
+  PROBE_SIZE,
+  fetchFullRange,
   mergeFeed,
   walkBack,
   withLookups,
@@ -60,15 +62,36 @@ const chain = (length: number, withTx: number[] = [], prefix = 'b'): Block[] =>
     } as Block
   })
 
-/** A node over `blocks` that, like the real one, returns at most a hundred per call. */
-const node = (blocks: Block[]) => {
+/**
+ * A node over `blocks` that, like the real one, returns at most a hundred per call and
+ * a `nextIndex` until the bottom of the chain. With `maxTransactions` it also stops a
+ * page once its blocks hold that many transactions, as signum-node#1084 does, always
+ * returning at least one block.
+ */
+const node = (blocks: Block[], maxTransactions = Infinity) => {
   const calls: number[] = []
+  const ranges: Array<[number, number]> = []
   const fetchRange = async (first: number, last: number) => {
     calls.push(first)
-    return blocks.slice(first, Math.min(last, first + BLOCKS_PER_REQUEST - 1) + 1)
+    ranges.push([first, last])
+    const range = blocks.slice(first, Math.min(last, first + BLOCKS_PER_REQUEST - 1) + 1)
+    const page: Block[] = []
+    let transactions = 0
+    for (const block of range) {
+      if (page.length > 0 && transactions >= maxTransactions) break
+      page.push(block)
+      transactions += block.numberOfTransactions
+    }
+    const asked = Math.min(last - first + 1, BLOCKS_PER_REQUEST)
+    const nextIndex = page.length < range.length || range.length === asked ? first + page.length : undefined
+    return { blocks: page, nextIndex }
   }
-  return { fetchRange, calls }
+  return { fetchRange, calls, ranges }
 }
+
+/** A chain of `length` blocks, tip first, each holding `perBlock` transactions. */
+const busyChain = (length: number, perBlock: number): Block[] =>
+  chain(length).map((block) => ({ ...block, numberOfTransactions: perBlock }))
 
 const target = { minBlocks: 50, minTransactions: 2 }
 
@@ -113,11 +136,73 @@ describe('walkBack', () => {
     expect(walked).toEqual(fresh)
   })
 
+  it('asks only for a few blocks first when it can splice onto the last walk', async () => {
+    const first = await walkBack(node(chain(1068, [394, 200])).fetchRange, [], target)
+    const { fetchRange, ranges } = node(chain(1069, [394, 200]))
+    await walkBack(fetchRange, first, target)
+    expect(ranges).toEqual([[0, PROBE_SIZE - 1]])
+  })
+
+  it('walks on from the probe when more blocks than it covers are new', async () => {
+    const first = await walkBack(node(chain(1068, [394, 200])).fetchRange, [], target)
+    const { fetchRange, calls } = node(chain(1068 + 25, [394, 200]))
+    const walked = await walkBack(fetchRange, first, target)
+    expect(calls).toEqual([0, PROBE_SIZE])
+    expect(walked[0].height).toBe(1092)
+    expect(walked.at(-1)?.height).toBe(200)
+  })
+
+  it('follows nextIndex past a page the node cut short, instead of taking it for genesis', async () => {
+    const { fetchRange, calls } = node(busyChain(300, 40), 100)
+    const walked = await walkBack(fetchRange, [], { minBlocks: 10, minTransactions: 1 })
+    // three blocks of 40 reach the node's budget of 100, so each page holds three
+    expect(calls).toEqual([0, 3, 6, 9])
+    expect(walked).toHaveLength(10)
+  })
+
+  it('stops at genesis when the last page is cut short and nothing follows', async () => {
+    const { fetchRange } = node(busyChain(5, 40), 100)
+    const walked = await walkBack(fetchRange, [], { minBlocks: 50, minTransactions: 1 })
+    expect(walked.map((b) => b.height)).toEqual([4, 3, 2, 1, 0])
+  })
+
+  it('stops when the node answers with an empty page despite a nextIndex', async () => {
+    const fetchRange = async () => ({ blocks: [], nextIndex: 5 })
+    const walked = await walkBack(fetchRange, [], target)
+    expect(walked).toEqual([])
+  })
+
   it('follows a rewind, dropping the blocks above the new tip', async () => {
     const first = await walkBack(node(chain(1068, [394, 200])).fetchRange, [], target)
     const walked = await walkBack(node(chain(1000, [394, 200])).fetchRange, first, target)
     expect(walked[0].height).toBe(999)
     expect(walked.at(-1)?.height).toBe(200)
+  })
+})
+
+describe('fetchFullRange', () => {
+  it('returns the whole range in one request when the node does not cut it short', async () => {
+    const blocks = chain(200)
+    const { fetchRange, calls } = node(blocks)
+    expect(await fetchFullRange(fetchRange, 50, 99)).toEqual(blocks.slice(50, 100))
+    expect(calls).toEqual([50])
+  })
+
+  it('completes a page the node cut short from nextIndex', async () => {
+    const blocks = busyChain(200, 40)
+    const { fetchRange, calls } = node(blocks, 100)
+    expect(await fetchFullRange(fetchRange, 50, 59)).toEqual(blocks.slice(50, 60))
+    expect(calls).toEqual([50, 53, 56, 59])
+  })
+
+  it('returns fewer blocks at the bottom of the chain', async () => {
+    const blocks = chain(70)
+    expect(await fetchFullRange(node(blocks).fetchRange, 50, 99)).toEqual(blocks.slice(50))
+  })
+
+  it('stops on an empty page despite a nextIndex', async () => {
+    const fetchRange = async () => ({ blocks: [], nextIndex: 7 })
+    expect(await fetchFullRange(fetchRange, 0, 49)).toEqual([])
   })
 })
 
