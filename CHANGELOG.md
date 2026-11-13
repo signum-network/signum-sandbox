@@ -1,5 +1,11 @@
 # signum-sandbox
 
+## 0.3.1
+
+### Patch Changes
+
+- chain feed no longer floods a syncing node with getBlocks requests
+
 ## 0.3.0
 
 ### Minor Changes
