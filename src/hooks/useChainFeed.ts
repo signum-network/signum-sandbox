@@ -1,7 +1,7 @@
 import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { Block, Transaction } from '@signumjs/core'
 import { ledger } from '@/lib/ledger'
-import { isTransaction, mergeFeed, walkBack, type FeedItem } from '@/lib/chainFeed'
+import { fetchFullRange, isTransaction, mergeFeed, walkBack, type FeedItem, type FetchRange } from '@/lib/chainFeed'
 import { PAGE_SIZE, pageRange } from '@/lib/paginate'
 
 /**
@@ -12,6 +12,11 @@ import { PAGE_SIZE, pageRange } from '@/lib/paginate'
 const WALK_TARGET = { minBlocks: PAGE_SIZE, minTransactions: PAGE_SIZE }
 
 const BLOCKS_KEY = ['blocks']
+
+const fetchBlocks: FetchRange = async (firstIndex, lastIndex) => {
+  const { blocks, nextIndex } = await ledger.block.getBlocks(firstIndex, lastIndex, true)
+  return { blocks, nextIndex }
+}
 
 export function useBlocks(height: number | null, connected: boolean) {
   const queryClient = useQueryClient()
@@ -25,8 +30,7 @@ export function useBlocks(height: number | null, connected: boolean) {
     queryKey: BLOCKS_KEY,
     queryFn: () =>
       walkBack(
-        async (firstIndex, lastIndex) =>
-          (await ledger.block.getBlocks(firstIndex, lastIndex, true)).blocks,
+        fetchBlocks,
         // The last walk, so a new block costs one request rather than a walk
         // back through every empty block since the last transaction.
         queryClient.getQueryData<Block[]>(BLOCKS_KEY) ?? [],
@@ -85,7 +89,7 @@ export function useBlockPage(page: number, connected: boolean, enabled: boolean)
   return useQuery({
     queryKey: ['blockPage', firstIndex],
     queryFn: async () => {
-      const { blocks } = await ledger.block.getBlocks(firstIndex, lastIndex, true)
+      const blocks = await fetchFullRange(fetchBlocks, firstIndex, lastIndex)
       return { page, blocks }
     },
     enabled,
